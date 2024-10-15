@@ -1,42 +1,63 @@
-version: '3'
+version: "3.8"
+
 services:
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
-      - '3000:3000'
+      - "3000:3000"
+    volumes:
+      # Uncomment for development
+      - ./frontend:/app
     environment:
-      - REACT_APP_API_URL=http://localhost:5000/api
+      - NODE_ENV=${NODE_ENV:-development} # Default to development if not set
+
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
-      - '5000:5000'
-    depends_on:
-      - mongodb
-      - postgres
-      - redis
+      - "5000:5000"
+    volumes:
+      # Uncomment for development
+      - ./backend:/app
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/hospital
-      - POSTGRES_URI=postgres://admin:adminpass@postgres:5432/hospital
-      - REDIS_HOST=redis
-  mongodb:
-    image: mongo
-    ports:
-      - '27017:27017'
-  postgres:
-    image: postgres
-    environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=adminpass
-      - POSTGRES_DB=hospital
-    ports:
-      - '5432:5432'
-  redis:
-    image: redis
-    ports:
-      - '6379:6379'
-  ai-service:
-    build: ./ai-service
-    ports:
-      - "8000:8000"
-    depends_on:
-      - backend
+      - NODE_ENV=${NODE_ENV:-development} # Default to development if not set
+      # - DATABASE_URL=postgres://user:password@db:5432/mydatabase
+      # - MONGO_URL=mongodb://mongo:27017/mydb
+      # - REDIS_URL=redis://redis:6379
+  #   depends_on:
+  #     - db
+  #     - mongo
+  #     - redis
+
+  # db:
+  #   image: postgres:15
+  #   environment:
+  #     POSTGRES_USER: user
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_DB: mydatabase
+  #   volumes:
+  #     - ./database/postgresql:/var/lib/postgresql/data
+
+  # mongo:
+  #   image: mongo:6
+  #   volumes:
+  #     - ./database/mongodb:/data/db
+
+  # redis:
+  #   image: redis:alpine
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - ./database/redis:/data
+
+  # llm:
+  #   build:
+  #     context: ./ai-services
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     - MODEL_PATH=/app/models/model.bin

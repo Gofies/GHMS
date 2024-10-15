@@ -4,7 +4,7 @@
 
 This is a full-stack hospital management system built using:
 
-- **Frontend:** React
+- **Frontend:** React with Tailwind CSS
 - **Backend:** Node.js with Express
 - **Databases:** MongoDB, PostgreSQL, Redis (for caching)
 - **AI Model:** An LLM used for live chat functionality
@@ -43,16 +43,16 @@ Before you can run the project, make sure you have the following installed:
    cd GHMS
    ```
 
-2. Make sure you have `make` installed on your system. If not, you can install it by running on Linux. If you use Windows, please search for the installation instructions:
+2. Make sure you have `make` installed on your system. If you are using a linux based system you probably have it, but in case run the command below. If you use Windows, google how to install make on windows.
 
    ```bash
    sudo apt install make
    ```
 
-3. Install project dependencies by running the following command inside the project root:
+3. set up the project by running:
 
    ```bash
-   make install
+   make build
    ```
 
 4. To start the services, run:
@@ -73,61 +73,28 @@ Before you can run the project, make sure you have the following installed:
 
 The project uses a Makefile to simplify common tasks. Below are the available commands:
 
-### Service Management
+| Command                                                   | Description                                                                        |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `make build`                                              | Build all service images (MongoDB, PostgreSQL, Redis, frontend, backend)           |
+| `make up-all`                                             | run all services (MongoDB, PostgreSQL, Redis, frontend, backend) in detached mode. |
+| `make down-all`                                           | Stop and remove all services (containers, networks, volumes).                      |
+| `make up service=<frontend/backend/db/mongo/redis/llm>`   | Start a specific service (MongoDB, PostgreSQL, Redis, frontend, backend)           |
+| `make down service=<frontend/backend/db/mongo/redis/llm>` | Stop a specific service (MongoDB, PostgreSQL, Redis, frontend, backend)            |
+| `make restart`                                            | Restart all running services.                                                      |
+| `make clean`                                              | Remove all Docker images, containers, and volumes.                                 |
+| `make status`                                             | Show the status of all running services.                                           |
+| `make logs`                                               | View logs for all services.                                                        |
 
-| Command        | Description                                                                                  |
-| -------------- | -------------------------------------------------------------------------------------------- |
-| `make up`      | Build and run all services (MongoDB, PostgreSQL, Redis, frontend, backend) in detached mode. |
-| `make down`    | Stop and remove all services (containers, networks, volumes).                                |
-| `make restart` | Restart all running services.                                                                |
-| `make clean`   | Remove all Docker images, containers, and volumes.                                           |
-
-### Dependency Management
-
-| Command                 | Description                                    |
-| ----------------------- | ---------------------------------------------- |
-| `make install`          | Install dependencies for frontend and backend. |
-| `make install-frontend` | Install dependencies for the frontend.         |
-| `make install-backend`  | Install dependencies for the backend.          |
-
-### Testing and Linting
-
-| Command              | Description                              |
-| -------------------- | ---------------------------------------- |
-| `make test`          | Run tests for both frontend and backend. |
-| `make test-frontend` | Run tests for the frontend.              |
-| `make test-backend`  | Run tests for the backend.               |
-| `make lint-frontend` | Lint the frontend code.                  |
-| `make lint-backend`  | Lint the backend code.                   |
-
-### Logs
-
-| Command                            | Description                                                                           |
-| ---------------------------------- | ------------------------------------------------------------------------------------- |
-| `make logs service=<service_name>` | View logs for a specific service (e.g., frontend, backend, postgres, mongodb, redis). |
-
-### Development
-
-| Command             | Description                         |
-| ------------------- | ----------------------------------- |
-| `make dev-frontend` | Build the frontend for development. |
-| `make dev-backend`  | Build the backend for development.  |
-
-### Building
-
-| Command               | Description                        |
-| --------------------- | ---------------------------------- |
-| `make build-frontend` | Build the frontend for production. |
-| `make build-backend`  | Build the backend for production.  |
+When running the commands make sure to check the .env file for the environment variables needed for the services to run. It is used to determine whether the services are running in development or production mode.
 
 ## Running the Project
 
-1. Start all services: Use `make up` to start the Docker containers for the databases, backend, and frontend.
+1. Start all services: Use `make up-all` to start the Docker containers for the databases, backend, and frontend.
 
 2. Accessing the services:
 
    - **Frontend:** [http://localhost:3000](http://localhost:3000)
-   - **Backend:** [http://localhost:5000/api](http://localhost:5000/api)
+   - **Backend:** [http://localhost:5000](http://localhost:5000)
    - **MongoDB:** `mongodb://localhost:27017`
    - **PostgreSQL:** `postgres://localhost:5432`
    - **Redis:** `redis://localhost:6379`
@@ -142,10 +109,10 @@ We follow the Git Flow branching model with the following conventions:
 
 - Always create a new branch from `develop` for any feature or bug fix. **_NEVER_** push directly to `main`.
 - Merges will be done via pull requests (PRs) after at least one code review.
-- Before doing any commits or starting any development, make sure to pull the latest changes from the `develop` branch or run the following command:
+- Before doing any commits or starting any development, make sure to pull the latest changes from all branches by running the following command:
 
   ```bash
-  make pull
+   git pull --all
   ```
 
 ### Branch Types:
@@ -160,13 +127,13 @@ We follow the Git Flow branching model with the following conventions:
 
   ```bash
   git checkout develop
-  git checkout -b feature/<feature-name>
+  git checkout -b <team>/<feature-name>
   ```
 
 - Push the feature branch to the remote repository:
 
   ```bash
-  git push origin feature/<feature-name>
+  git push origin <team>/<feature-name>
   ```
 
 - Create a pull request (PR) to merge your feature branch into `develop`.
@@ -175,6 +142,8 @@ We follow the Git Flow branching model with the following conventions:
 
 - After approval, the feature will be merged into `develop`.
 
+- Occasionally, `develop` will be merged into `main` for deployment testing.
+
 ### Commit Message Format:
 
 We follow the Conventional Commits style:
@@ -182,10 +151,8 @@ We follow the Conventional Commits style:
 - **feat:** A new feature
 - **fix:** A bug fix
 - **docs:** Documentation changes
-- **style:** Code formatting, no logic change
 - **refactor:** Refactoring code
 - **test:** Adding or updating tests
-- **chore:** Maintenance tasks
 
 Example:
 
@@ -195,17 +162,13 @@ git commit -m "feat: add patient appointment booking feature"
 
 ## Code Quality
 
-### Linting
-
-- Linting is enforced for both the frontend and backend. Run `make lint-backend` and `make lint-frontend` to ensure your code passes linting checks.
-
 ### Testing
 
-- All new code should include unit tests where applicable. Run tests locally using `make test` before pushing changes.
+- All new code should include unit tests where applicable.
 
 ## CI Pipeline
 
-Our CI pipeline runs on GitHub Actions. Every push to `develop` or `feature/*` branches will trigger:
+Our CI pipeline runs on GitHub Actions. Every push or pull to `develop` branch will trigger:
 
 1. **Build**: The CI will build the Docker containers for the project.
 2. **Install Dependencies**: Dependencies for both frontend and backend will be installed.
@@ -239,6 +202,8 @@ To stop the AI service:
 make down-ai
 ```
 
+# needs revisiting after a while
+
 ### Interacting with the AI Service
 
 The AI service exposes a REST API at `http://localhost:8000/chat`. You can send a POST request with a patient's query, and it will return the AI-generated response.
@@ -250,31 +215,3 @@ Example request payload:
   "patientQuery": "How can I book an appointment?"
 }
 ```
-
-### AI Service Testing
-
-To run AI service tests:
-
-```bash
-make test-ai
-```
-
-### AI Service Virtual Environment
-
-The AI service uses a virtual environment to manage its Python dependencies. This is handled within the Docker container, ensuring that the environment is consistent across all setups.
-
-#### Dependencies
-
-Dependencies are defined in the `requirements.txt` file located in the `ai-service` directory. They are installed in a virtual environment created inside the Docker container.
-
-### Building the AI Service
-
-To build the AI service, ensure that you have Docker and Docker Compose installed, then run:
-
-```bash
-make up-ai
-```
-
-### Summary
-
-This setup will help keep your AI service's dependencies isolated and manageable while using Docker, and your `.gitignore` will ensure that unnecessary files are not tracked by Git.
