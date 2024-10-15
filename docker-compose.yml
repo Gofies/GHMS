@@ -1,0 +1,42 @@
+version: '3'
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - '3000:3000'
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000/api
+  backend:
+    build: ./backend
+    ports:
+      - '5000:5000'
+    depends_on:
+      - mongodb
+      - postgres
+      - redis
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/hospital
+      - POSTGRES_URI=postgres://admin:adminpass@postgres:5432/hospital
+      - REDIS_HOST=redis
+  mongodb:
+    image: mongo
+    ports:
+      - '27017:27017'
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=adminpass
+      - POSTGRES_DB=hospital
+    ports:
+      - '5432:5432'
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'
+  ai-service:
+    build: ./ai-service
+    ports:
+      - "8000:8000"
+    depends_on:
+      - backend

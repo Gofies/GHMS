@@ -1,0 +1,35 @@
+# Node.js dependencies (for frontend and backend)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-specific files
+.DS_Store      # macOS
+Thumbs.db      # Windows
+
+# Build artifacts
+dist/
+build/
+
+# Cache and dependencies
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+# Ignore dependency directories
+*.egg-info/
+dist/
+build/
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+# Ignore log files
+*.log
+
