@@ -5,18 +5,20 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    ports:
+    ports: #might need to remove it after adding nginx webserver
       - "3000:3000"
     volumes:
       - ./frontend:/app
     environment:
       - NODE_ENV=${NODE_ENV:-development}
+    networks:
+      - gofies
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports:
+    ports: #might need to remove it after adding nginx webserver
       - "5000:5000"
     volumes:
       - ./backend:/app
@@ -28,6 +30,8 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
       - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+    networks:
+      - gofies
 
   postgres:
     image: postgres:15
@@ -35,10 +39,12 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    ports:
+    ports: #might need to remove it after adding nginx webserver
       - "5432:5432"
     volumes:
       - ./database/postgresql/db_data:/var/lib/postgresql/data
+    networks:
+      - gofies
 
   mongo:
     image: mongo:5.0
@@ -46,23 +52,46 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-    ports:
+    ports: #might need to remove it after adding nginx webserver
       - "27017:27017"
     volumes:
       - ./database/mongodb/db_data:/data/db
+    networks:
+      - gofies
 
   redis:
     image: redis:alpine
-    ports:
+    ports: #might need to remove it after adding nginx webserver
       - "6379:6379"
     volumes:
       - ./database/redis/db_data:/data
+    networks:
+      - gofies
 
   # llm:
   #   build:
   #     context: ./ai-services
   #     dockerfile: Dockerfile
-  #   ports:
+  #   ports: #might need to remove it after adding nginx webserver
   #     - "8000:8000"
   #   environment:
   #     - MODEL_PATH=/app/models/model.bin
+  #   networks:
+  #     - gofies
+
+  # nginx:
+  #   image: nginx:latest
+  #   ports:
+  #     - "80:80" # Forward requests from the host to the container
+  #     - "443:443" # For HTTPS, requires SSL certificates
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf
+  #   depends_on:
+  #     - frontend
+  #     - backend
+  #   networks:
+  #     - gofies
+
+networks:
+  gofies:
+    driver: bridge
