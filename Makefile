@@ -40,4 +40,4 @@ attach-redis:
 
 #attach to mongodb container's cli
 attach-mongo:
-	docker exec -it softeng-mongo-1 mongo -u admin -p secret --authenticationDatabase admin --host localhost
+	docker exec -it softeng-mongo-1 mongo -u admin -p admin --authenticationDatabase admin
