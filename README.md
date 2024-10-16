@@ -94,6 +94,7 @@ To attach to one of the running containers, you can use the following commands:
 | `make attach service=<postgres/redis/etc...>` | Attach to a running container (MongoDB, PostgreSQL, Redis, frontend, backend) |
 | `make attach-psql`                            | Attach to the PostgreSQL container's cli.                                     |
 | `make attach-redis`                           | Attach to the Redis container's cli.                                          |
+| `make attach-mongo`                           | Attach to the MongoDB container's cli.                                        |
 
 When running the commands make sure to check the `.env` file for the environment variables needed for the services to run. It is used to determine whether the services are running in development or production mode.
 

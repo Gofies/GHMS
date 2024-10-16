@@ -37,3 +37,7 @@ attach-psql:
 #attach to redis container's cli
 attach-redis:
 	docker exec -it softeng-redis-1 redis-cli
+
+#attach to mongodb container's cli
+attach-mongo:
+	docker exec -it softeng-mongo-1 mongo -u admin -p secret --authenticationDatabase admin --host localhost

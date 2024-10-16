@@ -10,7 +10,7 @@ services:
     volumes:
       - ./frontend:/app
     environment:
-      - NODE_ENV=${NODE_ENV:-development} # Default to development if not set
+      - NODE_ENV=${NODE_ENV:-development}
 
   backend:
     build:
@@ -21,14 +21,10 @@ services:
     volumes:
       - ./backend:/app
     environment:
-      - NODE_ENV=${NODE_ENV:-development} # Default to development if not set
+      - NODE_ENV=${NODE_ENV:-development}
       # - DATABASE_URL=postgres://user:password@db:5432/mydatabase
       # - MONGO_URL=mongodb://mongo:27017/mydb
       # - REDIS_URL=redis://redis:6379
-  #   depends_on:
-  #     - postgres
-  #     - mongo
-  #     - redis
 
   postgres:
     image: postgres:15
@@ -36,13 +32,21 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
     volumes:
       - ./database/postgresql:/var/lib/postgresql/data
 
-  # mongo:
-  #   image: mongo:6
-  #   volumes:
-  #     - ./database/mongodb:/data/db
+  mongo:
+    image: mongo:5.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./database/mongodb:/data/db
 
   redis:
     image: redis:alpine
