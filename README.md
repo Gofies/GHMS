@@ -73,15 +73,27 @@ Before you can run the project, make sure you have the following installed:
 
 The project uses a Makefile to simplify common tasks. Below are the available commands:
 
-| Command                                                   | Description                                                              |
-| --------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `make build`                                              | Build all service images (MongoDB, PostgreSQL, Redis, frontend, backend) |
-| `make up service=<frontend/backend/etc...>"overloaded"`   | Start a specific service (MongoDB, PostgreSQL, Redis, frontend, backend) |
-| `make down service=<frontend/backend/etc...>"overloaded"` | Stop a specific service (MongoDB, PostgreSQL, Redis, frontend, backend)  |
-| `make restart`                                            | Restart all running services.                                            |
-| `make clean`                                              | Remove all Docker images, containers, and volumes.                       |
-| `make status`                                             | Show the status of all running services.                                 |
-| `make logs`                                               | View logs for all services.                                              |
+| Command                                                    | Description                                                              |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `make build`                                               | Build all service images (MongoDB, PostgreSQL, Redis, frontend, backend) |
+| `make up`                                                  | Start all services (MongoDB, PostgreSQL, Redis, frontend, backend)       |
+| `make down`                                                | Stop all running services.                                               |
+| `make up service=<frontend/backend/etc...> "overloaded"`   | Start a specific service (MongoDB, PostgreSQL, Redis, frontend, backend) |
+| `make down service=<frontend/backend/etc...> "overloaded"` | Stop a specific service (MongoDB, PostgreSQL, Redis, frontend, backend)  |
+| `make restart`                                             | Restart all running services.                                            |
+| `make clean`                                               | Remove all Docker images, containers, and volumes.                       |
+| `make status`                                              | Show the status of all running services.                                 |
+| `make logs`                                                | View logs for all services.                                              |
+
+### How to attach to a running container
+
+To attach to one of the running containers, you can use the following commands:
+
+| Command                                       | Description                                                                   |
+| --------------------------------------------- | ----------------------------------------------------------------------------- |
+| `make attach service=<postgres/redis/etc...>` | Attach to a running container (MongoDB, PostgreSQL, Redis, frontend, backend) |
+| `make attach-psql`                            | Attach to the PostgreSQL container's cli.                                     |
+| `make attach-redis`                           | Attach to the Redis container's cli.                                          |
 
 When running the commands make sure to check the `.env` file for the environment variables needed for the services to run. It is used to determine whether the services are running in development or production mode.
 

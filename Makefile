@@ -6,13 +6,10 @@ up:
 down:
 	docker-compose down $(service)
 
-# Usage:
-# To run: make up service=frontend
-# To stop: make down service=frontend
-
 # Show logs
 logs:
 	docker-compose logs -f
+
 # Build all services
 build:
 	docker-compose build
@@ -28,3 +25,15 @@ restart:
 # Show status of all services
 status:
 	docker-compose ps
+
+#attach to a running container
+attach:
+	docker exec -it softeng-$(service)-1 sh
+
+#attach to postgres container's cli
+attach-psql:
+	docker exec -it softeng-postgres-1 psql -U admin
+
+#attach to redis container's cli
+attach-redis:
+	docker exec -it softeng-redis-1 redis-cli

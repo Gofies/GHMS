@@ -30,14 +30,14 @@ services:
   #     - mongo
   #     - redis
 
-  # postgres:
-  #   image: postgres:15
-  #   environment:
-  #     POSTGRES_USER: user
-  #     POSTGRES_PASSWORD: password
-  #     POSTGRES_DB: mydatabase
-  #   volumes:
-  #     - ./database/postgresql:/var/lib/postgresql/data
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./database/postgresql:/var/lib/postgresql/data
 
   # mongo:
   #   image: mongo:6
