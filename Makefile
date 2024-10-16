@@ -1,11 +1,3 @@
-# Bring up all services
-up-all:
-	docker-compose up -d
-
-# Stop all services
-down-all:
-	docker-compose down
-
 # Bring up services dynamically
 up:
 	docker-compose up $(service)

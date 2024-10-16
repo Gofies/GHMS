@@ -73,19 +73,17 @@ Before you can run the project, make sure you have the following installed:
 
 The project uses a Makefile to simplify common tasks. Below are the available commands:
 
-| Command                                                   | Description                                                                        |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `make build`                                              | Build all service images (MongoDB, PostgreSQL, Redis, frontend, backend)           |
-| `make up-all`                                             | run all services (MongoDB, PostgreSQL, Redis, frontend, backend) in detached mode. |
-| `make down-all`                                           | Stop and remove all services (containers, networks, volumes).                      |
-| `make up service=<frontend/backend/db/mongo/redis/llm>`   | Start a specific service (MongoDB, PostgreSQL, Redis, frontend, backend)           |
-| `make down service=<frontend/backend/db/mongo/redis/llm>` | Stop a specific service (MongoDB, PostgreSQL, Redis, frontend, backend)            |
-| `make restart`                                            | Restart all running services.                                                      |
-| `make clean`                                              | Remove all Docker images, containers, and volumes.                                 |
-| `make status`                                             | Show the status of all running services.                                           |
-| `make logs`                                               | View logs for all services.                                                        |
+| Command                                                   | Description                                                              |
+| --------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `make build`                                              | Build all service images (MongoDB, PostgreSQL, Redis, frontend, backend) |
+| `make up service=<frontend/backend/etc...>"overloaded"`   | Start a specific service (MongoDB, PostgreSQL, Redis, frontend, backend) |
+| `make down service=<frontend/backend/etc...>"overloaded"` | Stop a specific service (MongoDB, PostgreSQL, Redis, frontend, backend)  |
+| `make restart`                                            | Restart all running services.                                            |
+| `make clean`                                              | Remove all Docker images, containers, and volumes.                       |
+| `make status`                                             | Show the status of all running services.                                 |
+| `make logs`                                               | View logs for all services.                                              |
 
-When running the commands make sure to check the .env file for the environment variables needed for the services to run. It is used to determine whether the services are running in development or production mode.
+When running the commands make sure to check the `.env` file for the environment variables needed for the services to run. It is used to determine whether the services are running in development or production mode.
 
 ## Running the Project
 
@@ -188,6 +186,8 @@ If all checks pass, the changes can be merged into `develop` after a code review
 
 The AI services consist of two main models one responsible of handling live chat with patients using a language model, and the other one being a cluster of models responsible of analyzing the patient based on the reports and the data provided by the patient.
 
+# needs revisiting after a while
+
 ### Running the AI Service
 
 To run the AI service in isolation, use:
@@ -201,8 +201,6 @@ To stop the AI service:
 ```bash
 make down-ai
 ```
-
-# needs revisiting after a while
 
 ### Interacting with the AI Service
 
