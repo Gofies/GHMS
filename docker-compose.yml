@@ -38,7 +38,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./database/postgresql:/var/lib/postgresql/data
+      - ./database/postgresql/db_data:/var/lib/postgresql/data
 
   mongo:
     image: mongo:5.0
@@ -49,14 +49,14 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./database/mongodb:/data/db
+      - ./database/mongodb/db_data:/data/db
 
   redis:
     image: redis:alpine
     ports:
       - "6379:6379"
     volumes:
-      - ./database/redis:/data
+      - ./database/redis/db_data:/data
 
   # llm:
   #   build:

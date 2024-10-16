@@ -32,3 +32,6 @@ build/
 .ipynb_checkpoints/
 # Ignore log files
 *.log
+
+# Ignore data files
+db_data/
