@@ -3,56 +3,39 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - develop # Trigger the workflow on pushes to the develop branch
+      - develop
   pull_request:
     branches:
-      - develop # Trigger on pull requests targeting the develop branch
+      - develop
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
-    # services:
-    #   mongo:
-    #     image: mongo:latest
-    #     ports:
-    #       - 27017:27017
-    #   postgres:
-    #     image: postgres:latest
-    #     ports:
-    #       - 5432:5432
-    #     env:
-    #       POSTGRES_DB: your_database${{ secrets.POSTGRES_DB }}
-    #       POSTGRES_USER: your_user${{ secrets.DATABASE_USER }}
-    #       POSTGRES_PASSWORD: your_password${{ secrets.DATABASE_PASSWORD }}
-    #   redis:
-    #     image: redis:latest
-    #     ports:
-    #       - 6379:6379
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Check out the repository
+        uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
 
-      - name: Build Docker images
+      - name: Build and run services
         run: |
-          docker-compose build
+          docker-compose -f docker-compose.yml up -d --build
 
-      - name: Run tests
+      # Health check script to ensure all services are up and healthy
+      - name: Wait for services to be healthy
         run: |
-          docker-compose up -d
-          # Assuming your tests run as a service or command in Docker
-          # You may need to adjust the command according to your setup
-          docker-compose exec backend npm test
+          chmod +x healthycheck.sh
+          ./healthycheck.sh
 
-      - name: Tear down
-        if: always() # Always run this step, even if the previous steps failed
+      - name: Run backend tests
         run: |
-          docker-compose down
+          docker-compose exec backend npm run test
 
-      - name: Clean up unused Docker resources
+      - name: Run frontend tests
         run: |
-          docker system prune -af
+          docker-compose exec frontend npm run test
+
+      - name: Shut down services
+        run: docker-compose down
