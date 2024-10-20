@@ -1,14 +1,10 @@
-# Use a minimal Node.js image for the backend
-FROM node:18-alpine
+FROM node:18.16.0-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json to install dependencies
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+RUN npm ci --only=production
 
 # Copy the rest of the application
 COPY . .

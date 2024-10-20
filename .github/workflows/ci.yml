@@ -2,45 +2,159 @@ name: CI Pipeline
 
 on:
   push:
-    branches:
-      - develop
+    branches: [main, develop]
   pull_request:
-    branches:
-      - develop
+    branches: [main, develop]
+
+env:
+  REGISTRY: ghcr.io
+  FRONTEND_IMAGE: ${{ github.repository }}/frontend
+  BACKEND_IMAGE: ${{ github.repository }}/backend
+  POSTGRES_USER: admin
+  POSTGRES_PASSWORD: admin
+  POSTGRES_DB: admin
+  MONGO_INITDB_ROOT_USERNAME: admin
+  MONGO_INITDB_ROOT_PASSWORD: admin
+  MONGO_INITDB_DATABASE: admin
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Lint Frontend
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm run lint
+
+      - name: Lint Backend
+        working-directory: ./backend
+        run: |
+          npm ci
+          npm run lint
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mongodb:
+        image: mongo:5.0
+        env:
+          MONGO_INITDB_ROOT_USERNAME: ${{ env.MONGO_INITDB_ROOT_USERNAME }}
+          MONGO_INITDB_ROOT_PASSWORD: ${{ env.MONGO_INITDB_ROOT_PASSWORD }}
+          MONGO_INITDB_DATABASE: ${{ env.MONGO_INITDB_DATABASE }}
+        ports:
+          - 27017:27017
+
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up Docker
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Frontend Tests
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm test -- --coverage
+
+      - name: Backend Tests
+        working-directory: ./backend
+        env:
+          POSTGRES_HOST: admin
+          MONGO_HOST: admin
+          REDIS_HOST: admin
+        run: |
+          npm ci
+          npm test -- --coverage
+
+      - name: Upload Test Coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-reports
+          path: |
+            ./frontend/coverage
+            ./backend/coverage
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and run services
-        run: |
-          docker-compose -f docker-compose.yml up -d --build
+      - name: Extract Docker metadata (Frontend)
+        id: meta-frontend
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}
 
-      # Health check script to ensure all services are up and healthy
-      - name: Wait for services to be healthy
-        run: |
-          chmod +x healthycheck.sh
-          ./healthycheck.sh
+      - name: Extract Docker metadata (Backend)
+        id: meta-backend
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}
 
-      - name: Run backend tests
-        run: |
-          docker-compose exec backend npm run test
+      - name: Build and push Frontend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Run frontend tests
-        run: |
-          docker-compose exec frontend npm run test
-
-      - name: Shut down services
-        run: docker-compose down
+      - name: Build and push Backend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

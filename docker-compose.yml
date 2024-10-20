@@ -14,10 +14,19 @@ services:
     networks:
       - gofies
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"] # Adjust if your frontend has a health route
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:80",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   backend:
     build:
@@ -38,10 +47,19 @@ services:
     networks:
       - gofies
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"] # Adjust this based on your backend app
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:5000/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   postgres:
     image: postgres:15
@@ -93,29 +111,34 @@ services:
       timeout: 5s
       retries: 5
 
-  # llm:
-  #   build:
-  #     context: ./ai-services
-  #     dockerfile: Dockerfile
-  #   ports: #might need to remove it after adding nginx webserver
-  #     - "8000:8000"
-  #   environment:
-  #     - MODEL_PATH=/app/models/model.bin
-  #   networks:
-  #     - gofies
-
-  # nginx:
-  #   image: nginx:latest
-  #   ports:
-  #     - "80:80" # Forward requests from the host to the container
-  #     - "443:443" # For HTTPS, requires SSL certificates
-  #   volumes:
-  #     - ./nginx.conf:/etc/nginx/nginx.conf
-  #   depends_on:
-  #     - frontend
-  #     - backend
-  #   networks:
-  #     - gofies
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80" # Forward requests from the host to the container
+      - "443:443" # For HTTPS, requires SSL certificates
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro # Read-only
+      - ./nginx-logs:/var/log/nginx
+      - ./ssl:/etc/nginx/ssl:ro # Mount SSL certificates if using HTTPS
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - gofies
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 networks:
   gofies:
