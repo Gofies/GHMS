@@ -3,8 +3,8 @@ version: "3.8"
 services:
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./frontend/Dockerfile
     ports: #might need to remove it after adding nginx webserver
       - "3000:3000"
     volumes:

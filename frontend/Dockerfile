@@ -1,19 +1,20 @@
-# Build stage
-FROM node:18.16.0-alpine as build
+# Frontend Dockerfile
+
+FROM node:18.16.0-alpine AS build
 
 WORKDIR /app
-
-COPY package*.json ./
+COPY frontend/package*.json ./
 RUN npm ci
+COPY frontend/. . 
 
-COPY . .
+# Build your app
 RUN npm run build
 
-# Production stage
+# Use NGINX to serve the app
 FROM nginx:alpine
 
+COPY nginx.conf /etc/nginx/conf.d/default.conf 
 COPY --from=build /app/build /usr/share/nginx/html
-COPY ../nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
