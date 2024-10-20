@@ -8,7 +8,7 @@ down:
 
 # Show logs
 logs:
-	docker-compose logs -f
+	docker-compose logs -f $(service)
 
 # Build all services
 build:

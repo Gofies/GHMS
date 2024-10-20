@@ -21,15 +21,29 @@ jobs:
           sudo curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
 
-      - name: Build and run docker-compose
+      - name: Build Docker Compose
         run: |
           docker-compose -f docker-compose.yml up --build -d
-          # Wait for the frontend and backend services to be healthy
-          sleep 30  # Adjust the sleep duration based on your healthcheck start_periods
 
+      - name: Wait for services to be healthy
+        run: |
+          chmod +x ./health-check.sh
+          ./health-check.sh
+
+      - name: Install Frontend Dependencies
+        run: |
           docker-compose -f docker-compose.yml exec frontend npm install
+
+      - name: Run Frontend Tests
+        run: |
           docker-compose -f docker-compose.yml exec frontend npm test -- --coverage
+
+      - name: Install Backend Dependencies
+        run: |
           docker-compose -f docker-compose.yml exec backend npm install
+
+      - name: Run Backend Tests
+        run: |
           docker-compose -f docker-compose.yml exec backend npm test -- --coverage
 
       - name: Shutdown Docker Compose

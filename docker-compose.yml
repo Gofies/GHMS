@@ -5,12 +5,14 @@ services:
     build:
       context: .
       dockerfile: ./frontend/Dockerfile
-    ports: #might need to remove it after adding nginx webserver
-      - "3000:3000"
+      #     ports: #might need to remove it after adding nginx webserver
+      # - "3000:3000"
     volumes:
       - ./frontend:/app
     environment:
       - NODE_ENV=${NODE_ENV:-development}
+      - WDS_SOCKET_PORT=0
+      - WATCHPACK_POLLING=true
     networks:
       - gofies
     healthcheck:
@@ -21,7 +23,7 @@ services:
           "--no-verbose",
           "--tries=1",
           "--spider",
-          "http://localhost:80",
+          "http://localhost:3000",
         ]
       interval: 30s
       timeout: 10s
@@ -32,8 +34,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports: #might need to remove it after adding nginx webserver
-      - "5000:5000"
+    # ports: #might need to remove it after adding nginx webserver
+    #   - "5000:5000"
     volumes:
       - ./backend:/app
     environment:
@@ -114,12 +116,12 @@ services:
   nginx:
     image: nginx:alpine
     ports:
-      - "80:80" # Forward requests from the host to the container
-      - "443:443" # For HTTPS, requires SSL certificates
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro # Read-only
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx-logs:/var/log/nginx
-      - ./ssl:/etc/nginx/ssl:ro # Mount SSL certificates if using HTTPS
+      - ./ssl:/etc/nginx/ssl:ro
     depends_on:
       - frontend
       - backend

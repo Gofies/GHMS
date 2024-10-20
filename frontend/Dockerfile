@@ -1,21 +1,24 @@
-# Frontend Dockerfile
-
-FROM node:18.16.0-alpine AS build
+FROM node:18.16.0-alpine
 
 WORKDIR /app
-COPY frontend/package*.json ./
-RUN npm ci
-COPY frontend/. . 
 
-# Build your app
+# Copy package files
+COPY frontend/package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy the rest of the frontend code
+COPY frontend/. .
+
+# Build the application for production
 RUN npm run build
 
-# Use NGINX to serve the app
-FROM nginx:alpine
+# Expose port 3000 for development server
+EXPOSE 3000
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf 
-COPY --from=build /app/build /usr/share/nginx/html
+# Set the default environment to development if NODE_ENV is not set
+ENV NODE_ENV=${NODE_ENV:-development}
 
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+# Conditional CMD based on the environment
+CMD ["sh", "-c", "if [ \"$NODE_ENV\" = 'production' ]; then npm run start; else npm run dev; fi"]
