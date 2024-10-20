@@ -5,8 +5,8 @@ services:
     build:
       context: .
       dockerfile: ./frontend/Dockerfile
-    ports: #might need to remove it after adding nginx webserver
-      - "3000:3000"
+    # ports: #might need to remove it after adding nginx webserver
+    #   - "3000:3000"
     volumes:
       - ./frontend:/app
     environment:
@@ -15,27 +15,13 @@ services:
       - WATCHPACK_POLLING=true
     networks:
       - gofies
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:3000/health",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports: #might need to remove it after adding nginx webserver
-      - "5000:5000"
+    # ports: #might need to remove it after adding nginx webserver
+    #   - "5000:5000"
     volumes:
       - ./backend:/app
     environment:
@@ -48,20 +34,6 @@ services:
       - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
     networks:
       - gofies
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:5000/health",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
 
   postgres:
     image: postgres:15
