@@ -27,11 +27,11 @@ jobs:
 
       - name: Install Frontend Dependencies
         run: |
-          docker-compose -f docker-compose.yml exec frontend npm install
+          docker-compose -f docker-compose.yml exec -T frontend npm install
 
       - name: Install Backend Dependencies
         run: |
-          docker-compose -f docker-compose.yml exec backend npm install
+          docker-compose -f docker-compose.yml exec -T backend npm install
 
       - name: Wait for services to be healthy
         run: |
