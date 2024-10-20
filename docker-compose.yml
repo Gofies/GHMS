@@ -5,8 +5,8 @@ services:
     build:
       context: .
       dockerfile: ./frontend/Dockerfile
-      #     ports: #might need to remove it after adding nginx webserver
-      # - "3000:3000"
+    ports: #might need to remove it after adding nginx webserver
+      - "3000:3000"
     volumes:
       - ./frontend:/app
     environment:
@@ -23,7 +23,7 @@ services:
           "--no-verbose",
           "--tries=1",
           "--spider",
-          "http://localhost:3000",
+          "http://localhost:3000/health",
         ]
       interval: 30s
       timeout: 10s
@@ -34,8 +34,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    # ports: #might need to remove it after adding nginx webserver
-    #   - "5000:5000"
+    ports: #might need to remove it after adding nginx webserver
+      - "5000:5000"
     volumes:
       - ./backend:/app
     environment:
