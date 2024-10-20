@@ -4,7 +4,8 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci --only=production
+# Change this line to install all dependencies including devDependencies
+RUN npm install
 
 # Copy the rest of the application
 COPY . .
