@@ -38,7 +38,7 @@ services:
     networks:
       - gofies
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"] # Adjust this based on your backend app
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api"] # Adjust this based on your backend app
       interval: 10s
       timeout: 5s
       retries: 5
