@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI Pipeline
 
 on:
   push:
@@ -6,18 +6,38 @@ on:
   pull_request:
     branches: [main, develop]
 
-env:
-  REGISTRY: ghcr.io
-  FRONTEND_IMAGE: ${{ github.repository }}/frontend
-  BACKEND_IMAGE: ${{ github.repository }}/backend
-  POSTGRES_USER: admin
-  POSTGRES_PASSWORD: admin
-  POSTGRES_DB: admin
-  MONGO_INITDB_ROOT_USERNAME: admin
-  MONGO_INITDB_ROOT_PASSWORD: admin
-  MONGO_INITDB_DATABASE: admin
-
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and run docker-compose
+        run: |
+          docker-compose -f docker-compose.yml up --build -d
+          # Wait for the frontend and backend services to be healthy
+          sleep 30  # Adjust the sleep duration based on your healthcheck start_periods
+
+          docker-compose -f docker-compose.yml exec frontend npm install
+          docker-compose -f docker-compose.yml exec frontend npm test -- --coverage
+          docker-compose -f docker-compose.yml exec backend npm install
+          docker-compose -f docker-compose.yml exec backend npm test -- --coverage
+
+      - name: Shutdown Docker Compose
+        run: |
+          docker-compose -f docker-compose.yml down
+
+      - name: Upload Test Coverage
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-reports
+          path: |
+            ./frontend/coverage
+            ./backend/coverage
   # lint:
   #   runs-on: ubuntu-latest
   #   steps:
@@ -48,130 +68,3 @@ jobs:
   #       run: |
   #         npm ci
   #         npm run lint
-
-  test:
-    # needs: lint
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      mongodb:
-        image: mongo:5.0
-        env:
-          MONGO_INITDB_ROOT_USERNAME: ${{ env.MONGO_INITDB_ROOT_USERNAME }}
-          MONGO_INITDB_ROOT_PASSWORD: ${{ env.MONGO_INITDB_ROOT_PASSWORD }}
-          MONGO_INITDB_DATABASE: ${{ env.MONGO_INITDB_DATABASE }}
-        ports:
-          - 27017:27017
-
-      redis:
-        image: redis:alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Node.js for Frontend
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: "./frontend/package-lock.json"
-
-      - name: Frontend Tests
-        working-directory: ./frontend
-        run: |
-          npm ci
-          npm test -- --coverage || true  # Add '|| true' to prevent test failures from stopping the pipeline
-
-      - name: Set up Node.js for Backend
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: "./backend/package-lock.json"
-
-      - name: Backend Tests
-        working-directory: ./backend
-        env:
-          POSTGRES_HOST: admin
-          MONGO_HOST: admin
-          REDIS_HOST: admin
-        run: |
-          npm ci
-          npm test -- --coverage || true  # Add '|| true' to prevent test failures from stopping the pipeline
-
-      - name: Upload Test Coverage
-        if: always() # Always try to upload coverage reports even if tests fail
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage-reports
-          path: |
-            ./frontend/coverage
-            ./backend/coverage
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract Docker metadata (Frontend)
-        id: meta-frontend
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}
-
-      - name: Extract Docker metadata (Backend)
-        id: meta-backend
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}
-
-      - name: Build and push Frontend
-        uses: docker/build-push-action@v4
-        with:
-          context: ./frontend
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta-frontend.outputs.tags }}
-          labels: ${{ steps.meta-frontend.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and push Backend
-        uses: docker/build-push-action@v4
-        with:
-          context: ./backend
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta-backend.outputs.tags }}
-          labels: ${{ steps.meta-backend.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
