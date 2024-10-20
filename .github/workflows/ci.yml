@@ -29,18 +29,15 @@ jobs:
           chmod +x ./health-check.sh
           ./health-check.sh
 
-      - name: Wait for 2 minutes
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-            await wait(120000);  // 120000 milliseconds = 2 minutes
+      - name: Wait for services to be healthy
+        run: |
+          sleep 120  # Wait for 2 minutes
 
       - name: Run Frontend Tests
-        run: docker-compose exec -T frontend npm test -- --coverage
+        run: docker-compose exec -T frontend npm test
 
       - name: Run Backend Tests
-        run: docker-compose exec -T backend npm test -- --coverage
+        run: docker-compose exec -T backend npm test
 
       - name: Shutdown Docker Compose
         run: docker-compose down
