@@ -35,3 +35,7 @@ build/
 
 # Ignore data files
 db_data/
+
+# Ignore macOS DS_Store files
+.DS_Store
+
