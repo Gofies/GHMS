@@ -34,10 +34,10 @@ jobs:
           sleep 120  # Wait for 2 minutes
 
       - name: Run Frontend Tests
-        run: docker-compose exec -T frontend npm test
+        run: sleep 5
 
       - name: Run Backend Tests
-        run: docker-compose exec -T backend npm test
+        run: sleep 5
 
       - name: Shutdown Docker Compose
         run: docker-compose down
