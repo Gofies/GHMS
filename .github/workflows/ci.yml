@@ -28,7 +28,6 @@ jobs:
         run: |
           chmod +x ./health-check.sh
           ./health-check.sh
-          - name: Wait for services to be healthy
 
       - name: Wait for 2 minutes
         uses: actions/github-script@v6
