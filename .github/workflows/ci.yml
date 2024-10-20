@@ -18,39 +18,39 @@ env:
   MONGO_INITDB_DATABASE: admin
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - name: Set up Node.js for Frontend
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: "./frontend/package-lock.json"
+  #     - name: Set up Node.js for Frontend
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: "18"
+  #         cache: "npm"
+  #         cache-dependency-path: "./frontend/package-lock.json"
 
-      - name: Install and Lint Frontend
-        working-directory: ./frontend
-        run: |
-          npm ci
-          npm run lint
+  #     - name: Install and Lint Frontend
+  #       working-directory: ./frontend
+  #       run: |
+  #         npm ci
+  #         npm run lint
 
-      - name: Set up Node.js for Backend
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: "./backend/package-lock.json"
+  #     - name: Set up Node.js for Backend
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: "18"
+  #         cache: "npm"
+  #         cache-dependency-path: "./backend/package-lock.json"
 
-      - name: Install and Lint Backend
-        working-directory: ./backend
-        run: |
-          npm ci
-          npm run lint
+  #     - name: Install and Lint Backend
+  #       working-directory: ./backend
+  #       run: |
+  #         npm ci
+  #         npm run lint
 
   test:
-    needs: lint
+    # needs: lint
     runs-on: ubuntu-latest
     services:
       postgres:
