@@ -16,7 +16,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "dev": "react-scripts start"
+    "dev": "react-scripts start",
+    "lint": "eslint ."
   },
   "eslintConfig": {
     "extends": [
@@ -37,7 +38,9 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14"
   }

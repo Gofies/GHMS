@@ -3,14 +3,16 @@ version: "3.8"
 services:
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports: #might need to remove it after adding nginx webserver
-      - "3000:3000"
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    # ports: #might need to remove it after adding nginx webserver
+    #   - "3000:3000"
     volumes:
       - ./frontend:/app
     environment:
       - NODE_ENV=${NODE_ENV:-development}
+      - WDS_SOCKET_PORT=0
+      - WATCHPACK_POLLING=true
     networks:
       - gofies
 
@@ -18,8 +20,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports: #might need to remove it after adding nginx webserver
-      - "5000:5000"
+    # ports: #might need to remove it after adding nginx webserver
+    #   - "5000:5000"
     volumes:
       - ./backend:/app
     environment:
@@ -45,6 +47,11 @@ services:
       - ./database/postgresql/db_data:/var/lib/postgresql/data
     networks:
       - gofies
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mongo:
     image: mongo:5.0
@@ -58,6 +65,11 @@ services:
       - ./database/mongodb/db_data:/data/db
     networks:
       - gofies
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:alpine
@@ -67,30 +79,26 @@ services:
       - ./database/redis/db_data:/data
     networks:
       - gofies
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # llm:
-  #   build:
-  #     context: ./ai-services
-  #     dockerfile: Dockerfile
-  #   ports: #might need to remove it after adding nginx webserver
-  #     - "8000:8000"
-  #   environment:
-  #     - MODEL_PATH=/app/models/model.bin
-  #   networks:
-  #     - gofies
-
-  # nginx:
-  #   image: nginx:latest
-  #   ports:
-  #     - "80:80" # Forward requests from the host to the container
-  #     - "443:443" # For HTTPS, requires SSL certificates
-  #   volumes:
-  #     - ./nginx.conf:/etc/nginx/nginx.conf
-  #   depends_on:
-  #     - frontend
-  #     - backend
-  #   networks:
-  #     - gofies
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx-logs:/var/log/nginx
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - gofies
 
 networks:
   gofies:
