@@ -25,22 +25,22 @@ jobs:
         run: |
           docker-compose -f docker-compose.yml up --build -d
 
+      - name: Install Frontend Dependencies
+        run: |
+          docker-compose -f docker-compose.yml exec frontend npm install
+
+      - name: Install Backend Dependencies
+        run: |
+          docker-compose -f docker-compose.yml exec backend npm install
+
       - name: Wait for services to be healthy
         run: |
           chmod +x ./health-check.sh
           ./health-check.sh
 
-      - name: Install Frontend Dependencies
-        run: |
-          docker-compose -f docker-compose.yml exec frontend npm install
-
       - name: Run Frontend Tests
         run: |
           docker-compose -f docker-compose.yml exec frontend npm test -- --coverage
-
-      - name: Install Backend Dependencies
-        run: |
-          docker-compose -f docker-compose.yml exec backend npm install
 
       - name: Run Backend Tests
         run: |
