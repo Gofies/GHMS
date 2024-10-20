@@ -13,6 +13,11 @@ services:
       - NODE_ENV=${NODE_ENV:-development}
     networks:
       - gofies
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"] # Adjust if your frontend has a health route
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
@@ -32,6 +37,11 @@ services:
       - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
     networks:
       - gofies
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"] # Adjust this based on your backend app
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   postgres:
     image: postgres:15
@@ -45,6 +55,11 @@ services:
       - ./database/postgresql/db_data:/var/lib/postgresql/data
     networks:
       - gofies
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mongo:
     image: mongo:5.0
@@ -58,6 +73,11 @@ services:
       - ./database/mongodb/db_data:/data/db
     networks:
       - gofies
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:alpine
@@ -67,6 +87,11 @@ services:
       - ./database/redis/db_data:/data
     networks:
       - gofies
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # llm:
   #   build:
