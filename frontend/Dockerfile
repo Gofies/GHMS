@@ -1,19 +1,20 @@
-# Use a minimal Node.js image for the frontend
-FROM node:18-alpine
+FROM node:18.16.0-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json to install dependencies
-COPY package.json package-lock.json ./
+# Copy package files
+COPY frontend/package*.json ./
 
-# Install dependencies
+# Install all dependencies
 RUN npm install
 
-# Copy the rest of the application
-COPY . .
+# Copy the rest of the frontend code
+COPY frontend/. .
 
-# Expose port 3000 (default React dev server port)
+# Build the application for production
+RUN npm run build
+
+# Expose port 3000 for development server
 EXPOSE 3000
 
 # Set the default environment to development if NODE_ENV is not set
