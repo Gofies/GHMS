@@ -1,16 +1,12 @@
-version: "3.8"
-
 services:
   frontend:
     build:
       context: .
       dockerfile: ./frontend/Dockerfile
-    # ports: #might need to remove it after adding nginx webserver
-    #   - "3000:3000"
     volumes:
       - ./frontend:/app
+      - /app/node_modules
     environment:
-      - NODE_ENV=${NODE_ENV:-development}
       - WDS_SOCKET_PORT=0
       - WATCHPACK_POLLING=true
     networks:
@@ -18,14 +14,12 @@ services:
 
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
-    # ports: #might need to remove it after adding nginx webserver
-    #   - "5000:5000"
+      context: .
+      dockerfile: ./backend/Dockerfile
     volumes:
       - ./backend:/app
+      - /app/node_modules
     environment:
-      - NODE_ENV=${NODE_ENV:-development}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}

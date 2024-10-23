@@ -18,6 +18,10 @@ build:
 clean:
 	docker-compose down --rmi all --volumes --remove-orphans
 
+# prune all services
+prune:
+	docker system prune -f
+
 # Restart all services
 restart:
 	docker-compose restart
