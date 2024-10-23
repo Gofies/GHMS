@@ -164,6 +164,7 @@ We follow the Conventional Commits style:
 - **docs:** Documentation changes
 - **refactor:** Refactoring code
 - **test:** Adding or updating tests
+- **dev:** feature development tasks
 
 Example:
 

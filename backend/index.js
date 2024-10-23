@@ -4,6 +4,8 @@ const apiRoutes = require('./api_routes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.use(express.json());
+
 // Use the API routes
 app.use('/api', apiRoutes);
 
