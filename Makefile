@@ -45,3 +45,6 @@ attach-redis:
 #attach to mongodb container's cli
 attach-mongo:
 	docker exec -it softeng-mongo-1 mongo -u admin -p admin --authenticationDatabase admin
+	
+certificates:
+	./gen_dev_ssl_cert.sh
