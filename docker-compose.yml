@@ -29,31 +29,13 @@ services:
     networks:
       - gofies
 
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    ports: #might need to remove it after adding nginx webserver
-      - "5432:5432"
-    volumes:
-      - ./database/postgresql/db_data:/var/lib/postgresql/data
-    networks:
-      - gofies
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   mongo:
-    image: mongo:5.0
+    image: mongo:latest
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-    ports: #might need to remove it after adding nginx webserver
+    ports:
       - "27017:27017"
     volumes:
       - ./database/mongodb/db_data:/data/db
@@ -65,19 +47,34 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
-    image: redis:alpine
-    ports: #might need to remove it after adding nginx webserver
-      - "6379:6379"
-    volumes:
-      - ./database/redis/db_data:/data
+  citus-master:
+    image: "citusdata/citus:latest"
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    ports:
+      - "5432:5432"
     networks:
       - gofies
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+
+  citus-worker:
+    image: "citusdata/citus:latest"
+    deploy:
+      mode: replicated
+      replicas: 3
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    ports:
+      - "5433-5435:5432"
+    networks:
+      - gofies
+    depends_on:
+      - citus-master
 
   nginx:
     image: nginx:alpine
