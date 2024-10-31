@@ -41,18 +41,22 @@ attach:
 ##### Database Makefile Commands #####
 
 attach-citus-master:
-	docker exec -it ghms-citus-master-1 psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+	docker exec -it softeng-citus-master-1 psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
 
 attach-citus-worker:
-	docker exec -it ghms-citus-worker-1 psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+	docker exec -it softeng-citus-worker-1 psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+
+attach-mongo:
+	docker exec -it softeng-mongo-1 mongosh -u admin -p admin
+
+mongo-up:
+	docker-compose up -d mongo
 
 citus-up:
-	docker-compose up -d citus-master citus-worker
-	chmod +x ./database/citus/init.sh
-	@./database/citus/init.sh
+	docker-compose up -d citus-master citus-worker citus-init
 
 citus-down:
-	docker-compose down citus-master citus-worker
+	docker-compose down citus-master citus-worker citus-init
 
 citus-logs:
-	docker-compose logs -f citus-master citus-worker
+	docker-compose logs -f citus-master citus-worker citus-init

@@ -28,7 +28,7 @@ db.once('open', () => {
 // PostgreSQL Connection
 const pool = new Pool({
   user: POSTGRES_USER,
-  host: 'postgres',
+  host: 'citus-master',
   database: POSTGRES_DB,
   password: POSTGRES_PASSWORD,
   port: 5432,
