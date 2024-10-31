@@ -38,11 +38,11 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./database/mongodb/db_data:/data/db
+      - ./database/mongodb/db:/data/db
     networks:
       - gofies
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
