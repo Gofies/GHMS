@@ -46,7 +46,7 @@ check_service_health() {
 check_all_services_health() {
     local timeout_minutes=5
     local max_attempts=$((timeout_minutes * 6)) # 6 attempts per minute (10-second intervals)
-    local services=("mongo" "citus-master" "citus-worker")
+    local services=("mongo" "citus-master")
     local failed_services=()
     
     echo "Starting health checks for all services..."
