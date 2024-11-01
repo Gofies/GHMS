@@ -37,7 +37,9 @@ status:
 attach:
 	docker exec -it softeng-$(service)-1 sh
 
-
+certificates:
+	./gen_dev_ssl_cert.sh
+  
 ##### Database Makefile Commands #####
 
 attach-citus-master:
