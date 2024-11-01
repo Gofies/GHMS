@@ -1,3 +1,6 @@
+include .env
+export $(shell sed 's/=.*//' .env)
+
 # Bring up services dynamically
 up:
 	docker-compose up $(service)
@@ -34,17 +37,28 @@ status:
 attach:
 	docker exec -it softeng-$(service)-1 sh
 
-#attach to postgres container's cli
-attach-psql:
-	docker exec -it softeng-postgres-1 psql -U admin
-
-#attach to redis container's cli
-attach-redis:
-	docker exec -it softeng-redis-1 redis-cli
-
-#attach to mongodb container's cli
-attach-mongo:
-	docker exec -it softeng-mongo-1 mongo -u admin -p admin --authenticationDatabase admin
-	
 certificates:
 	./gen_dev_ssl_cert.sh
+  
+##### Database Makefile Commands #####
+
+attach-citus-master:
+	docker exec -it softeng-citus-master-1 psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+
+attach-citus-worker:
+	docker exec -it softeng-citus-worker-1 psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+
+attach-mongo:
+	docker exec -it softeng-mongo-1 mongosh -u admin -p admin
+
+mongo-up:
+	docker-compose up -d mongo
+
+citus-up:
+	docker-compose up -d citus-master citus-worker citus-init
+
+citus-down:
+	docker-compose down citus-master citus-worker citus-init
+
+citus-logs:
+	docker-compose logs -f citus-master citus-worker citus-init
