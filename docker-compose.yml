@@ -35,8 +35,6 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-    ports:
-      - "27017:27017"
     networks:
       - gofies
     healthcheck:
@@ -52,8 +50,6 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       POSTGRES_DB: "${POSTGRES_DB}"
       CITUS_WORKER_COUNT: "${CITUS_WORKER_COUNT}"
-    ports:
-      - "5432:5432"
     networks:
       - gofies
     volumes:
@@ -74,8 +70,6 @@ services:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       POSTGRES_DB: "${POSTGRES_DB}"
-    ports:
-      - "5433-5435:5432"
     networks:
       - gofies
     volumes:
@@ -89,7 +83,7 @@ services:
   citus-init:
     image: "citusdata/citus:12.1.3"
     volumes:
-      - ./database/citus:/data/citus
+      - ./database/citus:/data/citus:ro
     environment:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
@@ -97,7 +91,10 @@ services:
       CITUS_WORKER_COUNT: "${CITUS_WORKER_COUNT}"
     networks:
       - gofies
-    command: /bin/sh -c "/data/citus/init.sh"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        sh /data/citus/init.sh
     depends_on:
       citus-master:
         condition: service_healthy

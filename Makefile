@@ -1,8 +1,24 @@
 include .env
 export $(shell sed 's/=.*//' .env)
 
-# Bring up services dynamically
+ifeq ($(OS),Windows_NT)
+    CHECK_SSL := powershell -Command "$$sslPath = '$(CURDIR)/ssl'; \
+        if (-not (Test-Path \"$$sslPath/fullchain.pem\" -PathType Leaf) -or -not (Test-Path \"$$sslPath/yourdomain.key\" -PathType Leaf)) { \
+            Write-Host 'SSL certificates not found. Generating development certificates...' -ForegroundColor Yellow; \
+            bash ./gen_dev_ssl_cert.sh; \
+        } else { \
+            Write-Host 'SSL certificates found. Proceeding with service startup...' -ForegroundColor Green; \
+        }"
+else
+    CHECK_SSL := if [ ! -f ssl/fullchain.pem ] || [ ! -f ssl/yourdomain.key ]; then \
+        echo "SSL certificates not found. Generating development certificates..." && ./gen_dev_ssl_cert.sh; \
+    else \
+        echo "SSL certificates found. Proceeding with service startup..."; \
+    fi
+endif
+
 up:
+	@$(CHECK_SSL)
 	docker-compose up $(service)
 
 # Bring down services dynamically
