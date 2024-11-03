@@ -23,8 +23,8 @@ jobs:
 
       - name: Build and start services
         run: |
-          chmod +x ./gen_dev_ssl_certs.sh
-          ./gen_dev_ssl_certs.sh
+          chmod +x ./gen_dev_ssl_cert.sh
+          ./gen_dev_ssl_cert.sh
           docker-compose up -d --build
 
       - name: Wait for services to be healthy
