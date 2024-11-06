@@ -97,7 +97,7 @@ services:
       CITUS_WORKER_COUNT: "${CITUS_WORKER_COUNT}"
     networks:
       - gofies
-    command: >
+    command: |
       sh -c "
         sed -i 's/\r$//' /data/citus/init.sh &&
         chmod +x /data/citus/init.sh &&
