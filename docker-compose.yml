@@ -97,12 +97,7 @@ services:
       CITUS_WORKER_COUNT: "${CITUS_WORKER_COUNT}"
     networks:
       - gofies
-    command: |
-      sh -c "
-        sed -i 's/\r$//' /data/citus/init.sh &&
-        chmod +x /data/citus/init.sh &&
-        /data/citus/init.sh
-      "
+    command: "sh -c 'sed -i \"s/$$\r$$//\" /data/citus/init.sh && chmod +x /data/citus/init.sh && /data/citus/init.sh'"
     depends_on:
       citus-master:
         condition: service_healthy
