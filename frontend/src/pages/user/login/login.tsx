@@ -5,7 +5,7 @@ import { Input } from '../../../components/ui/login/Input';
 import { Label } from '../../../components/ui/login/Label';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { NavLink } from "react-router-dom";
-import { Endpoint, postRequest, getRequest } from '../../../helpers/Network';
+import { Endpoint, postRequest } from '../../../helpers/Network';
 import { Images } from "../../../assets/images/Images";
 
 export default function LoginPage() {
@@ -15,15 +15,12 @@ export default function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Login attempted');
     try {
       const response = await postRequest(Endpoint.LOGIN, { email, password });
-      console.log('Login successful:', response);
       // Handle successful login (e.g., redirect, store token, etc.)
     } catch (error) {
       console.error('Login failed:', error);
     } finally {
-      console.log("clear");
       setEmail('');
       setPassword('');
     }

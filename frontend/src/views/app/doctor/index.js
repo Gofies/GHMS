@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import './App.css';
+import React from 'react';
+import { Routes, Route } from "react-router-dom";
+import DoctorHomePage from "../../../pages/doctor/DoctorHomePage.tsx"
 
-function DoctorHomePage() {
+const DoctorView = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* <Route path="/" element={<DoctorHomePage />}></Route> */}
-        {/* related links will be added here */}
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<DoctorHomePage />} />
+      {/* Add additional routes here for DoctorView */}
+      {/* Example: <Route path="/settings" element={<DoctorSettings />} /> */}
+    </Routes>
   );
 }
 
-export default DoctorHomePage;
+export default DoctorView;

@@ -1,19 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './App.css';
-import LoginPage from './pages/user/login/login.tsx';
-import ForgotPasswordPage from './pages/user/forgotPassword/forgotPassword.tsx';
+import LoginPage from './pages/user/login/Login.tsx';
+import AdminView from "./views/app/admin"
+import DoctorView from './views/app/doctor';
+import PatientView from './views/app/patient';
+import LabStaffView from './views/app/labStaff/index.js';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LoginPage />}></Route>
-        <Route path="/forgot-password" element={<ForgotPasswordPage />}></Route>
-        {/* related links will be added here such as "/error", "/unauthorized" ... */}
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/admin/*" element={<AdminView />} />
+        <Route path="/doctor/*" element={<DoctorView />} />
+        <Route path="/lab-staff/*" element={<LabStaffView />} />
+        <Route path="/patient/*" element={<PatientView />} />
+        {/* Add more routes as needed */}
       </Routes>
-    </BrowserRouter>
-  );
+  </BrowserRouter>
+);
 }
 
 export default App;

@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import './App.css';
+import React from 'react';
+import { Routes, Route } from "react-router-dom";
+import AdminHomePage from "../../../pages/admin/AdminHomePage.tsx"
 
-function AdminHomePage() {
+const AdminView = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* <Route path="/" element={<AdminHomePage />}></Route> */}
-        {/* related links will be added here */}
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<AdminHomePage />} />
+      {/* Add additional routes here for DoctorView */}
+      {/* Example: <Route path="/settings" element={<AdminSettings />} /> */}
+   </Routes>
   );
 }
 
-export default AdminHomePage;
+export default AdminView;
