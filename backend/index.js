@@ -6,7 +6,7 @@ import connectDB from "./config/db.js";
 import patientAuthRoutes from "./routes/patient.routes/auth.route.js";
 //import { serveSwagger, setupSwagger } from "./utils/swagger.js";
 
-dotenv.config({ path: '../.env' });
+dotenv.config();
 const PORT = 5000;
 const app = express();
 
