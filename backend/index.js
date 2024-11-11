@@ -1,19 +1,25 @@
-const express = require('express');
-const apiRoutes = require('./api_routes');
+import express from "express";
+import cors from "cors";
 
+import dotenv from "dotenv";
+import connectDB from "./config/db.js";
+import patientAuthRoutes from "./routes/patient.routes/auth.route.js";
+//import { serveSwagger, setupSwagger } from "./utils/swagger.js";
+
+dotenv.config();
+const PORT = 5000;
 const app = express();
-const PORT = process.env.PORT || 5000;
 
+app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+//app.use(cookieParser());
+//app.use('/api-docs', serveSwagger, setupSwagger);
 
-// Use the API routes
-app.use('/api', apiRoutes);
+app.use("/api/v1/patient/auth", patientAuthRoutes);
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.send('healthy');
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+    connectDB();
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on http://0.0.0.0:${PORT}`);
-});

@@ -35,6 +35,7 @@ const times = [
 ]
 
 export default function AppointmentsPage() {
+  
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
     const [newAppointmentStep, setNewAppointmentStep] = useState(1);
@@ -64,7 +65,6 @@ export default function AppointmentsPage() {
         setSelectedDate(e.target.value);
         setIsDateOpen(false);
     };
-
 
     const handleSelectTime = (value) => {
         setSelectedTime(value);
@@ -375,6 +375,7 @@ export default function AppointmentsPage() {
                                 >
                                     Create Appointment
                                 </Button>
+
                             )}
                         </div>
                     </DialogContent>
