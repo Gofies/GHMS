@@ -10,7 +10,7 @@ export const DialogTrigger = ({ asChild, children }) => {
 };
 
 export const DialogContent = ({ children }) => (
-  <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+  <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-30">
     <div className="bg-white rounded-lg p-6 max-w-lg w-full">{children}</div>
   </div>
 );
