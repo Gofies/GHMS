@@ -35,29 +35,35 @@ const times = [
 ]
 
 export default function AppointmentsPage() {
-    const [selectedAppointment, setSelectedAppointment] = useState(null)
-    const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false)
-    const [newAppointmentStep, setNewAppointmentStep] = useState(1)
-    const [selectedSpecialty, setSelectedSpecialty] = useState("")
-    const [selectedDoctor, setSelectedDoctor] = useState("")
-    const [selectedDate, setSelectedDate] = useState("")
-    const [selectedTime, setSelectedTime] = useState("")
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
+    const [newAppointmentStep, setNewAppointmentStep] = useState(1);
 
+    const [selectedSpecialty, setSelectedSpecialty] = useState("");
+    const [selectedDoctor, setSelectedDoctor] = useState("");
+    const [selectedDate, setSelectedDate] = useState("");
+    const [selectedTime, setSelectedTime] = useState("");
+    
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isSpecialtyOpen, setIsSpecialtyOpen] = useState(false);
     const [isDoctorOpen, setIsDoctorOpen] = useState(false);
+    const [isDateOpen, setIsDateOpen] = useState(false);
     const [isTimeOpen, setIsTimeOpen] = useState(false);
-
 
     const handleSelectSpecialty = (value) => {
         setSelectedSpecialty(value);
-        setSelectedDoctor(''); 
         setIsSpecialtyOpen(false);
     };
 
     const handleSelectDoctor = (value) => {
         setSelectedDoctor(value);
         setIsDoctorOpen(false);
+    };
+
+    const handleSelectDate = (e) => {
+        setSelectedDate(e.target.value);
+        setIsDateOpen(false);
     };
 
     const handleSelectTime = (value) => {
@@ -108,7 +114,7 @@ export default function AppointmentsPage() {
         <div className="flex h-screen bg-gray-100">
             <Sidebar />
             <main className="flex-1 overflow-y-auto">
-                <Header title="Appointments"/>
+                <Header title="Appointments" />
                 {/* Appointments Content */}
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                     <Card>
@@ -199,81 +205,155 @@ export default function AppointmentsPage() {
                             <DialogTitle>New Appointment</DialogTitle>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
+                            {/* Step 1: Select Specialty */}
                             {newAppointmentStep === 1 && (
                                 <div>
-                                    <h3 className="font-semibold mb-2">Select Specialty:</h3>
-                                    <Select>
-                                        <SelectTrigger
-                                            value={selectedSpecialty}
-                                            onClick={() => setIsSpecialtyOpen(!isSpecialtyOpen)}
-                                        />
-                                        <SelectContent isOpen={isSpecialtyOpen}>
-                                            {specialties.map((specialty) => (
-                                                <SelectItem
-                                                    key={specialty}
-                                                    value={specialty}
-                                                    onSelect={handleSelectSpecialty}
+                                    <div className="flex items-center w-full">
+                                        <div className="flex-1">
+                                            <Select className="w-3/4">
+                                                <SelectTrigger
+                                                    value={selectedSpecialty || "Select a specialty..."}
+                                                    onClick={() => setIsSpecialtyOpen(!isSpecialtyOpen)}
+                                                    className="h-full"
                                                 />
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                                <SelectContent isOpen={isSpecialtyOpen}>
+                                                    {specialties.map((specialty) => (
+                                                        <SelectItem
+                                                            key={specialty}
+                                                            value={specialty}
+                                                            onSelect={handleSelectSpecialty}
+                                                        >
+                                                            {specialty}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        {selectedSpecialty && (
+                                            <button
+                                                className="ml-2 w-10 h-[38px] flex justify-center items-center text-white bg-blue-600 rounded hover:bg-blue-700"
+                                                onClick={() => handleSelectSpecialty("")}
+                                            >
+                                                ✖
+                                            </button>
+                                        )}
+                                    </div>
+                                    {!selectedSpecialty && (
+                                        <p className="text-red-500 text-sm mt-2">Please select a specialty.</p>
+                                    )}
                                 </div>
                             )}
+                            {/* Step 2: Select Doctor */}
                             {newAppointmentStep === 2 && selectedSpecialty && (
                                 <div>
-                                    <h3 className="font-semibold mb-2">Select Doctor:</h3>
-                                    <Select>
-                                        <SelectTrigger
-                                            value={selectedDoctor}
-                                            onClick={() => setIsDoctorOpen(!isDoctorOpen)}
-                                        />
-                                        <SelectContent isOpen={isDoctorOpen}>
-                                            {doctors[selectedSpecialty]?.map((doctor) => (
-                                                <SelectItem
-                                                    key={doctor}
-                                                    value={doctor}
-                                                    onSelect={handleSelectDoctor}
+                                    <div className="flex items-center w-full">
+                                        <div className="flex-1">
+                                            <Select className="w-3/4">
+                                                <SelectTrigger
+                                                    value={selectedDoctor || "Select a doctor..."}
+                                                    onClick={() => setIsDoctorOpen(!isDoctorOpen)}
+                                                    className="h-full"
                                                 />
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                                <SelectContent isOpen={isDoctorOpen}>
+                                                    {doctors[selectedSpecialty]?.map((doctor) => (
+                                                        <SelectItem
+                                                            key={doctor}
+                                                            value={doctor}
+                                                            onSelect={handleSelectDoctor}
+                                                        >
+                                                            {doctor}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        {selectedDoctor && (
+                                            <button
+                                                className="ml-2 w-10 h-[38px] flex justify-center items-center text-white bg-blue-600 rounded hover:bg-blue-700"
+                                                onClick={() => handleSelectDoctor("")}
+                                            >
+                                                ✖
+                                            </button>
+                                        )}
+                                    </div>
+                                    {!selectedDoctor && (
+                                        <p className="text-red-500 text-sm mt-2">Please select a doctor.</p>
+                                    )}
                                 </div>
                             )}
+
+                            {/* Step 3: Select Date and Time */}
                             {newAppointmentStep === 3 && selectedSpecialty && selectedDoctor && (
-                                <>
-                                    <div>
-                                        <h3 className="font-semibold mb-2">Select Date:</h3>
-                                        <input
-                                            type="date"
-                                            className="w-full p-2 border rounded"
-                                            value={selectedDate}
-                                            onChange={(e) => setSelectedDate(e.target.value)}
-                                        />
+                                <div>
+                                    {/* Date Selection */}
+                                    <div className="flex items-center w-full gap-2">
+                                        <div className="flex-1">
+                                            <div className="w-full h-[38px] p-2 border rounded">
+                                                <input
+                                                    type="date"
+                                                    value={selectedDate}
+                                                    onChange={handleSelectDate}
+                                                    className="w-full"
+                                                />
+                                            </div>
+                                        </div>
+                                        {selectedDate && (
+                                            <button
+                                                className="w-10 h-[38px] flex justify-center items-center text-white bg-blue-600 rounded hover:bg-blue-700"
+                                                onClick={() => setSelectedDate("")}
+                                            >
+                                                ✖
+                                            </button>
+                                        )}
+                            
+                                    </div>
+                                    <div> 
+                                        {!selectedDate && (
+                                            <p className="text-red-500 text-sm mt-2">Please select a date.</p>
+                                        )}
                                     </div>
 
-                                    <div>
-                                        <h3 className="font-semibold mb-2">Select Time:</h3>
-                                        <Select>
-                                            <SelectTrigger
-                                                value={selectedTime}
-                                                onClick={() => setIsTimeOpen((prev) => !prev)}
-                                            />
-                                            <SelectContent isOpen={isTimeOpen}>
-                                                {times.map((time) => (
-                                                    <SelectItem
-                                                        key={time}
-                                                        value={time}
-                                                        onSelect={handleSelectTime}
-                                                    >
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                    {/* Time Selection */}
+                                    <div className="flex items-center w-full gap-2 mt-4">
+                                        <div className="flex-1">
+                                            <Select className="w-full">
+                                                <SelectTrigger
+                                                    value={selectedTime || "Select a time..."}
+                                                    onClick={() => setIsTimeOpen((prev) => !prev)}
+                                                    className="h-full w-full"
+                                                />
+                                                <SelectContent isOpen={isTimeOpen}>
+                                                    {times.map((time) => (
+                                                        <SelectItem
+                                                            key={time}
+                                                            value={time}
+                                                            onSelect={handleSelectTime}
+                                                        >
+                                                            {time}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        {selectedTime && (
+                                            <button
+                                                className="w-10 h-[38px] flex justify-center items-center text-white bg-blue-600 rounded hover:bg-blue-700"
+                                                onClick={() => handleSelectTime("")}
+                                            >
+                                                ✖
+                                            </button>
+                                        )}
                                     </div>
-                                </>
+                                    <div> 
+                                        {!selectedTime && (
+                                            <p className="text-red-500 text-sm mt-2">Please select a time.</p>
+                                        )}
+                                    </div>
+                                </div>
                             )}
-
                         </div>
+
+                        {/* Navigation Buttons */}
                         <div className="flex justify-between mt-4">
                             <Button variant="outline" onClick={handleCloseNewAppointmentDialog}>
                                 Close
@@ -281,16 +361,26 @@ export default function AppointmentsPage() {
                             {newAppointmentStep > 1 && (
                                 <Button onClick={handlePreviousStep}>Previous</Button>
                             )}
-                            {newAppointmentStep < 3 ? (
+                            {/* Conditionally render the Next button */}
+                            {newAppointmentStep === 1 && selectedSpecialty && (
                                 <Button onClick={handleNextStep}>Next</Button>
-                            ) : (
-                                <Button onClick={handleCreateAppointment}>Create Appointment</Button>
+                            )}
+                            {newAppointmentStep === 2 && selectedSpecialty && selectedDoctor && (
+                                <Button onClick={handleNextStep}>Next</Button>
+                            )}
+                            {newAppointmentStep === 3 && selectedDate && selectedTime && (
+                                <Button
+                                    onClick={handleCreateAppointment}
+                                    disabled={!selectedDate || !selectedTime}
+                                >
+                                    Create Appointment
+                                </Button>
+
                             )}
                         </div>
                     </DialogContent>
                 </Dialog>
             )}
-
         </div>
     )
 }
