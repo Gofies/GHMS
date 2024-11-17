@@ -6,12 +6,14 @@ import AdminView from "./views/app/admin"
 import DoctorView from './views/app/doctor';
 import PatientView from './views/app/patient';
 import LabStaffView from './views/app/labStaff/index.js';
+import PatientSignupPage from "./pages/patient/PatientSignupPage.tsx";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
+        <Route path="/signup" element={<PatientSignupPage />} />
         <Route path="/admin/*" element={<AdminView />} />
         <Route path="/doctor/*" element={<DoctorView />} />
         <Route path="/lab-staff/*" element={<LabStaffView />} />
