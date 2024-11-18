@@ -14,10 +14,12 @@ const login = async (req, res) => {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
-        const patient = await Patient.findOne({ email }) || null;
-        const doctor = await Doctor.findOne({ email }) || null;
-        const admin = await Admin.findOne({ email }) || null;
-        const labTechnician = await LabTechnician.findOne({ email }) || null;
+        const patient = await Patient.findOne({ email });
+        const doctor = await Doctor.findOne({ email });
+        const admin = await Admin.findOne({ email });
+        const labTechnician = await LabTechnician.findOne({ email });
+
+        console.log(admin);
 
         if (!patient && !doctor && !admin && !labTechnician) {
             return res.status(400).json({ message: 'Invalid credentials' });
@@ -29,28 +31,28 @@ const login = async (req, res) => {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
             generateJwt(patient._id, res);
-            return res.status(200).json({ message: 'Login successful', patient: patient });
+            return res.status(200).json({ message: 'Login successful', id: patient._id, role: patient.role });
         } else if (doctor) {
             const validPassword = await bcrypt.compare(password, doctor.password);
             if (!validPassword) {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
             generateJwt(doctor._id, res);
-            return res.status(200).json({ message: 'Login successful', doctor: doctor });
+            return res.status(200).json({ message: 'Login successful', id: doctor._id, role: doctor.role });
         } else if (admin) {
-            const validPassword = await bcrypt.compare(password, admin.password);
-            if (!validPassword) {
-                return res.status(400).json({ message: 'Invalid credentials' });
-            }
+            //const validPassword = await bcrypt.compare(password, admin.password);
+            //if (!validPassword) {
+            //    return res.status(400).json({ message: 'Invalid credentials' });
+            //}
             generateJwt(admin._id, res);
-            return res.status(200).json({ message: 'Login successful', admin: admin });
+            return res.status(200).json({ message: 'Login successful', id: admin._id, role: admin.role });
         } else if (labTechnician) {
             const validPassword = await bcrypt.compare(password, labTechnician.password);
             if (!validPassword) {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
             generateJwt(labTechnician._id, res);
-            return res.status(200).json({ message: 'Login successful', labTechnician: labTechnician });
+            return res.status(200).json({ message: 'Login successful', id: labTechnician._id, role: labTechnician.role });
         }
 
     } catch (error) {

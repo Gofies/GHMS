@@ -1,10 +1,15 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.route.js";
 import patientAuthRoutes from "./routes/patient.routes/auth.route.js";
+import patientAppointmentRoutes from "./routes/patient.routes/appointment.route.js";
+
+import adminDoctorRoutes from "./routes/admin.routes/doctor.routes.js";
+
 //import { serveSwagger, setupSwagger } from "./utils/swagger.js";
 
 dotenv.config();
@@ -14,11 +19,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-//app.use(cookieParser());
+app.use(cookieParser());
 //app.use('/api-docs', serveSwagger, setupSwagger);
 
 app.use("/api/v1/auth", authRoutes);
+
 app.use("/api/v1/patient/auth", patientAuthRoutes);
+app.use("/api/v1/patient/appointments", patientAppointmentRoutes);
+
+app.use("/api/v1/admin/doctors", adminDoctorRoutes);
 
 app.get("/api/health", (req, res) => {
     res.status(200).send('OK');
