@@ -3,7 +3,6 @@ import { Routes, Route } from "react-router-dom";
 import PatientHomePage from "../../../pages/patient/PatientHomePage.tsx";
 import PatientHealthMetricsPage from "../../../pages/patient/PatientHealthMetricsPage.tsx";
 import PatientAppointmentsPage from "../../../pages/patient/PatientAppointmentsPage.tsx";
-
 const PatientView = () => {
   return (
     <Routes>
