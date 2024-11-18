@@ -4,6 +4,7 @@ import PatientHomePage from "../../../pages/patient/PatientHomePage.tsx";
 import PatientHealthMetricsPage from "../../../pages/patient/PatientHealthMetricsPage.tsx";
 import PatientAppointmentsPage from "../../../pages/patient/PatientAppointmentsPage.tsx";
 import PatientMedicalRecordsPage from "../../../pages/patient/PatientMedicalRecordsPage.tsx";
+
 const PatientView = () => {
   return (
     <Routes>
