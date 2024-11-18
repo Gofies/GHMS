@@ -11,6 +11,11 @@ services:
       - WATCHPACK_POLLING=true
     networks:
       - gofies
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-k", "https://nginx/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   backend:
     build:
@@ -28,6 +33,13 @@ services:
       - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
     networks:
       - gofies
+    depends_on:
+      - mongo
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-k", "https://nginx/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   mongo:
     image: mongo:8.0
@@ -118,6 +130,11 @@ services:
       - backend
     networks:
       - gofies
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 networks:
   gofies:
