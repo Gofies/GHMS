@@ -3,6 +3,7 @@ import cors from "cors";
 
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
+import authRoutes from "./routes/auth.route.js";
 import patientAuthRoutes from "./routes/patient.routes/auth.route.js";
 //import { serveSwagger, setupSwagger } from "./utils/swagger.js";
 
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 //app.use(cookieParser());
 //app.use('/api-docs', serveSwagger, setupSwagger);
 
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/patient/auth", patientAuthRoutes);
 
 app.get("/api/health", (req, res) => {

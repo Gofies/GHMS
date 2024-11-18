@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
 import Patient from '../../models/patient.model.js';
 import generateJwt from '../../utils/generateJwt.js';
-import jwt from 'jsonwebtoken';
 
 const signup = async (req, res) => {
     try {
@@ -58,6 +57,7 @@ const signup = async (req, res) => {
                     email: patient.email,
                     phone: patient.phone,
                     birthdate: patient.birthdate,
+                    role: patient.role,
                 }
             });
         }
@@ -68,75 +68,5 @@ const signup = async (req, res) => {
     }
 };
 
-const login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
 
-        if (email === undefined || password === undefined) {
-            return res.status(400).json({ message: 'All fields are required' });
-        }
-
-        const patient = await Patient.findOne({ email });
-
-        if (!patient) {
-            return res.status(400).json({ message: 'Invalid credentials' });
-        }
-
-        const validPassword = await bcrypt.compare(password, patient.password);
-
-        if (!validPassword) {
-            return res.status(400).json({ message: 'Invalid credentials' });
-        }
-
-        generateJwt(patient._id, res);
-        return res.status(200).json({ message: 'Login successful', patient: patient });
-
-    } catch (error) {
-        console.log('Error in login controller: ', error.message);
-        return res.status(500).json({ message: 'Server error. Please try again later.' });
-    }
-};
-
-const logout = (req, res) => {
-    try {
-        res.clearCookie('token');
-        return res.status(200).json({ message: 'Logout successful' });
-    } catch (error) {
-        console.log('Error in logout controller: ', error.message);
-        return res.status(500).json({ message: 'Server error. Please try again later.' });
-    }
-};
-
-const refreshToken = async (req, res) => {
-    try {
-        const { refreshToken } = req.cookies;
-
-        if (!refreshToken) {
-            return res.status(401).json({ message: 'Unauthorized' });
-        }
-
-        jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, decoded) => {
-            if (err) {
-                return res.status(403).json({ message: 'Invalid refresh token' });
-            }
-
-            // Find user based on decoded user ID from the refresh token
-            const patient = await Patient.findById(decoded.id).select('-password');
-
-            if (!patient) {
-                return res.status(401).json({ message: 'Unauthorized' });
-            }
-
-            // Generate new tokens and send them in response
-            generateJwt(patient._id, res);
-            return res.status(200).json({ message: 'Token refreshed' });
-        });
-    } catch (error) {
-        console.log('Error in refresh token endpoint: ', error.message);
-        return res.status(500).json({ message: 'Server error. Please try again later.' });
-    }
-};
-
-
-
-export { signup, login, logout, refreshToken };
+export { signup };
