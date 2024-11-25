@@ -39,6 +39,10 @@ app.use("/api/v1/patient/profile", patientProfileRoutes);
 
 app.use("/api/v1/admin/doctors", adminDoctorRoutes);
 
+//ASAGDAKI SILMEEEEEEEEEEEEEEEEEE
+app.get("/api/health", (req, res) => {
+    res.status(200).send('OK');
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
