@@ -12,6 +12,7 @@ import patientAppointmentRoutes from "./routes/patient.routes/appointment.route.
 import patientMetricsRoutes from "./routes/patient.routes/health.metric.route.js";
 import patientMedicalRecordRoutes from "./routes/patient.routes/medical.record.route.js";
 import patientProfileRoutes from "./routes/patient.routes/profile.route.js";
+import patientHomeRoutes from "./routes/patient.routes/home.route.js";
 
 import adminDoctorRoutes from "./routes/admin.routes/doctor.routes.js";
 
@@ -29,6 +30,7 @@ app.use(cookieParser());
 
 app.use("/api/v1/auth", authRoutes);
 
+app.use("/api/v1/patient/", patientHomeRoutes);
 app.use("/api/v1/patient/auth", patientAuthRoutes);
 app.use("/api/v1/patient/appointments", patientAppointmentRoutes);
 app.use("/api/v1/patient/metrics", patientMetricsRoutes);
