@@ -1,5 +1,5 @@
 import Doctor from '../../models/doctor.model.js';
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 
 const getDoctors = async (req, res) => {
     try {
@@ -23,7 +23,7 @@ const newDoctor = async (req, res) => {
     try {
         const { name, surname, title, email, password, birthdate, phone, jobstartdate, degree, specialization } = req.body;
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcryptjs.hash(password, 10);
 
         const doctor = new Doctor({
             name,

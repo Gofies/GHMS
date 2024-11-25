@@ -24,8 +24,6 @@ const newAppointment = async (req, res) => {
             type
         });
 
-
-
         await Patient.findByIdAndUpdate(patientId, { $push: { appointments: appointment._id } });
 
         return res.status(201).json({ message: 'Appointment created successfully', appointment });
@@ -37,11 +35,7 @@ const newAppointment = async (req, res) => {
 
 const getAppointments = async (req, res) => {
     try {
-        const token = req.cookies.accessToken;
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const patientId = decoded.id;
-
-        const patient = await Patient.findById(patientId)
+        const patient = await Patient.findById(req.user._id)
             .select('appointments')
             .populate('appointments');
 

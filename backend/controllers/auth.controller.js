@@ -1,10 +1,44 @@
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 import Patient from '../models/patient.model.js';
 import Doctor from '../models/doctor.model.js';
 import Admin from '../models/admin.model.js';
 import LabTechnician from '../models/lab.technician.model.js';
 import generateJwt from '../utils/generateJwt.js';
 import jwt from 'jsonwebtoken';
+
+const adminSignup = async (req, res) => {
+    try {
+        const { name, surname, email, password, role, phone } = req.body;
+
+        if (email === undefined || password === undefined) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        const admin = await Admin.findOne({ email });
+
+        if (admin) {
+            return res.status(400).json({ message: 'Admin already exists' });
+        }
+
+        const hashedPassword = await bcryptjs.hash(password, 12);
+
+        const newAdmin = new Admin({
+            name,
+            surname,
+            email,
+            password: hashedPassword,
+            role,
+            phone
+        });
+
+        await newAdmin.save();
+
+        return res.status(201).json({ message: 'Admin created successfully' });
+    } catch (error) {
+        console.log('Error in admin signup controller: ', error.message);
+        return res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+}
 
 const login = async (req, res) => {
     try {
@@ -26,28 +60,28 @@ const login = async (req, res) => {
         }
 
         if (patient) {
-            const validPassword = await bcrypt.compare(password, patient.password);
+            const validPassword = await bcryptjs.compare(password, patient.password);
             if (!validPassword) {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
             generateJwt(patient._id, res);
             return res.status(200).json({ message: 'Login successful', id: patient._id, role: patient.role });
         } else if (doctor) {
-            const validPassword = await bcrypt.compare(password, doctor.password);
+            const validPassword = await bcryptjs.compare(password, doctor.password);
             if (!validPassword) {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
             generateJwt(doctor._id, res);
             return res.status(200).json({ message: 'Login successful', id: doctor._id, role: doctor.role });
         } else if (admin) {
-            //const validPassword = await bcrypt.compare(password, admin.password);
+            //const validPassword = await bcryptjs.compare(password, admin.password);
             //if (!validPassword) {
             //    return res.status(400).json({ message: 'Invalid credentials' });
             //}
             generateJwt(admin._id, res);
             return res.status(200).json({ message: 'Login successful', id: admin._id, role: admin.role });
         } else if (labTechnician) {
-            const validPassword = await bcrypt.compare(password, labTechnician.password);
+            const validPassword = await bcryptjs.compare(password, labTechnician.password);
             if (!validPassword) {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
@@ -101,4 +135,4 @@ const refreshToken = async (req, res) => {
     }
 };
 
-export { login, logout, refreshToken };
+export { login, logout, refreshToken, adminSignup };
