@@ -17,6 +17,10 @@ const doctorSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    password: {
+        type: String,
+        required: true
+    },
     birthdate: {
         type: Date,
         required: true
@@ -42,8 +46,7 @@ const doctorSchema = new mongoose.Schema({
         ref: 'Hospital',
     },
     appointments: {
-        type: Array,
-        required: true
+        type: Array
     },
     role: {
         type: String,

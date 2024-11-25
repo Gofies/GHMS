@@ -25,6 +25,9 @@ const patientSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    emergencycontact: {
+        type: String,
+    },
     birthdate: {
         type: Date,
         required: true
@@ -32,6 +35,9 @@ const patientSchema = new mongoose.Schema({
     nationality: {
         type: String,
         required: true
+    },
+    address: {
+        type: String,
     },
     labtests: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -48,6 +54,31 @@ const patientSchema = new mongoose.Schema({
         ref: 'Prescription',
         required: true
     }],
+    diagnoses: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Diagnosis',
+    }],
+    weight: {
+        type: Number,
+    },
+    height: {
+        type: Number,
+    },
+    bloodpressure: {
+        type: String,
+    },
+    bloodsugar: {
+        type: Number,
+    },
+    bloodtype: {
+        type: String,
+    },
+    allergies: [{
+        type: String,
+    }],
+    heartrate: {
+        type: Number,
+    },
     role: {
         type: String,
         required: true

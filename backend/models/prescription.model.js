@@ -1,10 +1,25 @@
 import mongoose from "mongoose";
 
 const prescription = new mongoose.Schema({
-    medicine: {
-        type: Array,    // {name: "Paracetamol", quantity: "2", time: "Morning", form}, {name: "Ibuprofen", quantity: "1", time: "Afternoon"},  
-        required: true
-    },
+    medicine: [
+        {
+            name: {
+                type: String,
+                required: true,
+            },
+            quantity: {
+                type: String,
+                required: true,
+            },
+            time: {
+                type: String,
+                required: true,
+            },
+            form: {
+                type: String, // Optional if `form` is not always required
+            }
+        }
+    ],
     time: {
         type: String,
         required: true
