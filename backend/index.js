@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+
 import cookieParser from "cookie-parser";
 
 import dotenv from "dotenv";
@@ -15,6 +16,7 @@ import patientProfileRoutes from "./routes/patient.routes/profile.route.js";
 
 import adminDoctorRoutes from "./routes/admin.routes/doctor.routes.js";
 
+
 //import { serveSwagger, setupSwagger } from "./utils/swagger.js";
 
 dotenv.config();
@@ -24,6 +26,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use(cookieParser());
 //app.use('/api-docs', serveSwagger, setupSwagger);
 
@@ -36,6 +39,13 @@ app.use("/api/v1/patient/medical-record", patientMedicalRecordRoutes);
 app.use("/api/v1/patient/profile", patientProfileRoutes);
 
 app.use("/api/v1/admin/doctors", adminDoctorRoutes);
+
+
+
+
+app.get("/api/health", (req, res) => {
+    res.status(200).send('OK');
+});
 
 
 app.listen(PORT, () => {

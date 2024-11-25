@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const prescription = new mongoose.Schema({
+
     medicine: [
         {
             name: {
@@ -20,6 +21,7 @@ const prescription = new mongoose.Schema({
             }
         }
     ],
+
     time: {
         type: String,
         required: true

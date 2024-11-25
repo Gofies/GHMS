@@ -20,7 +20,9 @@ const labTestSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
+
     testtype: { // doctor, lab, radiology
+
         type: String,
         required: true
     },

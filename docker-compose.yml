@@ -40,8 +40,10 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
     ports:
       - "5000:5000"
+
 
   mongo:
     image: mongo:8.0

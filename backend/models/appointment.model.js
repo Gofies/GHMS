@@ -17,6 +17,8 @@ const appointment = new mongoose.Schema({
     },
     polyclinic: {
         type: mongoose.Schema.Types.ObjectId,
+
+    
     },
     treatment: [{
         type: mongoose.Schema.Types.ObjectId,

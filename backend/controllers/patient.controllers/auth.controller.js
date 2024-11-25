@@ -1,6 +1,9 @@
+
 import bcryptjs from 'bcryptjs';
 import Patient from '../../models/patient.model.js';
 import generateJwt from '../../utils/generateJwt.js';
+import jwt from 'jsonwebtoken';
+
 
 const signup = async (req, res) => {
     try {
@@ -30,8 +33,11 @@ const signup = async (req, res) => {
             return res.status(400).json({ message: 'Patient already exists' });
         }
 
+
         const salt = await bcryptjs.genSalt(10);
         const hashedPassword = await bcryptjs.hash(password, salt);
+
+
 
         const patient = await Patient.create({
             name,
@@ -46,7 +52,6 @@ const signup = async (req, res) => {
         });
 
         if (patient) {
-            generateJwt(patient._id, res);
             return res.status(201).json({
                 message: 'Signup successful',
                 patient: {
@@ -58,6 +63,7 @@ const signup = async (req, res) => {
                     phone: patient.phone,
                     birthdate: patient.birthdate,
                     role: patient.role,
+
                 }
             });
         }
@@ -67,6 +73,7 @@ const signup = async (req, res) => {
         return res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
+
 
 const changePassword = async (req, res) => {
     try {
@@ -102,9 +109,9 @@ const changePassword = async (req, res) => {
 
     } catch (error) {
         console.log('Error in changePassword controller: ', error.message);
-        return res.status(500).json({ message: 'Server error. Please try again later.' });
     }
-};
 
 
 export { signup, changePassword };
+
+

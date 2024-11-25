@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const doctorSchema = new mongoose.Schema({
+const itTechnicianSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -17,12 +17,6 @@ const doctorSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-
-    password: {
-        type: String,
-        required: true
-    },
-
     birthdate: {
         type: Date,
         required: true
@@ -35,29 +29,20 @@ const doctorSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    degree: {
-        type: String,
-        required: true
-    },
-    specialization: {
-        type: String,
+    technicalskills: {
+        type: Array,
         required: true
     },
     hospital: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Hospital',
     },
-    appointments: {
-        type: Array
-    },
     role: {
         type: String,
         required: true
     },
-
 }, { timestamps: true });
 
-const Doctor = mongoose.model('Doctor', doctorSchema);
+const ItTechnician = mongoose.model('ItTechnician', itTechnicianSchema);
 
-export default Doctor;
-
+export default ItTechnician;
