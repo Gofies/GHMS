@@ -14,11 +14,9 @@ const appointment = new mongoose.Schema({
     hospital: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Hospital',
-        required: true
     },
     polyclinic: {
-        type: mongoose.schema.Types.ObjectId,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
     },
     treatment: [{
         type: mongoose.Schema.Types.ObjectId,
