@@ -4,7 +4,7 @@ import generateJwt from '../../utils/generateJwt.js';
 
 const signup = async (req, res) => {
     try {
-        const { name, surname, gender, email, password, passwordconfirm, phone, birthdate, nationality } = req.body;
+        const { name, surname, gender, height, weight, bloodtype, address, emergencycontact, email, password, passwordconfirm, phone, birthdate, nationality } = req.body;
 
         if (
             name === undefined ||
@@ -15,7 +15,12 @@ const signup = async (req, res) => {
             passwordconfirm === undefined ||
             phone === undefined ||
             birthdate === undefined ||
-            nationality === undefined
+            nationality === undefined ||
+            height === undefined ||
+            weight === undefined ||
+            bloodtype === undefined ||
+            address === undefined ||
+            emergencycontact === undefined
         ) {
             return res.status(400).json({ message: 'All fields are required' });
         }
@@ -42,6 +47,11 @@ const signup = async (req, res) => {
             phone,
             birthdate,
             nationality,
+            height,
+            weight,
+            bloodtype,
+            address,
+            emergencycontact,
             role: 'patient'
         });
 
