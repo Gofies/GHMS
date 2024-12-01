@@ -58,6 +58,10 @@ const patientSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Diagnosis',
     }],
+    family: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Patient',
+    }],
     weight: {
         type: Number,
     },
