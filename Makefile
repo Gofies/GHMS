@@ -16,6 +16,7 @@ logs:
 build:
 	mkdir -p ssl
 	bash gen_dev_ssl_cert.sh
+	dos2unix ./database/citus/init.sh
 	docker-compose build
 
 # Clean all services

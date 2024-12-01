@@ -1,13 +1,13 @@
 import express from 'express';
 
-import { signup, login, logout, refreshToken } from '../../controllers/patient.controllers/auth.controller.js';
+import { signup, changePassword } from '../../controllers/patient.controllers/auth.controller.js';
+import { protect } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
 router.post('/signup', signup);
-router.post('/login', login);
-router.post('/logout', logout);
-router.post('/refresh-token', refreshToken);
+router.put('/change-password', protect('patient'), changePassword);
+
 
 
 export default router;
