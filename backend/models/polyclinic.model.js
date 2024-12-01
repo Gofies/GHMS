@@ -13,7 +13,6 @@ const polyclinicSchema = new mongoose.Schema({
     doctors: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Doctor',
-        required: true
     }],
 }, { timestamps: true });
 

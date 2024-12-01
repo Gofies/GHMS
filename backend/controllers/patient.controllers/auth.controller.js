@@ -1,11 +1,10 @@
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 import Patient from '../../models/patient.model.js';
 import generateJwt from '../../utils/generateJwt.js';
-import jwt from 'jsonwebtoken';
 
 const signup = async (req, res) => {
     try {
-        const { name, surname, gender, email, password, passwordconfirm, phone, birthdate, nationality } = req.body;
+        const { name, surname, gender, email, password, passwordconfirm, phone, emergencycontact, birthdate, nationality, address } = req.body;
 
         if (
             name === undefined ||
@@ -15,8 +14,10 @@ const signup = async (req, res) => {
             password === undefined ||
             passwordconfirm === undefined ||
             phone === undefined ||
+            emergencycontact === undefined ||
             birthdate === undefined ||
-            nationality === undefined
+            nationality === undefined ||
+            address === undefined
         ) {
             return res.status(400).json({ message: 'All fields are required' });
         }
@@ -31,8 +32,8 @@ const signup = async (req, res) => {
             return res.status(400).json({ message: 'Patient already exists' });
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const salt = await bcryptjs.genSalt(10);
+        const hashedPassword = await bcryptjs.hash(password, salt);
 
         const patient = await Patient.create({
             name,
@@ -41,8 +42,10 @@ const signup = async (req, res) => {
             email,
             password: hashedPassword,
             phone,
+            emergencycontact,
             birthdate,
             nationality,
+            address,
             role: 'patient'
         });
 
@@ -57,7 +60,10 @@ const signup = async (req, res) => {
                     gender: patient.gender,
                     email: patient.email,
                     phone: patient.phone,
+                    emergencycontact: patient.emergencycontact,
                     birthdate: patient.birthdate,
+                    address: patient.address,
+                    role: patient.role,
                 }
             });
         }
@@ -67,76 +73,43 @@ const signup = async (req, res) => {
         return res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
-
-const login = async (req, res) => {
+const changePassword = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { currentPassword, newPassword, newPasswordConfirm } = req.body;
 
-        if (email === undefined || password === undefined) {
+        if (currentPassword === undefined || newPassword === undefined || newPasswordConfirm === undefined) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
-        const patient = await Patient.findOne({ email });
+        if (newPassword !== newPasswordConfirm) {
+            return res.status(400).json({ message: 'Passwords do not match' });
+        }
+
+        const patient = await Patient.findById(req.user._id);
 
         if (!patient) {
-            return res.status(400).json({ message: 'Invalid credentials' });
+            return res.status(404).json({ message: 'Patient not found' });
         }
 
-        const validPassword = await bcrypt.compare(password, patient.password);
+        const isMatch = await bcryptjs.compare(currentPassword, patient.password);
 
-        if (!validPassword) {
-            return res.status(400).json({ message: 'Invalid credentials' });
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid current password' });
         }
 
-        generateJwt(patient._id, res);
-        return res.status(200).json({ message: 'Login successful', patient: patient });
+        const salt = await bcryptjs.genSalt(10);
+        const hashedPassword = await bcryptjs.hash(newPassword, salt);
+
+        patient.password = hashedPassword;
+        await patient.save();
+
+        return res.status(200).json({ message: 'Password updated successfully' });
 
     } catch (error) {
-        console.log('Error in login controller: ', error.message);
-        return res.status(500).json({ message: 'Server error. Please try again later.' });
-    }
-};
-
-const logout = (req, res) => {
-    try {
-        res.clearCookie('token');
-        return res.status(200).json({ message: 'Logout successful' });
-    } catch (error) {
-        console.log('Error in logout controller: ', error.message);
-        return res.status(500).json({ message: 'Server error. Please try again later.' });
-    }
-};
-
-const refreshToken = async (req, res) => {
-    try {
-        const { refreshToken } = req.cookies;
-
-        if (!refreshToken) {
-            return res.status(401).json({ message: 'Unauthorized' });
-        }
-
-        jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, decoded) => {
-            if (err) {
-                return res.status(403).json({ message: 'Invalid refresh token' });
-            }
-
-            // Find user based on decoded user ID from the refresh token
-            const patient = await Patient.findById(decoded.id).select('-password');
-
-            if (!patient) {
-                return res.status(401).json({ message: 'Unauthorized' });
-            }
-
-            // Generate new tokens and send them in response
-            generateJwt(patient._id, res);
-            return res.status(200).json({ message: 'Token refreshed' });
-        });
-    } catch (error) {
-        console.log('Error in refresh token endpoint: ', error.message);
+        console.log('Error in changePassword controller: ', error.message);
         return res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
 
 
-
-export { signup, login, logout, refreshToken };
+export { signup, changePassword };

@@ -14,11 +14,10 @@ const appointment = new mongoose.Schema({
     hospital: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Hospital',
-        required: true
     },
     polyclinic: {
-        type: mongoose.schema.Types.ObjectId,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Polyclinic',
     },
     treatment: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -39,7 +38,11 @@ const appointment = new mongoose.Schema({
     status: {
         type: String,
         required: true
-    }
+    },
+    tests: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'LabTests'
+    }],
 }, { timestamps: true });
 
 const Appointment = mongoose.model('Appointment', appointment);
