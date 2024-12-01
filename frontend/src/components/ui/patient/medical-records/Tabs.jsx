@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 export const Tabs = ({ defaultValue, children, className }) => {
   const [activeTab, setActiveTab] = useState(defaultValue);
 
   return (
     <div className={`tabs-container ${className}`}>
-      {React.Children.map(children, (child) =>
-        React.cloneElement(child, { activeTab, setActiveTab })
-      )}
+      {React.Children.map(children, (child) => {
+        return React.cloneElement(child, { activeTab, setActiveTab });
+      })}
     </div>
   );
 };
@@ -24,10 +24,10 @@ export const TabsTrigger = ({ value, activeTab, setActiveTab, children }) => (
   <button
     className={`px-4 py-2 text-sm font-medium ${
       activeTab === value
-        ? 'text-blue-600 border-b-2 border-blue-600'
-        : 'text-gray-600 hover:text-gray-800'
+        ? "text-blue-600 border-b-2 border-blue-600"
+        : "text-gray-600 hover:text-gray-800"
     }`}
-    onClick={() => setActiveTab(value)}
+    onClick={() => setActiveTab(value)} 
   >
     {children}
   </button>

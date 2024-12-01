@@ -5,42 +5,43 @@ import { Label } from "../../components/ui/patient/settings/Label.jsx"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/patient/settings/Select.jsx"
 import { Switch } from "../../components/ui/patient/settings/Switch.jsx"
 import { CalendarDays, Home, User, FileText, PieChart, Settings, LogOut, Moon, Bell, Lock } from 'lucide-react'
-
-import Sidebar from "../../components/ui/patient/settings/Sidebar.jsx";
-import Header from "../../components/ui/patient/settings/Header.jsx";
+import Sidebar from "../../components/ui/common/Sidebar.jsx";
+import Header from "../../components/ui/common/Header.jsx";
+import { useDarkMode } from '../../helpers/DarkModeContext';
 
 export default function SettingsPage() {
-  const [darkMode, setDarkMode] = useState(false)
   const [language, setLanguage] = useState('english')
   const [notifications, setNotifications] = useState(true)
   const [twoFactor, setTwoFactor] = useState(false)
  
-  const handleDarkModeToggle = () => {
-    setDarkMode((prevMode) => {
-      const newMode = !prevMode;
-      if (newMode) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-      return newMode;
-    });
+  // const [darkMode, setDarkMode] = useState(
+  //   localStorage.getItem("darkMode") === "true" // Dark mode durumu yerel depolamadan alınır
+  // );
+  const [darkMode, setDarkMode] = useState(false);
+  
+  const handleDarkModeToggle = (checked) => {
+    // setDarkMode(checked);
+    // if (checked) {
+    //   document.documentElement.classList.add("dark"); // `dark` sınıfını ekler
+    //   localStorage.setItem("darkMode", "true"); // Yerel depolamada dark mode'u aktif olarak kaydeder
+    // } else {
+    //   document.documentElement.classList.remove("dark"); // `dark` sınıfını kaldırır
+    //   localStorage.setItem("darkMode", "false"); // Yerel depolamada dark mode'u devre dışı bırakır
+    // }
   };
   
-
   const handleLanguageChange = (value: string) => {
     setLanguage(value)
     // Here you would typically update the language in your app
   }
 
   return (
-    <div className="flex h-screen bg-gray-100 ">
+    <div className="flex h-screen bg-gray-100">
       <Sidebar />
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {/* Header */}
         <Header title="Settings" />
-
         {/* Settings Content */}
         <div className="max-w-2xl mx-auto py-6 sm:px-6 lg:px-8">
           <Card>
