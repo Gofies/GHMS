@@ -1,9 +1,11 @@
 import express from 'express';
-import { getPatientHome } from '../../controllers/patient.controllers/home.controller.js';
+
+import { getDoctorHome } from '../../controllers/doctor.controllers/home.controller.js';
+
 import { protect } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
-router.get('/', protect('patient'), getPatientHome);
+router.get('/', protect('doctor'), getDoctorHome);
 
 export default router;
