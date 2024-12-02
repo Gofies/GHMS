@@ -2,9 +2,10 @@ import Patient from '../../models/patient.model.js';
 
 const getHealthMetric = async (req, res) => {
     try {
-        const metrics = await Patient.findById(req.user._id).select('-_id weight height bloodpressure heartrate');
+        const metricsDoc = await Patient.findById(req.user._id).select('-_id weight height bloodpressure heartrate bloodsugar bloodtype');
         const allergies = await Patient.findById(req.user._id).select('-_id allergies');
-        const bmi = (metrics.weight / (metrics.height / 100 * metrics.height / 100)).toFixed(2);
+        const metrics = metricsDoc.toObject();
+        const bmi = (metrics.weight / ((metrics.height / 100) ** 2)).toFixed(2);
         metrics.bmi = bmi;
         return res.status(200).json({ message: 'Health metrics retrieved successfully', metrics, allergies });
     } catch (error) {
@@ -34,7 +35,7 @@ const updateHeight = async (req, res) => {
 
 const updateBloodPressure = async (req, res) => {
     try {
-        const patient = await Patient.findByIdAndUpdate(req.user._id, { bloodpressure: req.body.bloodpressure }, { new: true });
+        const patient = await Patient.findByIdAndUpdate(req.user._id, { bloodpressure: req.body["blood-pressure"] }, { new: true });
         return res.status(200).json({ message: 'Blood pressure updated successfully', patient });
     }
     catch (error) {
@@ -44,7 +45,7 @@ const updateBloodPressure = async (req, res) => {
 
 const updateBloodSugar = async (req, res) => {
     try {
-        const patient = await Patient.findByIdAndUpdate(req.user._id, { bloodsugar: req.body.bloodsugar }, { new: true });
+        const patient = await Patient.findByIdAndUpdate(req.user._id, { bloodsugar: req.body["blood-sugar"] }, { new: true });
         return res.status(200).json({ message: 'Blood sugar updated successfully', patient });
     }
     catch (error) {
@@ -54,7 +55,7 @@ const updateBloodSugar = async (req, res) => {
 
 const updateBloodType = async (req, res) => {
     try {
-        const patient = await Patient.findByIdAndUpdate(req.user._id, { bloodtype: req.body.bloodtype }, { new: true });
+        const patient = await Patient.findByIdAndUpdate(req.user._id, { bloodtype: req.body["blood-type"] }, { new: true });
         return res.status(200).json({ message: 'Blood type updated successfully', patient });
     }
     catch (error) {
@@ -79,7 +80,7 @@ const updateAllergies = async (req, res) => {
 
 const updateHeartRate = async (req, res) => {
     try {
-        const patient = await Patient.findByIdAndUpdate(req.user._id, { heartrate: req.body.heartrate }, { new: true });
+        const patient = await Patient.findByIdAndUpdate(req.user._id, { heartrate: req.body["heart-rate"] }, { new: true });
         return res.status(200).json({ message: 'Heart rate updated successfully', patient });
     }
     catch (error) {
