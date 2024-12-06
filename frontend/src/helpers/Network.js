@@ -13,22 +13,14 @@ export const Endpoint = {
   GET_DIAGNOSES: "/patient/medical-record/diagnoses",
   GET_HOME_APPOINTMENTS: "/patient",
   GET_HEALTH_METRICS: "/patient/metrics",
-  PUT_HEALTH_METRICS: "/patient/metrics"
+  PUT_HEALTH_METRICS: "/patient/metrics",
+
+  GET_DOCTOR_HOME: "/doctor",
+  GET_DOCTOR_PATIENTS: "/doctor/patient"
 };
 
-const axiosInstance = axios.create({
-  baseURL: 'https://localhost/api/v1/',
-  withCredentials: true, 
-  headers: {
-    'Content-Type': 'application/json',
-    'Cache-Control': 'no-cache', 
-    Pragma: 'no-cache', 
-    Expires: '0', 
-  },
-});
-
 // const axiosInstance = axios.create({
-//   baseURL: 'http://localhost:5000/api/v1/',
+//   baseURL: 'https://localhost/api/v1/',
 //   withCredentials: true, 
 //   headers: {
 //     'Content-Type': 'application/json',
@@ -38,6 +30,21 @@ const axiosInstance = axios.create({
 //   },
 // });
 
+const axiosInstance = axios.create({
+  baseURL: 'http://localhost:5000/api/v1/',
+  withCredentials: true, 
+  headers: {
+    'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache', 
+    Pragma: 'no-cache', 
+    Expires: '0', 
+  },
+});
+
+//|| error.response.status === 500
+//error.response.status === 401 || 
+//      !originalRequest._retry
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -45,28 +52,31 @@ axiosInstance.interceptors.response.use(
 
     if (
       error.response &&
-      (error.response.status === 401 || error.response.status === 403 || error.response.status === 500) &&
-      !originalRequest._retry
+      (error.response.status === 403) 
     ) {
       console.log("Unauthorized or Forbidden error, attempting refresh...");
-      originalRequest._retry = true;
+      //originalRequest._retry = true;
 
       try {
         await axiosInstance.post('/auth/refresh-token', {});
         console.log("Refresh token successful. Retrying original request...");
         return axiosInstance(originalRequest);
       } catch (refreshError) {
-        console.error('Refresh token expired or failed, redirecting to login.');
+        console.error('Refresh token expired or failed. Logging out...');
+        // Logout user or redirect to login
+        window.location.href = '/'; // Yönlendirme
         return Promise.reject(refreshError);
       }
-    }
+    
     return Promise.reject(error);
   }
+}
 );
 
-export const getRequest = async (url, params = {}) => {
+
+export const getRequest = async (url, data= {}, params = {}) => {
   try {
-    const response = await axiosInstance.get(url, { params });
+    const response = await axiosInstance.get(url, data, { params });
     return response.data;
   } catch (error) {
     handleError(error);

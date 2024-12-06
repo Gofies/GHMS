@@ -10,7 +10,7 @@ const DoctorView = () => {
     <Routes>
       <Route path="/" element={<DoctorHomePage />} />
       <Route path="/patient-management/*" element={<DoctorPatientManagementPage />} />
-      <Route path="/patient-details/*" element={<DoctorPatientDetailsPage />} />
+      <Route path="/patient-details/:patientId" element={<DoctorPatientDetailsPage />} />
       <Route path="/prescriptions" element={<DoctorPrescriptionsPage />} />
       {/* Add additional routes here for DoctorView */}
       {/* Example: <Route path="/settings" element={<DoctorSettings />} /> */}

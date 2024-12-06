@@ -28,7 +28,7 @@ function App() {
               <Route path="/admin/*" element={<AdminView />} />
             </Route>
             <Route element={<ProtectedRoute requiredRole="doctor" />}>
-              <Route path="/doctor/*" element={<DoctorView />} />
+              <Route path="/doctor/:doctorId/*" element={<DoctorView />} />
             </Route>
             <Route element={<ProtectedRoute requiredRole="lab-staff" />}>
               <Route path="/lab-staff/*" element={<LabStaffView />} />

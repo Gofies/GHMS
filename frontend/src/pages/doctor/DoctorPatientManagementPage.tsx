@@ -1,10 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "../../components/ui/doctor/management/Button.jsx"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/doctor/management/Card.jsx"
 import { Input } from "../../components/ui/doctor/management/Input.jsx"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/doctor/management/Table.jsx"
 import { Home, Users, Clipboard, LogOut, Search } from 'lucide-react'
 import Link from "../../components/ui/doctor/management/Link.jsx"
+import { useNavigate, useLocation } from "react-router-dom";
+
+import { Endpoint, getRequest } from "../../helpers/Network.js";
+
+import Sidebar from "../../components/ui/doctor/common/Sidebar.jsx"
+import Header from "../../components/ui/common/Header.jsx";
+
 
 // Mock data for patients
 const patients = [
@@ -15,49 +22,82 @@ const patients = [
   { id: 5, name: "Charlie Davis", age: 41, gender: "Male", lastVisit: "2023-05-30" },
 ]
 
+function calculateAge(birthdate) {
+  // Doğum tarihini Date nesnesine çevir
+  const birthDate = new Date(birthdate);
+
+  // Bugünün tarihini al
+  const today = new Date();
+
+  // Yaşı hesapla
+  let age = today.getFullYear() - birthDate.getFullYear();
+
+  // Ay ve gün kontrolü yap (tam yaş için)
+  const monthDifference = today.getMonth() - birthDate.getMonth();
+  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+    age--; // Doğum günü henüz geçmemişse yaşı bir azalt
+  }
+
+  return age;
+}
+
 export default function PatientManagement() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [error, setError] = useState(null);
+  const [patients, setPatients] = useState([]);
 
-  const filteredPatients = patients.filter(patient =>
-    patient.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+
+  const location = useLocation();
+
+  // Doctor ID'yi mevcut URL'den alıyoruz
+  const paths = location.pathname.split("/");
+  console.log("paths", paths)
+  const doctorId = paths[2]; // /doctor/:doctorId/ kısmından doctorId'yi alır
+
+
+  useEffect(() => {
+    const handleViewAllPatients = async () => {
+      setError(null);
+
+      try {
+        const response = await getRequest(Endpoint.GET_DOCTOR_PATIENTS);
+        console.log('Patients:', response.patients);
+        const a = extractPatients(response.patients);
+        console.log("a", a);
+        setPatients(Array.isArray(a) ? a : []); // Dizi kontrolü
+      } catch (err) {
+        console.error('Error fetching patients:', err);
+        setError('Failed to fetch patients. Please try again later.');
+      }
+    };
+    handleViewAllPatients();
+  }, [])
+
+  const extractPatients = (data) => {
+    // Tüm appointments içinden patient bilgilerini toplar
+    const patients = data.appointments.map((appointment) => appointment.patient);
+    
+    // Hastaları benzersiz hale getirir (aynı hastayı birden fazla eklememek için)
+    const uniquePatients = Array.from(
+      new Map(patients.map((patient) => [patient._id, patient])).values()
+    );
+  
+    return uniquePatients;
+  };
+
+  const filteredPatients = Array.isArray(patients)
+    ? patients.filter(patient =>
+      patient.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    : [];
+  // hasta ismine göre sıralıyor
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md hidden md:block">
-        <div className="p-4">
-          <h2 className="text-2xl font-bold text-gray-800">Hospital System</h2>
-        </div>
-        <nav className="mt-6">
-          <Link href="/doctor/" className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100">
-            <Home className="w-5 h-5 mr-2" />
-            Home
-          </Link>
-          <Link href="/doctor/patient-management/" className="flex items-center px-4 py-2 text-gray-700 bg-gray-100">
-            <Users className="w-5 h-5 mr-2" />
-            Patient Management
-          </Link>
-          <Link href="/doctor/prescriptions/" className="flex items-center px-4 py-2 mt-2 text-gray-600 hover:bg-gray-100">
-            <Clipboard className="w-5 h-5 mr-2" />
-            Prescriptions
-          </Link>
-        </nav>
-      </aside>
-
+      <Sidebar />
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
-        {/* Header */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <h1 className="text-2xl font-semibold text-gray-900">Patient Management</h1>
-            <Button variant="outline">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        </header>
-
+        <Header title="Patient Appointments"/>
         {/* Patient List */}
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <Card>
@@ -81,6 +121,7 @@ export default function PatientManagement() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
+                    <TableHead>Surname</TableHead>
                     <TableHead>Age</TableHead>
                     <TableHead>Gender</TableHead>
                     <TableHead>Last Visit</TableHead>
@@ -88,19 +129,29 @@ export default function PatientManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredPatients.map((patient) => (
-                    <TableRow key={patient.id}>
-                      <TableCell>{patient.name}</TableCell>
-                      <TableCell>{patient.age}</TableCell>
-                      <TableCell>{patient.gender}</TableCell>
-                      <TableCell>{patient.lastVisit}</TableCell>
-                      <TableCell>
-                        <Link href={`/doctor/patient-details/${patient.id}`}>
-                          <Button variant="outline" size="sm">View Details</Button>
-                        </Link>
+                  {filteredPatients.length > 0 ? (
+                    filteredPatients.map((patient) => (
+                      <TableRow key={patient._id}>
+                        <TableCell>{patient.name}</TableCell>
+                        <TableCell>{patient.surname}</TableCell>
+                        <TableCell>{calculateAge(patient.birthdate)}</TableCell>
+                        <TableCell>{patient.gender}</TableCell>
+                        <TableCell>{patient.date}</TableCell>
+                        <TableCell>
+                          <Link href={`/doctor/${doctorId}/patient-details/${patient._id}`}>
+                            <Button variant="outline" size="sm">View Details</Button>
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-gray-500">
+                        No patients found.
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )}
+
                 </TableBody>
               </Table>
             </CardContent>
