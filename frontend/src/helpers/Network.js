@@ -19,19 +19,8 @@ export const Endpoint = {
   GET_DOCTOR_PATIENTS: "/doctor/patient"
 };
 
-// const axiosInstance = axios.create({
-//   baseURL: 'https://localhost/api/v1/',
-//   withCredentials: true, 
-//   headers: {
-//     'Content-Type': 'application/json',
-//     'Cache-Control': 'no-cache', 
-//     Pragma: 'no-cache', 
-//     Expires: '0', 
-//   },
-// });
-
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5000/api/v1/',
+  baseURL: 'https://localhost/api/v1/',
   withCredentials: true, 
   headers: {
     'Content-Type': 'application/json',
@@ -40,10 +29,6 @@ const axiosInstance = axios.create({
     Expires: '0', 
   },
 });
-
-//|| error.response.status === 500
-//error.response.status === 401 || 
-//      !originalRequest._retry
 
 axiosInstance.interceptors.response.use(
   (response) => response,
@@ -72,7 +57,6 @@ axiosInstance.interceptors.response.use(
   }
 }
 );
-
 
 export const getRequest = async (url, data= {}, params = {}) => {
   try {
