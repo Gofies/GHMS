@@ -6,7 +6,7 @@ import { Label } from "../../components/ui/patient/profile/Label.jsx"
 import { Textarea } from "../../components/ui/patient/profile/TextArea.jsx"
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/patient/profile/Avatar.jsx"
 import { Endpoint, getRequest, postRequest } from "../../helpers/Network.js";
-import Sidebar from "../../components/ui/common/Sidebar.jsx";
+import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
 //import { useDarkMode } from '../../helpers/DarkModeContext.js';
 

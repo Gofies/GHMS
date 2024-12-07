@@ -5,7 +5,7 @@ import { Label } from "../../components/ui/patient/settings/Label.jsx"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/patient/settings/Select.jsx"
 import { Switch } from "../../components/ui/patient/settings/Switch.jsx"
 import { CalendarDays, Home, User, FileText, PieChart, Settings, LogOut, Moon, Bell, Lock } from 'lucide-react'
-import Sidebar from "../../components/ui/common/Sidebar.jsx";
+import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
 import { useDarkMode } from '../../helpers/DarkModeContext';
 

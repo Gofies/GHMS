@@ -9,6 +9,9 @@ import { Textarea } from "../../components/ui/doctor/prescriptions/TextArea.jsx"
 import { Home, Users, Clipboard, LogOut, Search, Plus, Edit } from 'lucide-react'
 import Link from "../../components/ui/doctor/prescriptions/Link.jsx"
 
+import Sidebar from "../../components/ui/doctor/common/Sidebar.jsx"
+import Header from "../../components/ui/common/Header.jsx";
+
 // Mock data for prescriptions
 const prescriptions = [
   { id: 1, patientName: "John Doe", medication: "Lisinopril", dosage: "10mg", frequency: "Once daily", startDate: "2023-05-15", endDate: "2023-11-15" },
@@ -51,40 +54,11 @@ export default function Prescriptions() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md hidden md:block">
-        <div className="p-4">
-          <h2 className="text-2xl font-bold text-gray-800">Hospital System</h2>
-        </div>
-        <nav className="mt-6">
-          <Link href="/doctor-homepage" className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100">
-            <Home className="w-5 h-5 mr-2" />
-            Home
-          </Link>
-          <Link href="/patient-management" className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100">
-            <Users className="w-5 h-5 mr-2" />
-            Patient Management
-          </Link>
-          <Link href="#" className="flex items-center px-4 py-2 mt-2 text-gray-700 bg-gray-100">
-            <Clipboard className="w-5 h-5 mr-2" />
-            Prescriptions
-          </Link>
-        </nav>
-      </aside>
+      <Sidebar />
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
-        {/* Header */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <h1 className="text-2xl font-semibold text-gray-900">Prescriptions</h1>
-            <Button variant="outline">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        </header>
-
+        <Header title="Prescriptions"/>
         {/* Prescriptions Content */}
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <Card>

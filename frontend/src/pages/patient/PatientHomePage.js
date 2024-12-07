@@ -8,7 +8,7 @@ import { Badge } from '../../components/ui/patient/home/Badge'
 import { Plus } from 'lucide-react'
 //import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/patient/home/Dialog'
 
-import Sidebar from "../../components/ui/common/Sidebar.jsx";
+import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
 import { Endpoint, getRequest } from "../../helpers/Network.js";
 import { useNavigate, useLocation } from 'react-router-dom'

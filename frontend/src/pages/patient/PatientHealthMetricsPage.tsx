@@ -11,7 +11,7 @@ import { CartesianGrid } from 'recharts/es6/cartesian/CartesianGrid';
 import { Tooltip } from 'recharts/es6/component/Tooltip';
 import { Legend } from 'recharts/es6/component/Legend';
 import { ResponsiveContainer } from 'recharts/es6/component/ResponsiveContainer';
-import Sidebar from "../../components/ui/common/Sidebar.jsx";
+import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
 import { Endpoint, putRequest, getRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify'

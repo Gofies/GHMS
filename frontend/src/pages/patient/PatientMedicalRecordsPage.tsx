@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/patient/medical-records/Table.jsx"
-import Sidebar from "../../components/ui/common/Sidebar.jsx";
+import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
 
 import { Endpoint, getRequest } from "../../helpers/Network.js";
