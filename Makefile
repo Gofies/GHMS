@@ -16,13 +16,16 @@ logs:
 build:
 	mkdir -p ssl
 	bash gen_dev_ssl_cert.sh
-	dos2unix ./database/citus/init.sh
 	docker-compose build
 
 # Clean all services
 clean:
-	docker-compose down --rmi all --volumes --remove-orphans
+	docker-compose down --volumes --remove-orphans
 	rm -rf ssl
+	docker system prune
+	rm -rf ./database/mongodb/sh*
+	rm -rf ./database/mongodb/con*
+	rm -rf ./database/postgres/pgdata
 
 # prune all services
 prune:
@@ -42,26 +45,25 @@ attach:
 
 certificates:
 	./gen_dev_ssl_cert.sh
-  
-##### Database Makefile Commands #####
 
-attach-citus-master:
-	docker exec -it softeng-citus-master-1 psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
-
-attach-citus-worker:
-	docker exec -it softeng-citus-worker-1 psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
-
-attach-mongo:
-	docker exec -it softeng-mongo-1 mongosh -u admin -p admin
-
+##### Database Commands #####
 mongo-up:
-	docker-compose up -d mongo
+	docker-compose up -d configsvr1 shard1 shard2 mongos mongo-init
 
-citus-up:
-	docker-compose up -d citus-master citus-worker citus-init
+psql-up:
+	docker-compose up -d postgres
 
-citus-down:
-	docker-compose down citus-master citus-worker citus-init
+attach-psql:
+	docker compose exec postgres psql -U ${POSTGRES_USERNAME} -d ${POSTGRES_DATABASE}
 
-citus-logs:
-	docker-compose logs -f citus-master citus-worker citus-init
+attach-mongos:
+	docker exec -it mongos mongosh --port 27020
+
+attach-configsvr1:
+	docker exec -it configsvr1 mongosh --port 27019
+
+attach-shard1:
+	docker exec -it shard1 mongosh --port 27018
+
+attach-shard2:
+	docker exec -it shard2 mongosh --port 27017

@@ -42,3 +42,8 @@ db_data/
 AWS_connect.sh
 test.txt
 ssl/
+
+# Database persistant data
+database/mongodb/sh*
+database/mongodb/con*
+database/postgres/pgdata
