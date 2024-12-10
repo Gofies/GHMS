@@ -25,7 +25,7 @@ function App() {
             <Route path="/" element={<LoginPage />} />
             <Route path="/signup" element={<PatientSignupPage />} />
             <Route element={<ProtectedRoute requiredRole="admin" />}>
-              <Route path="/admin/*" element={<AdminView />} />
+              <Route path="/admin/:adminId/*" element={<AdminView />} />
             </Route>
             <Route element={<ProtectedRoute requiredRole="doctor" />}>
               <Route path="/doctor/*" element={<DoctorView />} />
