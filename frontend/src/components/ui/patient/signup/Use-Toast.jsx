@@ -1,30 +1,22 @@
-import { useState } from "react"
+import React from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-export function useToast() {
-  const [toasts, setToasts] = useState([])
+const ToastComponent = () => {
+  return (
+    <ToastContainer
+      position="top-right"
+      autoClose={3000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="light"
+    />
+  );
+};
 
-  const toast = ({ title, description }) => {
-    setToasts((prev) => [...prev, { title, description }])
-
-    setTimeout(() => {
-      setToasts((prev) => prev.slice(1))
-    }, 3000)
-  }
-
-  return {
-    toast,
-    ToastContainer: () => (
-      <div className="fixed top-4 right-4 space-y-2 z-50">
-        {toasts.map((toast, index) => (
-          <div
-            key={index}
-            className="p-4 bg-white border rounded-md shadow-md"
-          >
-            <h4 className="font-semibold">{toast.title}</h4>
-            <p className="text-sm text-gray-500">{toast.description}</p>
-          </div>
-        ))}
-      </div>
-    ),
-  }
-}
+export default ToastComponent;

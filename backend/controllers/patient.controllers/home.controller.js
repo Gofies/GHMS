@@ -1,52 +1,15 @@
 import Patient from '../../models/patient.model.js';
 
-const getUpcomingAppointments = async (req, res) => {
+const getPatientHome = async (req, res) => {
     try {
-        const patient = await Patient.findById(req.user._id)
-            .select('appointments')
-            .populate({ path: 'appointments', match: { status: 'Scheduled' } });
-
-        if (!patient) {
-            return res.status(404).json({ message: "Patient not found" });
-        }
-
-        const appointments = patient.appointments;
-
-        if (appointments) {
-            return res.status(200).json({
-                message: 'Appointments retrieved successfully',
-                appointments
-            });
-        }
-    }
-    catch (error) {
-        return res.status(500).json({ message: "patient.getUpcomingAppointments: " + error.message });
+        const patient = await Patient.findById(req.user.id).select('appointments').populate('appointments');
+        const upcomingAppointments = patient.appointments.filter(appointment => appointment.date > new Date());
+        const recentAppointments = patient.appointments.filter(appointment => appointment.date < new Date());
+        res.json({ upcomingAppointments, recentAppointments });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
     }
 }
 
-const getRecentAppointments = async (req, res) => {
-    try {
-        const patient = await Patient.findById(req.user._id)
-            .select('appointments')
-            .populate({ path: 'appointments', match: { status: 'Completed' } });
-
-        if (!patient) {
-            return res.status(404).json({ message: "Patient not found" });
-        }
-
-        const appointments = patient.appointments;
-
-        if (appointments) {
-            return res.status(200).json({
-                message: 'Appointments retrieved successfully',
-                appointments
-            });
-        }
-    }
-    catch (error) {
-        return res.status(500).json({ message: "patient.getRecentAppointments: " + error.message });
-    }
-}
-
-
-export { getUpcomingAppointments, getRecentAppointments };
+export { getPatientHome };

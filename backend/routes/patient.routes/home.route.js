@@ -1,9 +1,9 @@
 import express from 'express';
-import { getRecentAppointments, getUpcomingAppointments } from '../../controllers/patient.controllers/home.controller.js';
+import { getPatientHome } from '../../controllers/patient.controllers/home.controller.js';
 import { protect } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
-router.get('/', protect('patient'), getUpcomingAppointments, getRecentAppointments);
+router.get('/', protect('patient'), getPatientHome);
 
 export default router;

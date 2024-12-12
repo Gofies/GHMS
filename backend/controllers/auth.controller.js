@@ -53,8 +53,6 @@ const login = async (req, res) => {
         const admin = await Admin.findOne({ email });
         const labTechnician = await LabTechnician.findOne({ email });
 
-        console.log(admin);
-
         if (!patient && !doctor && !admin && !labTechnician) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
@@ -97,7 +95,8 @@ const login = async (req, res) => {
 
 const logout = (req, res) => {
     try {
-        res.clearCookie('token');
+        res.clearCookie('accessToken');
+        res.clearCookie('refreshToken');
         return res.status(200).json({ message: 'Logout successful' });
     } catch (error) {
         console.log('Error in logout controller: ', error.message);

@@ -1,19 +1,22 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "../../components/ui/patient/appointment/Button.jsx"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/patient/appointment/Card.jsx"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/patient/appointment/Dialog.jsx"
 import { Select, SelectContent, SelectItem, SelectTrigger } from "../../components/ui/patient/appointment/Select.jsx"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/patient/appointment/Table.jsx"
 import { Plus, Info } from 'lucide-react'
-
-import Sidebar from "../../components/ui/patient/appointment/Sidebar.jsx";
-import Header from "../../components/ui/patient/appointment/Header.jsx";
+import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
+import Header from "../../components/ui/common/Header.jsx";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // Mock data for appointments
 const appointments = [
-    { id: 1, doctor: "Dr. Smith", specialty: "Cardiology", date: "2023-06-15", time: "10:00 AM", status: "Scheduled" },
-    { id: 2, doctor: "Dr. Johnson", specialty: "Orthopedics", date: "2023-06-20", time: "2:30 PM", status: "Completed" },
-    { id: 3, doctor: "Dr. Williams", specialty: "Neurology", date: "2023-06-25", time: "11:15 AM", status: "Scheduled" },
+    { id: 1, doctor: "Dr. Smith", specialty: "Dermatology", date: "2024-12-03", time: "10:00 AM", status: "Scheduled"  },
+    { id: 2, doctor: "Dr. Johnson", specialty: "Ophthalmology", date: "2024-12-02", time: "12:00 AM", status: "Scheduled"  },
+    { id: 3, doctor: "Dr. Williams", specialty: "Endocrinology", date: "2024-12-01", time: "14:00 AM", status: "Scheduled"  },
+    { id: 4, doctor: "Dr. Brown", specialty: "Cardiology", date: "2024-11-16", time: "10:00 AM", status: "Completed" },
+    { id: 5, doctor: "Dr. Davis", specialty: "Orthopedics", date: "2024-11-15", time: "2:30 PM", status: "Completed" },
+    { id: 6, doctor: "Dr. Miller", specialty: "Neurology", date: "2024-11-14", time: "11:15 AM", status: "Completed" },
 ]
 
 // Mock data for specialties and doctors
@@ -89,6 +92,9 @@ export default function AppointmentsPage() {
         setSelectedTime("")
         setNewAppointmentStep(1)
         setIsNewAppointmentOpen(true)
+
+        navigate(`${location.pathname}/new`);
+
     }
 
     const handleNextStep = () => {
@@ -103,12 +109,17 @@ export default function AppointmentsPage() {
         setIsNewAppointmentOpen(false);
     };
 
+    const navigate = useNavigate();
+    const location = useLocation();
+
     const handleCreateAppointment = () => {
         // Implement appointment creation logic here
-        console.log("New appointment created:", { selectedSpecialty, selectedDoctor, selectedDate, selectedTime })
-        setIsNewAppointmentOpen(false);
-        // It will call createAppointment method
-    }
+        //setIsNewAppointmentOpen(false);
+        navigate(`${location.pathname}new`);
+      }
+
+    //const [appointments, setAppointments] = useState([]);
+    const [error, setError] = useState(null);
 
     return (
         <div className="flex h-screen bg-gray-100">
@@ -382,5 +393,5 @@ export default function AppointmentsPage() {
                 </Dialog>
             )}
         </div>
-    )
+    );
 }

@@ -20,10 +20,6 @@ const prescription = new mongoose.Schema({
             }
         }
     ],
-    time: {
-        type: String,
-        required: true
-    },
     status: {
         type: String,
         required: true

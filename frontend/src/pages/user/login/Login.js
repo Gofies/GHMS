@@ -1,30 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '../../../components/ui/login/Button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../../components/ui/login/Card';
 import { Input } from '../../../components/ui/login/Input';
 import { Label } from '../../../components/ui/login/Label';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { NavLink } from "react-router-dom";
-import { Endpoint, postRequest } from '../../../helpers/Network';
 import { Images } from "../../../assets/images/Images";
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { login, clearError } from '../../../redux/authSlice';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async (e) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { loading, error, isAuthenticated, role, userId } = useSelector((state) => state.auth);
+
+  const handleLogin = (e) => {
     e.preventDefault();
-    try {
-      const response = await postRequest(Endpoint.LOGIN, { email, password });
-      // Handle successful login (e.g., redirect, store token, etc.)
-    } catch (error) {
-      console.error('Login failed:', error);
-    } finally {
-      setEmail('');
-      setPassword('');
-    }
+    dispatch(login({ email, password }));
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      switch (role) {
+        case "admin":
+          navigate("/admin/");
+          break;
+        case "doctor":
+          navigate(`/doctor/${userId}/`);
+          break;
+        case "lab-staff":
+          navigate("/lab-staff/");
+          break;
+        case "patient":
+          navigate(`/patient/${userId}/`);
+          break;
+        default:
+          navigate("/");
+      }
+    }
+  }, [isAuthenticated, role, navigate]);
+
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-green-100">
@@ -84,17 +108,30 @@ export default function LoginPage() {
                 </Button>
               </div>
             </div>
+            {/* Display loading state */}
+            {loading && (
+              <div className="mt-2 text-sm text-blue-600">Logging in...</div>
+            )}
+
+            {/* Display error message */}
+            {error && (
+              <div className="mt-2 text-sm text-red-600">
+                {error.message || "Email or password is incorrect. Please try again."}
+              </div>
+            )}
             <div className="mt-4">
-              <Button className="w-full" type="submit">Sign in</Button>
+              <Button className="w-full" type="submit" disabled={loading}>
+                {loading ? "Signing in..." : "Sign in"}
+              </Button>
             </div>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col">
           <NavLink
-            to="/forgot-password"
+            to="/signup"
             className="text-sm text-blue-600 hover:underline"
           >
-            Forgot your password?
+            Signup
           </NavLink>
         </CardFooter>
       </Card>
