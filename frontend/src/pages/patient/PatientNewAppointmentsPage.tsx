@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../componen
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/patient/appointment/Select.jsx"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/patient/appointment/Table.jsx"
 import { Plus, Info } from 'lucide-react'
-import Sidebar from "../../components/ui/common/Sidebar.jsx";
+import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
 import { Input } from "../../components/ui/patient/profile/Input.jsx"
 import { Label } from "../../components/ui/patient/profile/Label.jsx"
@@ -24,6 +24,7 @@ const cities = [
   "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Mardin", "Mersin",
   "Muğla", "Muş", "Nevşehir", "Niğde", "Ordu", "Osmaniye", "Rize", "Sakarya",
   "Samsun", "Siirt", "Sinop", "Sivas", "Şanlıurfa", "Şırnak", "Tekirdağ",
+
   "Tokat", "Trabzon", "Tunceli", "Uşak", "Van", "Yalova", "Yozgat", "Zonguldak"
 ];
 

@@ -32,7 +32,7 @@ export default function LoginPage() {
           navigate(`/admin/${userId}/`);
           break;
         case "doctor":
-          navigate("/doctor/");
+          navigate(`/doctor/${userId}/`);
           break;
         case "lab-staff":
           navigate("/lab-staff/");

@@ -1,7 +1,13 @@
+import { useState, useEffect } from 'react'
 import { Button } from "../../components/ui/doctor/homepage/Button.jsx"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/doctor/homepage/Card.jsx"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/doctor/homepage/Table.jsx"
 import { CalendarDays, Home, Users, FileText, Clipboard, LogOut } from 'lucide-react'
+import { Endpoint, getRequest } from "../../helpers/Network.js";
+import { useNavigate, useLocation } from "react-router-dom";
+
+import Sidebar from "../../components/ui/doctor/common/Sidebar.jsx"
+import Header from "../../components/ui/common/Header.jsx";
 
 // Mock data for appointments
 const appointments = [
@@ -19,41 +25,47 @@ const labResults = [
 ]
 
 export default function DoctorHomepage() {
+
+  const [error, setError] = useState(null);
+  const [homeAppointments, setHomeAppointments] = useState(null);
+  const [labResults, setLabResults] = useState(null);
+  const [loading, setLoading] = useState(false); // Yükleme durumunu kontrol etmek için state
+  const [isViewAllClicked, setIsViewAllClicked] = useState(false); // "View All Patients" butonuna basılıp basılmadığını kontrol etmek için state
+  const [isViewAllVisible, setIsViewAllVisible] = useState(false); // Liste açık mı kontrolü için state
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const fetchDoctorHome = async () => {
+      try {
+        const response = await getRequest(Endpoint.GET_DOCTOR_HOME);
+        console.log("response", response);
+        setHomeAppointments(response.todaysAppointments);
+        setLabResults(response.filteredLabTests);
+        // setHomeAppointments(response); 
+      } catch (err) {
+        console.error('Error fetching patient profile:', err);
+        setError('Failed to load patient profile.');
+      }
+    };
+    fetchDoctorHome();
+  }, []);
+  
+ const handleViewAllPatients = async () => {
+  navigate(`${location.pathname}patient-management`);
+
+  };
+
+
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md hidden md:block">
-        <div className="p-4">
-          <h2 className="text-2xl font-bold text-gray-800">Hospital System</h2>
-        </div>
-        <nav className="mt-6">
-          <a href="#" className="flex items-center px-4 py-2 text-gray-700 bg-gray-100">
-            <Home className="w-5 h-5 mr-2" />
-            Home
-          </a>
-          <a href="#" className="flex items-center px-4 py-2 mt-2 text-gray-600 hover:bg-gray-100">
-            <Users className="w-5 h-5 mr-2" />
-            Patient Management
-          </a>
-          <a href="#" className="flex items-center px-4 py-2 mt-2 text-gray-600 hover:bg-gray-100">
-            <Clipboard className="w-5 h-5 mr-2" />
-            Prescriptions
-          </a>
-        </nav>
-      </aside>
+      <Sidebar />
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {/* Header */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <h1 className="text-2xl font-semibold text-gray-900">Welcome, Dr. Smith</h1>
-            <Button variant="outline">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        </header>
+       <Header title="Home"/>
 
         {/* Dashboard Content */}
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -77,13 +89,22 @@ export default function DoctorHomepage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {appointments.map((appointment) => (
-                      <TableRow key={appointment.id}>
-                        <TableCell>{appointment.patient}</TableCell>
-                        <TableCell>{appointment.time}</TableCell>
-                        <TableCell>{appointment.type}</TableCell>
+                    {homeAppointments && homeAppointments.length > 0 ? (
+                      homeAppointments.map((appointment) => (
+                        <TableRow key={appointment.id}>
+                          <TableCell>{appointment.patient}</TableCell>
+                          <TableCell>{appointment.time}</TableCell>
+                          <TableCell>{appointment.type}</TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={3} style={{ textAlign: 'center' }}>
+                          No records available
+                        </TableCell>
                       </TableRow>
-                    ))}
+                    )}
+
                   </TableBody>
                 </Table>
               </CardContent>
@@ -109,42 +130,52 @@ export default function DoctorHomepage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {labResults.map((result) => (
-                      <TableRow key={result.id}>
-                        <TableCell>{result.patient}</TableCell>
-                        <TableCell>{result.test}</TableCell>
-                        <TableCell>{result.date}</TableCell>
-                        <TableCell>{result.status}</TableCell>
+                    {labResults && labResults.length > 0 ? (
+                      labResults.map((result) => (
+                        <TableRow key={result.id}>
+                          <TableCell>{result.patient}</TableCell>
+                          <TableCell>{result.test}</TableCell>
+                          <TableCell>{result.date}</TableCell>
+                          <TableCell>{result.status}</TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={4} style={{ textAlign: 'center', fontStyle: 'italic' }}>
+                          No lab results available.
+                        </TableCell>
                       </TableRow>
-                    ))}
+                    )}
+
                   </TableBody>
                 </Table>
               </CardContent>
             </Card>
           </div>
 
-          {/* Quick Actions */}
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-3">
-                <Button className="w-full">
-                  <Users className="w-4 h-4 mr-2" />
-                  View All Patients
-                </Button>
-                <Button className="w-full">
-                  <Clipboard className="w-4 h-4 mr-2" />
-                  Write Prescription
-                </Button>
-                <Button className="w-full">
-                  <CalendarDays className="w-4 h-4 mr-2" />
-                  Schedule Appointment
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Quick Actions Card */}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold">Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-3">
+            <Button className="w-full" onClick={handleViewAllPatients}>
+              <Users className="w-4 h-4 mr-2" />
+              {loading ? 'Loading...' : isViewAllVisible ? 'Hide Patients' : 'View All Patients'}
+            </Button>
+            <Button className="w-full">
+              <Clipboard className="w-4 h-4 mr-2" />
+              Write Prescription
+            </Button>
+            <Button className="w-full">
+              <CalendarDays className="w-4 h-4 mr-2" />
+              Schedule Appointment
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
         </div>
       </main>
     </div>
