@@ -37,7 +37,8 @@ axiosInstance.interceptors.response.use(
 
     if (
       error.response &&
-      (error.response.status === 403) 
+      (error.response.status === 401 || error.response.status === 403) &&
+      !originalRequest._retry
     ) {
       console.log("Unauthorized or Forbidden error, attempting refresh...");
       //originalRequest._retry = true;

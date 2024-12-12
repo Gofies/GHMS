@@ -29,11 +29,13 @@ export const SelectContent = ({ children, isOpen }) => {
   );
 };
 
-export const SelectItem = ({ value, onSelect }) => {
+export const SelectItem = ({ value, onSelect, disabled }) => {
   return (
     <div
-      onClick={() => onSelect(value)}
-      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+      onClick={() => !disabled && onSelect(value)} // Eğer disabled değilse onSelect çağrılır
+      className={`px-4 py-2 cursor-pointer ${
+        disabled ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "hover:bg-gray-100"
+      }`}
     >
       {value}
     </div>
