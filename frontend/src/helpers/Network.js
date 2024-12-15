@@ -22,7 +22,7 @@ export const Endpoint = {
 };
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5001/api/v1/',
+  baseURL: 'https://localhost/api/v1/',
   withCredentials: true, 
   headers: {
     'Content-Type': 'application/json',
