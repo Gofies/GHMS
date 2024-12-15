@@ -26,6 +26,8 @@ jobs:
           mkdir -p ./ssl
           chmod +x ./gen_dev_ssl_cert.sh
           ./gen_dev_ssl_cert.sh
+          openssl rand -base64 756 > ./database/mongodb-build/auth/mongodb-keyfile
+          chmod 400 ./database/mongodb-build/auth/mongodb-keyfile
           docker-compose up -d --build
 
       - name: Wait for services to be healthy

@@ -74,7 +74,7 @@ for collection in "${collections[@]}"; do
     execute_with_retry "docker-compose exec router01 mongosh --port 27117 -u \"${MONGO_USERNAME}\" -p \"${MONGO_PASSWORD}\" --authenticationDatabase admin --eval 'db.adminCommand({ shardCollection: \"HospitalDatabase.${collection}\", key: { _id: \"hashed\" } })'" # random
 done
 
-log docker exec -it router-01 bash -c "echo 'sh.status()' | mongosh --port 27117 -u \"${MONGO_USERNAME}\" -p \"${MONGO_PASSWORD}\" --authenticationDatabase admin"
+docker exec -it router-01 bash -c "echo 'sh.status()' | mongosh --port 27117 -u \"${MONGO_USERNAME}\" -p \"${MONGO_PASSWORD}\" --authenticationDatabase admin"
 
 log "MongoDB cluster setup complete."
 
