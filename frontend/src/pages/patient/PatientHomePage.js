@@ -12,12 +12,13 @@ import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
 import { Endpoint, getRequest } from "../../helpers/Network.js";
 import { useNavigate, useLocation } from 'react-router-dom'
+import { applyMiddleware } from '@reduxjs/toolkit'
 
 export default function PatientHomeScreen() {
 
   const [date, setDate] = useState(null);
   const [error, setError] = useState(null);
- // const [homeAppointments, setHomeAppointments] = useState(null);
+  // const [homeAppointments, setHomeAppointments] = useState(null);
 
   const homeAppointments = [
     { id: 1, doctor: "Dr. Smith", specialty: "Cardiology", date: "2024-11-16" },
@@ -28,19 +29,10 @@ export default function PatientHomeScreen() {
     { id: 6, doctor: "Dr. Miller", specialty: "Endocrinology", date: "2024-12-01" },
   ]
 
-  const upcomingAppointments = [
-    { id: 1, doctor: "Dr. Smith", specialty: "Cardiology", date: "2024-12-03" },
-    { id: 2, doctor: "Dr. Johnson", specialty: "Orthopedics", date: "2024-12-02" },
-    { id: 3, doctor: "Dr. Williams", specialty: "Neurology", date: "2024-12-01" },
-  ]
+  const [appointmentDates, setAppointmentDates] = useState([]);
+  const [recentAppointments, setRecentAppointments] = useState([]);
+  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
 
-  const recentAppointments = [
-    { id: 4, doctor: "Dr. Brown", specialty: "Dermatology", date: "2024-11-16" },
-    { id: 5, doctor: "Dr. Davis", specialty: "Ophthalmology", date: "2024-11-15" },
-    { id: 6, doctor: "Dr. Miller", specialty: "Endocrinology", date: "2024-11-14" },
-  ]
-
-  const appointmentDates = homeAppointments.map(appointment => new Date(appointment.date))
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,7 +49,14 @@ export default function PatientHomeScreen() {
       try {
         const response = await getRequest(Endpoint.GET_HOME_APPOINTMENTS);
         console.log("response", response)
-       // setHomeAppointments(response); 
+        setRecentAppointments(response.recentAppointments);
+        setUpcomingAppointments(response.upcomingAppointments);
+
+        const dates = response.recentAppointments
+          ? response.recentAppointments.map(appointment => new Date(appointment.date))
+          : [];
+        setAppointmentDates(dates);
+
       } catch (err) {
         console.error('Error fetching patient profile:', err);
         setError('Failed to load patient profile.');
@@ -98,13 +97,13 @@ export default function PatientHomeScreen() {
                     selected={date}
                     onSelect={setDate}
                     className="rounded-md border"
-                    appointmentDates={appointmentDates}
-                  /*modifiers={{
-                    appointment: appointmentDates,
-                  }}
-                  modifiersStyles={{
-                    appointment: { color: 'white', backgroundColor: 'hsl(var(--primary))' }
-                  }}*/
+                    appointmentDates={appointmentDates || []}
+                    modifiers={{
+                      appointment: appointmentDates,
+                    }}
+                    modifiersStyles={{
+                      appointment: { color: 'white', backgroundColor: 'hsl(var(--primary))' }
+                    }}
                   />
                 </CardContent>
               </Card>
@@ -116,8 +115,8 @@ export default function PatientHomeScreen() {
                 </CardHeader>
                 <CardContent>
                   <ScrollArea className="h-[300px]">
-                    {homeAppointments.length > 0 ? (
-                      homeAppointments.map((appointment) => (
+                    {upcomingAppointments.length > 0 ? (
+                      upcomingAppointments.map((appointment) => (
                         <div key={appointment.id} className="flex items-center space-x-4 mb-4">
                           <Avatar>
                             <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${appointment.doctor}`} />
@@ -145,26 +144,33 @@ export default function PatientHomeScreen() {
                 </CardHeader>
                 <CardContent>
                   <ScrollArea className="h-[200px]">
-                    {recentAppointments.length > 0 ? (
-                      recentAppointments.map((appointment) => (
-                        <div key={appointment.id} className="flex items-center space-x-4 mb-4">
-                          <Avatar>
-                            <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${appointment.doctor}`} />
-                            <AvatarFallback>{appointment.doctor.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-sm font-medium">{appointment.doctor}</p>
-                            <p className="text-sm text-gray-500">{appointment.specialty}</p>
-                            <p className="text-xs text-gray-400">{appointment.date}</p>
+                    {recentAppointments && recentAppointments.length > 0 ? (
+                      recentAppointments.map((appointment) => {
+                        // Sadece tarih kısmını al
+                        const formattedDate = appointment.date.split("T")[0];
+                        return (
+                          <div key={appointment.id} className="flex items-center space-x-4 mb-4">
+                            <Avatar>
+                              <AvatarImage
+                                src={`https://api.dicebear.com/6.x/initials/svg?seed=${appointment.doctor}`}
+                              />
+                              <AvatarFallback>{appointment.doctor.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="text-sm font-medium">{appointment.doctor}</p>
+                              <p className="text-sm text-gray-500">{appointment.specialty}</p>
+                              <p className="text-xs text-gray-400">{formattedDate}</p> {/* Formatlanmış tarih */}
+                            </div>
                           </div>
-                        </div>
-                      ))
+                        );
+                      })
                     ) : (
                       <p className="text-sm text-gray-500">No upcoming appointments.</p>
                     )}
                   </ScrollArea>
                 </CardContent>
               </Card>
+
             </div>
           </div>
         </div>

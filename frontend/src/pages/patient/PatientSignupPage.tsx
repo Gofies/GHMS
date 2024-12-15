@@ -360,7 +360,6 @@ export default function PatientSignupPage() {
                   </div>
                 </div>
               </div>
-
             </div>
 
             {/* Sağ Sütun */}

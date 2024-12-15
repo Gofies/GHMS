@@ -6,8 +6,10 @@ export const Endpoint = {
   LOGIN: "/auth/login",
   LOGOUT: "/auth/logout",
   SIGNUP: "/patient/auth/signup",
+  CHANGE_PASSWORD: "/patient/auth/change-password",
   GET_PATIENT_APPOINTMENTS: "/patient/appointments",
   GET_PROFILE: "/patient/profile",
+  UPDATE_PROFILE: "/patient/profile",
   GET_LAB_TESTS: "/patient/medical-record/lab-tests",
   GET_OTHER_TESTS: "/patient/medical-record/other-tests",
   GET_DIAGNOSES: "/patient/medical-record/diagnoses",
@@ -59,9 +61,9 @@ axiosInstance.interceptors.response.use(
 }
 );
 
-export const getRequest = async (url, data= {}, params = {}) => {
+export const getRequest = async (url, params = {}) => {
   try {
-    const response = await axiosInstance.get(url, data, { params });
+    const response = await axiosInstance.get(url, { params });
     return response.data;
   } catch (error) {
     handleError(error);
@@ -88,6 +90,7 @@ export const putRequest = async (url, data = {}, params = {}) => {
     throw error;
   }
 };
+
 
 const handleError = (error) => {
   if (error.response) {
