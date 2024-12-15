@@ -1,11 +1,20 @@
 import mongoose from "mongoose";
-const connectToDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGODB_URI)
-        console.log("Connected to the database");
-    } catch (error) {
-        console.log("Error connecting to the database: ", error.message);
-    }
-}
+import dotenv from "dotenv";
 
-export default connectToDB;
+dotenv.config();
+
+// Connect to MongoDB
+const connectToMongoDB = async () => {
+    try {
+        const mongoURI = `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@router01:27117,router02:27118/HospitalDatabase?authMechanism=DEFAULT&authSource=admin`;
+    
+        await mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+    
+        console.log("Connected to the MongoDB database");
+    } catch (error) {
+        console.log("Error connecting to the MongoDB database: ", error.message);
+    }
+    
+};
+
+export { connectToMongoDB };
