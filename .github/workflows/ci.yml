@@ -28,7 +28,7 @@ jobs:
           ./gen_dev_ssl_cert.sh
           openssl rand -base64 756 > ./database/mongodb-build/auth/mongodb-keyfile
           chmod 400 ./database/mongodb-build/auth/mongodb-keyfile
-          docker-compose up -d router01 router02 configsvr01 configsvr02 configsvr03 shard01-a shard01-b shard02-a shard02-b shard03-a shard03-b --build
+          docker-compose up -d --build router01 router02 configsvr01 configsvr02 configsvr03 shard01-a shard01-b shard02-a shard02-b shard03-a shard03-b
           chmod +x ./database/init.sh
           ./database/init.sh
           docker-compose up -d --build
