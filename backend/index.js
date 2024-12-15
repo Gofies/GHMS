@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 
 import dotenv from "dotenv";
-import connectDB from "./config/db.js";
+import { connectToMongoDB } from "./config/db.js";
 import './updateDoctorSchedules.js';
 
 import authRoutes from "./routes/auth.route.js";
@@ -60,6 +60,6 @@ app.get("/api/health", (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
-    connectDB();
+    connectToMongoDB();
 });
 
