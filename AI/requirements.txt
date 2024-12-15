@@ -1,0 +1,16 @@
+transformers
+torch
+fastapi
+pydantic
+uvicorn
+aiofiles
+python-multipart
+pdfplumber
+Pillow
+python-dotenv
+torch
+torchvision
+torchxrayvision
+numpy
+sacremoses 
+protobuf

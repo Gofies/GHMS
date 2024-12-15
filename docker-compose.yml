@@ -118,6 +118,22 @@ services:
       citus-worker:
         condition: service_healthy
 
+  llm:
+    build:
+      context: ./AI
+      dockerfile: Dockerfile
+    ports:
+      - "3131:3131"
+    networks:
+      - gofies
+    volumes:
+      - ./AI/llm/uploads:/app/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-k", "https://nginx/llm/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   nginx:
     image: nginx:alpine
     ports:
@@ -130,6 +146,7 @@ services:
     depends_on:
       - frontend
       - backend
+      - llm
     networks:
       - gofies
     healthcheck:
