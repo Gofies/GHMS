@@ -23,10 +23,7 @@ jobs:
 
       - name: Build and start services
         run: |
-          mkdir -p ./ssl
-          chmod +x ./gen_dev_ssl_cert.sh
-          ./gen_dev_ssl_cert.sh
-          docker-compose up -d --build
+          make build
 
       - name: Wait for services to be healthy
         run: |
