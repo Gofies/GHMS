@@ -1,6 +1,8 @@
 #!/bin/bash
 
-echo "MongoDB cluster setup started. Please wait..."
+echo "MongoDB Setup started... (approx. 1 minute)"
+
+echo "MongoDB cluster Setup started..."
 
 LOG_FILE="./database/init_log.txt"
 
@@ -66,8 +68,7 @@ for cmd in "${commands[@]}"; do
     execute_with_retry "$cmd"
 done
 
-collections=("admins" "appointments" "diagnoses" "doctors" "hospitals" "labtechnicians" "patients" "polyclinics" "prescriptions")
-
+collections=("admins" "appointments" "diagnoses" "doctors" "hospitals" "labtechnicians" "labtests" "patients" "polyclinics" "prescriptions" "treatments")
 for collection in "${collections[@]}"; do
     log "Sharding the collection: $collection..."
     execute_with_retry "docker-compose exec router01 mongosh --port 27117 -u \"${MONGO_USERNAME}\" -p \"${MONGO_PASSWORD}\" --authenticationDatabase admin --eval 'db.adminCommand({ shardCollection: \"HospitalDatabase.${collection}\", key: { _id: \"hashed\" } })'" # random
@@ -75,6 +76,22 @@ done
 
 log docker exec -it router-01 bash -c "echo 'sh.status()' | mongosh --port 27117 -u \"${MONGO_USERNAME}\" -p \"${MONGO_PASSWORD}\" --authenticationDatabase admin"
 
-log "MongoDB cluster cluster setup complete."
+log "MongoDB cluster setup complete."
 
-echo "MongoDB cluster cluster setup complete."
+
+log "MongoDB mock data addition started..."
+
+json_files=("admins.json" "doctors.json" "appointments.json" "hospitals.json" "patients.json" "polyclinics.json" "prescriptions.json")
+for json_file in "${json_files[@]}"; do
+
+    docker cp ./database/mocks/$json_file router-01:/data/$json_file
+    
+    collection_name=$(basename "$json_file" .json)
+    
+    docker-compose exec router01 sh -c "mongoimport --host router01 --port 27117 --db HospitalDatabase --collection $collection_name --file /data/$json_file --jsonArray --username $MONGO_USERNAME --password $MONGO_PASSWORD --authenticationDatabase admin"
+done
+
+
+log "MongoDB mock data addition complete."
+
+echo "MongoDB setup complete."
