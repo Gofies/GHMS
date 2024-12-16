@@ -1,21 +1,23 @@
-# Dockerfile for FastAPI-based LLM service
-
-# Base image
+# Dockerfile
 FROM python:3.9-slim
 
 # Set working directory
 WORKDIR /app
 
-# Install dependencies
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install slowapi
-# Copy the FastAPI application
-COPY . .
+# Copy requirements file
+COPY requirements.txt .
 
-# Expose the application port
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY src/ .
+
+# Create uploads directory
+RUN mkdir uploads
+
+# Expose port
 EXPOSE 3131
 
-# Command to run the application
-#sign in to huggingface
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3131"]
+# Run the application
+CMD ["python", "app.py"]
