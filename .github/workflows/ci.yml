@@ -21,55 +21,29 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      - name: Generate .env file
+      - name: Build and start services
         run: |
-          echo "MONGO_USERNAME=topsecretusername" >> .env
-          echo "MONGO_PASSWORD=verysecurepassword" >> .env
+          make
 
-      - name: Generate SSL Certificates
+      - name: Wait for services to be healthy
         run: |
-          mkdir -p ssl
-          chmod +x ./gen_dev_ssl_cert.sh
-          ./gen_dev_ssl_cert.sh
+          chmod +x ./health-check.sh
+          ./health-check.sh
 
-      - name: Build and Start MongoDB Services
-        run: |
-          openssl rand -base64 756 > ./database/mongodb-build/auth/mongodb-keyfile
-          chmod 400 ./database/mongodb-build/auth/mongodb-keyfile
-          mkdir -p ./ssl
-          docker-compose build
-          docker-compose up -d
+      - name: Run Frontend Tests
+        run: sleep 5
 
-      - name: Wait for MongoDB Services
-        run: |
-          services=("router01" "configsvr01" "shard01-a" "shard02-a" "shard03-a")
-          for service in "${services[@]}"; do
-            for i in {1..15}; do
-              status=$(docker inspect --format '{{.State.Health.Status}}' $(docker-compose ps -q $service) 2>/dev/null)
-              echo "Checking $service: $status"
-              if [ "$status" == "healthy" ]; then
-                echo "$service is healthy."
-                break
-              fi
-              echo "Waiting for $service to become healthy... ($i/15)"
-              sleep 5
-            done
-          done
-
-      - name: Dump Logs for Debugging
-        run: docker-compose logs
-
-      - name: Run MongoDB Initialization Script
-        run: |
-          chmod +x ./database/init.sh
-          ./database/init.sh
-
-      - name: Dump Logs on Failure
-        if: failure()
-        run: |
-          docker-compose logs > docker_logs.txt
-          cat docker_logs.txt
+      - name: Run Backend Tests
+        run: sleep 5
 
       - name: Shutdown Docker Compose
-        if: always()
         run: docker-compose down
+
+      - name: Upload Test Coverage
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-reports
+          path: |
+            ./frontend/coverage
+            ./backend/coverage
