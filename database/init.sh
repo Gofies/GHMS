@@ -11,16 +11,6 @@ log() {
 }
 
 > "$LOG_FILE"
-
-# Check if the .env file exists
-if [ ! -f ./.env ]; then
-  echo ".env file not found!"
-  exit 1
-fi
-
-# Source the .env file
-source ./.env
-
 # Maximum number of retries
 MAX_RETRIES=15
 # Delay between retries in seconds
