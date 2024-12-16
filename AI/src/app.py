@@ -11,7 +11,6 @@ def create_app(config_class=Config):
     # Initialize services
     file_service = FileService(app.config['UPLOAD_FOLDER'])
     
-    # Register routes
     register_routes(app, file_service)
     
     return app

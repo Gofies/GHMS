@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 def processor_routes(file_service):
     processor = Blueprint('processor', __name__)
     
-    @processor.route('/process', methods=['POST'])
+    @processor.route('/llm/process', methods=['POST'])
     def process_data():
         try:
             result = file_service.process_request(request)
