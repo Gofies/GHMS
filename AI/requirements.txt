@@ -1,4 +1,5 @@
 Flask==2.1.2
 werkzeug==2.1.2
-Pillow
-PyPDF2
+Pillow==9.0.1       # For handling images
+pytesseract==0.3.10 # For OCR (image text extraction)
+PyPDF2==3.0.0       # For PDF text extraction
