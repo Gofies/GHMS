@@ -4,7 +4,7 @@ export $(shell sed 's/=.*//' .env)
 all: build up
 
 up: mongo-up
-	docker-compose up $(service)
+	docker-compose up -d $(service)
 
 # Bring down services dynamically
 down:
