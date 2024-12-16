@@ -9,9 +9,6 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    env:
-      MONGO_USERNAME: topsecretusername
-      MONGO_PASSWORD: verysecurepassword
     steps:
       - uses: actions/checkout@v3
 
