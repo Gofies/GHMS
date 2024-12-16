@@ -44,11 +44,20 @@ jobs:
         run: |
           services=("router01" "configsvr01" "shard01-a" "shard02-a" "shard03-a")
           for service in "${services[@]}"; do
-            until docker inspect --format '{{.State.Health.Status}}' $(docker-compose ps -q $service) | grep -q "healthy"; do
-              echo "Waiting for $service to become healthy..."
+            for i in {1..15}; do
+              status=$(docker inspect --format '{{.State.Health.Status}}' $(docker-compose ps -q $service) 2>/dev/null)
+              echo "Checking $service: $status"
+              if [ "$status" == "healthy" ]; then
+                echo "$service is healthy."
+                break
+              fi
+              echo "Waiting for $service to become healthy... ($i/15)"
               sleep 5
             done
           done
+
+      - name: Dump Logs for Debugging
+        run: docker-compose logs
 
       - name: Run MongoDB Initialization Script
         run: |
