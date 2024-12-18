@@ -29,5 +29,5 @@ jobs:
             cd softeng/ &&
             git pull origin main &&
             sudo docker-compose down &&
-            make deploy
+            sudo make deploy
           '
