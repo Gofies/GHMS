@@ -3,6 +3,8 @@ export $(shell sed 's/=.*//' .env)
 
 all: build up
 
+deploy: build-deploy up
+
 up: mongo-up
 	docker-compose up -d $(service)
 
@@ -20,6 +22,9 @@ build: mongo-build
 	bash gen_dev_ssl_cert.sh
 	docker-compose build
 
+build-deploy: mongo-build
+	docker-compose build
+	
 prune:
 	docker system prune -f
 
