@@ -1,9 +1,7 @@
-// frontend/tailwind.config.js
+// tailwind.config.js
 module.exports = {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}", // Adjust this to include all relevant files
-    "./public/index.html",
-  ],
+  darkMode: 'class', // 'media' yerine 'class' kullanıyoruz
+  content: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
   theme: {
     extend: {},
   },

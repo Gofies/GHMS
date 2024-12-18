@@ -1,0 +1,3 @@
+[{"_id":{"$oid":"673b9827a25ee0e8d7a88e97"},"name":"rasim berke","surname":"turan","email":"berke@turan.com","password":"123","role":"admin"},
+{"_id":{"$oid":"67499c336da68d4d1426e835"},"name":"rasim berke","surname":"turan","email":"admin@admin.com","password":"$2a$12$NTLxCv6nHYwy9RLc3lOUf.h0eyJ1aLrh03zCfQih3THiH7s0pZBAy","phone":"123125312","role":"admin","createdAt":{"$date":"2024-11-29T10:49:23.469Z"},"updatedAt":{"$date":"2024-11-29T10:49:23.469Z"},"__v":0}
+]

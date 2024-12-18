@@ -3,16 +3,25 @@ import bcryptjs from 'bcryptjs';
 
 const getDoctors = async (req, res) => {
     try {
-        const doctors = await Doctor.find();
+        const doctors = await Doctor.find({}, 'name surname specialization');
         return res.status(200).json({ message: 'Doctors retrieved successfully', doctors });
     } catch (error) {
         return res.status(500).json({ message: "admin.getDoctors: " + error.message });
     }
 }
 
+const getDoctorsOfHospital = async (req, res) => {
+    try {
+        const doctors = await Doctor.find({ hospital: req.params.hospitalId }, 'name surname specialization');
+        return res.status(200).json({ message: 'Doctors retrieved successfully', doctors });
+    } catch (error) {
+        return res.status(500).json({ message: "admin.getDoctorsOfHospital: " + error.message });
+    }
+}
+
 const getDoctor = async (req, res) => {
     try {
-        const doctor = await Doctor.findById(req.params.id);
+        const doctor = await Doctor.findById(req.params.id).populate('hospital', 'name').populate('polyclinic', 'name').select('-password');
         return res.status(200).json({ message: 'Doctor retrieved successfully', doctor });
     } catch (error) {
         return res.status(500).json({ message: "admin.getDoctor :" + error.message });
@@ -68,4 +77,4 @@ const deleteDoctor = async (req, res) => {
     }
 }
 
-export { getDoctors, getDoctor, newDoctor, updateDoctor, deleteDoctor };
+export { getDoctors, getDoctorsOfHospital, getDoctor, newDoctor, updateDoctor, deleteDoctor };

@@ -4,7 +4,7 @@ import generateJwt from '../../utils/generateJwt.js';
 
 const signup = async (req, res) => {
     try {
-        const { name, surname, gender, email, password, passwordconfirm, phone, birthdate, nationality } = req.body;
+        const { name, surname, gender, email, password, passwordconfirm, phone, emergencycontact, birthdate, nationality, address } = req.body;
 
         if (
             name === undefined ||
@@ -14,8 +14,10 @@ const signup = async (req, res) => {
             password === undefined ||
             passwordconfirm === undefined ||
             phone === undefined ||
+            emergencycontact === undefined ||
             birthdate === undefined ||
-            nationality === undefined
+            nationality === undefined ||
+            address === undefined
         ) {
             return res.status(400).json({ message: 'All fields are required' });
         }
@@ -40,8 +42,10 @@ const signup = async (req, res) => {
             email,
             password: hashedPassword,
             phone,
+            emergencycontact,
             birthdate,
             nationality,
+            address,
             role: 'patient'
         });
 
@@ -56,7 +60,9 @@ const signup = async (req, res) => {
                     gender: patient.gender,
                     email: patient.email,
                     phone: patient.phone,
+                    emergencycontact: patient.emergencycontact,
                     birthdate: patient.birthdate,
+                    address: patient.address,
                     role: patient.role,
                 }
             });
@@ -67,7 +73,6 @@ const signup = async (req, res) => {
         return res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
-
 const changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword, newPasswordConfirm } = req.body;
