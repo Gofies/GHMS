@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { logout } from '../redux/authSlice';
-import { useDispatch } from "react-redux";
 
 export const Endpoint = {
   LOGIN: "/auth/login",
@@ -21,14 +19,15 @@ export const Endpoint = {
   GET_DOCTOR_PATIENTS: "/doctor/patient"
 };
 
+// Use production backend URL instead of localhost
 const axiosInstance = axios.create({
-  baseURL: 'https://localhost/api/v1/',
-  withCredentials: true, 
+  baseURL: 'https://www.gofies.software/api/v1/',
+  withCredentials: true, // Send cookies with requests
   headers: {
     'Content-Type': 'application/json',
-    'Cache-Control': 'no-cache', 
-    Pragma: 'no-cache', 
-    Expires: '0', 
+    'Cache-Control': 'no-cache',
+    Pragma: 'no-cache',
+    Expires: '0',
   },
 });
 
@@ -43,7 +42,7 @@ axiosInstance.interceptors.response.use(
       !originalRequest._retry
     ) {
       console.log("Unauthorized or Forbidden error, attempting refresh...");
-      //originalRequest._retry = true;
+      originalRequest._retry = true;
 
       try {
         await axiosInstance.post('/auth/refresh-token', {});
@@ -51,14 +50,14 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         console.error('Refresh token expired or failed. Logging out...');
-        // Logout user or redirect to login
-        window.location.href = '/'; // Yönlendirme
+        window.location.href = '/'; // Redirect to login page
         return Promise.reject(refreshError);
       }
-    
+    }
+
+    // Return the error for other cases
     return Promise.reject(error);
   }
-}
 );
 
 export const getRequest = async (url, params = {}) => {
@@ -91,10 +90,8 @@ export const putRequest = async (url, data = {}, params = {}) => {
   }
 };
 
-
 const handleError = (error) => {
   if (error.response) {
-    // Backend'den gelen hata
     console.error('API error response:', error.response.data);
     if (error.response.status === 401) {
       console.error('Unauthorized error. Token may have expired.');
@@ -102,10 +99,8 @@ const handleError = (error) => {
       console.error('Forbidden error. You do not have permission.');
     }
   } else if (error.request) {
-    // Backend'e istek atıldı ama yanıt alınamadı
     console.error('No response received:', error.request);
   } else {
-    // Başka bir hata
     console.error('Unexpected error:', error.message);
   }
 };
