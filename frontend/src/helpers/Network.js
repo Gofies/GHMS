@@ -18,6 +18,11 @@ export const Endpoint = {
   PUT_HEALTH_METRICS: "/patient/metrics",
 
   GET_DOCTOR_HOME: "/doctor",
+  GET_ADMIN_DOCTOR: "/admin/doctor",
+
+  GET_ADMIN_POLYCLINIC: "/admin/polyclinic",
+  GET_ADMIN_HOSPITAL: "/admin/hospital",
+
   GET_DOCTOR_PATIENTS: "/doctor/patient"
 };
 
@@ -91,6 +96,15 @@ export const putRequest = async (url, data = {}, params = {}) => {
   }
 };
 
+export const deleteRequest = async (url, data = {}, params = {}) => {
+  try {
+    const response = await axiosInstance.delete(url, data, { params });
+    return response.data;
+  } catch (error) {
+    handleError(error);
+    throw error;
+  }
+};
 
 const handleError = (error) => {
   if (error.response) {
