@@ -22,6 +22,16 @@ export default function Sidebar() {
           icon: User,
         },
         {
+          to: `/admin/${userId}/polyclinic-management`,
+          label: "Polyclinic Management",
+          icon: User,
+        },
+        {
+          to: `/admin/${userId}/hospital-management`,
+          label: "Hospital Management",
+          icon: User,
+        },
+        {
           to: `/admin/${userId}/security`,
           label: "Security",
           icon: Shield,

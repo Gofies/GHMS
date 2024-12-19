@@ -1,71 +1,202 @@
-'use client'
-
-import { useState } from 'react'
-import { Button } from "../../components/ui/admin/Button.jsx"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/admin/Card.jsx"
-import { Input } from "../../components/ui/admin/Input.jsx"
-import { Label } from "../../components/ui/admin/Label.jsx"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/admin/Select.jsx"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/admin/Table.jsx"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/admin/Dialog.jsx"
-import { Badge } from "../../components/ui/admin/Badge.jsx"
-import { Switch } from "../../components/ui/admin/Switch.jsx"
-import { Home, Users, Shield, Settings, LogOut, Search, Plus, Edit, Trash2 } from 'lucide-react'
-//import Link from 'next/link'
+"use client";
+import { useEffect, useState } from 'react';
+import { Button } from "../../components/ui/admin/Button.jsx";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/admin/Card.jsx";
+import { Input } from "../../components/ui/admin/Input.jsx";
+import { Label } from "../../components/ui/admin/Label.jsx";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/admin/Table.jsx";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/admin/Dialog.jsx";
+import { Badge } from "../../components/ui/admin/Badge.jsx";
+import { Search, Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/ui/admin/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
-import { Endpoint, postRequest, getRequest } from "../../helpers/Network.js";
-import { toast } from 'react-toastify'
-
-// Mock data for users
-const users = [
-  { id: 1, name: "John Doe", email: "john@example.com", role: "Doctor", status: "Active" },
-  { id: 2, name: "Jane Smith", email: "jane@example.com", role: "Nurse", status: "Active" },
-  { id: 3, name: "Bob Johnson", email: "bob@example.com", role: "Lab Staff", status: "Inactive" },
-  { id: 4, name: "Alice Brown", email: "alice@example.com", role: "Admin", status: "Active" },
-  { id: 5, name: "Charlie Davis", email: "charlie@example.com", role: "IT Staff", status: "Active" },
-]
+import { Endpoint, postRequest, getRequest, putRequest ,deleteRequest} from "../../helpers/Network.js";
+import { toast } from 'react-toastify';
 
 export default function AdminUserManagementPage() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [newUser, setNewUser] = useState({ name: '', email: '', role: '', status: 'Active' })
-  const [editingUser, setEditingUser] = useState(null)
+  const [doctors, setDoctors] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState('');
+  const [surname, setSurname] = useState('');
+  const [title, setTitle] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [jobstartdate, setJobStartDate] = useState('');
+  const [password, setPassword] = useState('');
+  const [degree, setDegree] = useState('');
+  const [specialization, setSpecialization] = useState('');
+  const [selectedDay, setSelectedDay] = useState(1);
+  const [selectedMonth, setSelectedMonth] = useState('January');
+  const [selectedYear, setSelectedYear] = useState(2024);
+  const [editingUser, setEditingUser] = useState(null);
+  const [updatedPatientUser, setUpdatedPatientUser] = useState(null);
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.role.toLowerCase().includes(searchTerm.toLowerCase())
-  )
 
-  const handleCreateUser = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    // Here you would typically send the new user data to your backend
-    console.log("New user created:", newUser)
-    setNewUser({ name: '', email: '', role: '', status: 'Active' })
-  }
+  const days = Array.from({ length: 31 }, (_, i) => i + 1); // 1-31
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i); // Last 100 years
 
-  const handleEditUser = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    // Here you would typically send the updated user data to your backend
-    console.log("User updated:", editingUser)
-    setEditingUser(null)
-  }
+  const fetchDoctors = async () => {
+    try {
+      const response = await getRequest(Endpoint.GET_ADMIN_DOCTOR);
+      if (response) {
+        setDoctors(response.doctors);
+        setFilteredUsers(response.doctors);
+      } else {
+        toast.error('Failed to fetch users.');
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      toast.error('An error occurred while fetching user data.');
+    }
+  };
 
-  const handleDeleteUser = (userId: number) => {
-    // Here you would typically send a delete request to your backend
-    console.log("User deleted:", userId)
-  }
+
+  const getFormattedDate = () => {
+    if (!selectedDay || !selectedMonth || !selectedYear) return null;
+
+    const monthIndex = months.indexOf(selectedMonth) + 1; // Get month index
+    return `${selectedYear}-${String(monthIndex).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
+  };
+
+  const navigate = useNavigate();
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    const birthdate = getFormattedDate();
+    if (!birthdate) {
+      alert("Please select a valid date of birth.");
+      return;
+    }
+    const requestBody = {
+      name,
+      surname,
+      title,
+      email,
+      password,
+      birthdate,
+      phone,
+      jobstartdate,
+      degree,
+      specialization,
+    };
+    try {
+      const responseData = await postRequest(Endpoint.GET_ADMIN_DOCTOR, requestBody);
+      if (responseData) {
+        toast.success("Account created successfully!");
+        if (toast.success) {
+          setTimeout(() => {
+            navigate(0); // Refresh the page or redirect
+          }, 1000);
+        }
+      } else {
+        toast.error("An error occurred during user creation.");
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("An unexpected error occurred.");
+    }
+  };
+
+  const handleEditUser1 = async (e, id) => {
+    e.preventDefault();
+    // if (!editingUser) return;
+
+    console.log("a");
+    try {
+      const responseData = await getRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`);
+      console.log(responseData);
+      if (responseData) {
+        setEditingUser(responseData.doctor);
+        toast.success("User fetched");
+      } else {
+        toast.error("An error occurred during user update.");
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("An unexpected error occurred.");
+    }
+  };
+
+  const handleEditUser2 = async (e, id) => {
+   e.preventDefault();
+    if (!editingUser) return;
+
+    const birthdate = getFormattedDate();
+    if (!birthdate) {
+      alert("Please select a valid date of birth.");
+      return;
+    }
+
+    const requestBody = {
+      ...editingUser,
+      name,
+      surname,
+      title,
+      email,
+      phone,
+      jobstartdate,
+      degree,
+      specialization,
+      birthdate,
+    };
+
+    try {
+      const responseData = await putRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`, requestBody);
+      console.log("r", responseData);
+      if (responseData) {
+        toast.success("User updated successfully!");
+      } else {
+        toast.error("An error occurred during user update.");
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("An unexpected error occurred.");
+    }
+  };
+
+  useEffect(() => {
+    //   if (searchTerm) {
+    //     const filtered = users.filter((user) =>
+    //       `${user.name} ${user.surname}`.toLowerCase().includes(searchTerm.toLowerCase())
+    //     );
+    //     setFilteredUsers(filtered);
+    //   } else {
+    fetchDoctors();
+    //   }
+  }, []);
+  // }, [searchTerm, users]);
+
+
+  const deleteUser = async (id) => {
+    try {
+      const response = await deleteRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`);
+      if (response) {
+        toast.success('User deleted successfully!');
+        setDoctors(doctors.filter(user => user._id !== id));
+        setFilteredUsers(filteredUsers.filter(user => user._id !== id));
+      } else {
+        toast.error('Failed to delete user.');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error('An unexpected error occurred while deleting the user.');
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
       <Sidebar />
 
-      {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
-        <Header title="User Management"/>
+        <Header title="User Management" />
 
-        {/* User Management Content */}
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center">
@@ -90,62 +221,141 @@ export default function AdminUserManagementPage() {
                   <DialogTitle>Create New User</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleCreateUser}>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="name" className="text-right">
-                        Name
-                      </Label>
+                  <div className="grid grid-cols-2 gap-6 py-4">
+                    <div>
+                      <Label htmlFor="name">Name</Label>
                       <Input
                         id="name"
-                        value={newUser.name}
-                        onChange={(e) => setNewUser({...newUser, name: e.target.value})}
-                        className="col-span-3"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="John"
+                        required
+                        className="w-full"
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="email" className="text-right">
-                        Email
-                      </Label>
+                    <div>
+                      <Label htmlFor="surname">Surname</Label>
+                      <Input
+                        id="surname"
+                        value={surname}
+                        onChange={(e) => setSurname(e.target.value)}
+                        placeholder="Doe"
+                        required
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email">E-Mail</Label>
                       <Input
                         id="email"
-                        type="email"
-                        value={newUser.email}
-                        onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-                        className="col-span-3"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="example@domain.com"
+                        required
+                        className="w-full"
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="role" className="text-right">
-                        Role
-                      </Label>
-                      <Select
-                        value={newUser.role}
-                        onValueChange={(value) => setNewUser({...newUser, role: value})}
+                    <div className="relative">
+                      <Label htmlFor="password">Password</Label>
+                      <Input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter your password"
+                        required
+                        className="w-full"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
                       >
-                        <SelectTrigger className="col-span-3">
-                          <SelectValue placeholder="Select a role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="doctor">Doctor</SelectItem>
-                          <SelectItem value="nurse">Nurse</SelectItem>
-                          <SelectItem value="lab_staff">Lab Staff</SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="it_staff">IT Staff</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                    </div>
+                    <div>
+                      <Label htmlFor="phone">Phone</Label>
+                      <Input
+                        id="phone"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="+90 123 456 7890"
+                        required
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="title">Title</Label>
+                      <Input
+                        id="title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Prof. Dr."
+                        required
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="degree">Degree</Label>
+                      <Input
+                        id="degree"
+                        value={degree}
+                        onChange={(e) => setDegree(e.target.value)}
+                        placeholder="PhD"
+                        required
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="specialization">Specialization</Label>
+                      <Input
+                        id="specialization"
+                        value={specialization}
+                        onChange={(e) => setSpecialization(e.target.value)}
+                        placeholder="Cardiology"
+                        required
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="birthdate">Birthdate</Label>
+                      <Input
+                        id="birthdate"
+                        type="date"
+                        value={getFormattedDate()}
+                        onChange={(e) => {
+                          const [year, month, day] = e.target.value.split('-');
+                          setSelectedYear(parseInt(year, 10));
+                          setSelectedMonth(months[parseInt(month, 10) - 1]);
+                          setSelectedDay(parseInt(day, 10));
+                        }}
+                        required
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="jobstartdate">Job Start Date</Label>
+                      <Input
+                        id="jobstartdate"
+                        type="date"
+                        value={jobstartdate}
+                        onChange={(e) => setJobStartDate(e.target.value)}
+                        required
+                        className="w-full"
+                      />
                     </div>
                   </div>
                   <div className="flex justify-end">
                     <Button type="submit">Create User</Button>
                   </div>
-                
                 </form>
               </DialogContent>
             </Dialog>
           </div>
 
           <Card>
-            <CardHeader className="flex space-between">
+            <CardHeader>
               <CardTitle className="text-xl font-bold">User List</CardTitle>
             </CardHeader>
             <CardContent>
@@ -154,17 +364,19 @@ export default function AdminUserManagementPage() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Role</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Specialization</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredUsers.map((user) => (
-                    <TableRow key={user.id}>
+                    <TableRow key={user._id}>
                       <TableCell>{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.role}</TableCell>
+                      <TableCell>{user.title}</TableCell>
+                      <TableCell>{user.specialization}</TableCell>
                       <TableCell>
                         <Badge variant={user.status === 'Active' ? 'default' : 'secondary'}>
                           {user.status}
@@ -174,7 +386,11 @@ export default function AdminUserManagementPage() {
                         <div className="flex space-x-2">
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button variant="outline" size="sm" onClick={() => setEditingUser(user)}>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => { handleEditUser1(e, user._id) }}
+                              >
                                 <Edit className="w-4 h-4 mr-2" />
                                 Edit
                               </Button>
@@ -183,69 +399,133 @@ export default function AdminUserManagementPage() {
                               <DialogHeader>
                                 <DialogTitle>Edit User</DialogTitle>
                               </DialogHeader>
-                              <form onSubmit={handleEditUser}>
-                                <div className="grid gap-4 py-4">
-                                  <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="edit-name" className="text-right">
-                                      Name
-                                    </Label>
+                              <form onSubmit={(e) => { handleEditUser2(e, user._id)}}>
+                                <div className="grid grid-cols-2 gap-6 py-4">
+                                  <div>
+                                    <Label htmlFor="name">Name</Label>
                                     <Input
-                                      id="edit-name"
-                                      value={editingUser?.name}
-                                      onChange={(e) => setEditingUser({...editingUser, name: e.target.value})}
-                                      className="col-span-3"
+                                      id="name"
+                                      value={editingUser?.name || ''}
+                                      onChange={(e) =>
+                                        setEditingUser((prev) => ({
+                                          ...prev,
+                                          name: e.target.value,
+                                        }))
+                                      }
+                                      placeholder="John"
+                                      required
+                                      className="w-full"
+                                    />
+
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="surname">Surname</Label>
+                                    <Input
+                                      id="surname"
+                                      value={editingUser?.surname || ''}
+                                      onChange={(e) =>
+                                        setEditingUser((prev) => ({
+                                          ...prev,
+                                          surname: e.target.value,
+                                        }))
+                                      }
+                                      placeholder="Doe"
+                                      required
+                                      className="w-full"
                                     />
                                   </div>
-                                  <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="edit-email" className="text-right">
-                                      Email
-                                    </Label>
+                                  <div>
+                                    <Label htmlFor="email">E-Mail</Label>
                                     <Input
-                                      id="edit-email"
-                                      type="email"
-                                      value={editingUser?.email}
-                                      onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
-                                      className="col-span-3"
+                                      id="email"
+                                      value={editingUser?.email || ''}
+                                      onChange={(e) =>
+                                        setEditingUser((prev) => ({
+                                          ...prev,
+                                          email: e.target.value,
+                                        }))
+                                      }
+                                      placeholder="example@domain.com"
+                                      required
+                                      className="w-full"
                                     />
                                   </div>
-                                  <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="edit-role" className="text-right">
-                                      Role
-                                    </Label>
-                                    <Select
-                                      value={editingUser?.role}
-                                      onValueChange={(value) => setEditingUser({...editingUser, role: value})}
-                                    >
-                                      <SelectTrigger className="col-span-3">
-                                        <SelectValue placeholder="Select a role" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="doctor">Doctor</SelectItem>
-                                        <SelectItem value="nurse">Nurse</SelectItem>
-                                        <SelectItem value="lab_staff">Lab Staff</SelectItem>
-                                        <SelectItem value="admin">Admin</SelectItem>
-                                        <SelectItem value="it_staff">IT Staff</SelectItem>
-                                      </SelectContent>
-                                    </Select>
+                                  <div>
+                                    <Label htmlFor="phone">Phone</Label>
+                                    <Input
+                                      id="phone"
+                                      value={editingUser?.phone || ''}
+                                      onChange={(e) =>
+                                        setEditingUser((prev) => ({
+                                          ...prev,
+                                          phone: e.target.value,
+                                        }))
+                                      }
+                                      placeholder="+90 123 456 7890"
+                                      required
+                                      className="w-full"
+                                    />
                                   </div>
-                                  <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="edit-status" className="text-right">
-                                      Status
-                                    </Label>
-                                    <Switch
-                                      id="edit-status"
-                                      checked={editingUser?.status === 'Active'}
-                                      onCheckedChange={(checked) => setEditingUser({...editingUser, status: checked ? 'Active' : 'Inactive'})}
+                                  <div>
+                                    <Label htmlFor="title">Title</Label>
+                                    <Input
+                                      id="title"
+                                      value={editingUser?.title || ''}
+                                      onChange={(e) =>
+                                        setEditingUser((prev) => ({
+                                          ...prev,
+                                          title: e.target.value,
+                                        }))
+                                      }
+                                      placeholder="Prof. Dr."
+                                      required
+                                      className="w-full"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="degree">Degree</Label>
+                                    <Input
+                                      id="degree"
+                                      value={editingUser?.degree || ''}
+                                      onChange={(e) =>
+                                        setEditingUser((prev) => ({
+                                          ...prev,
+                                          degree: e.target.value,
+                                        }))
+                                      }
+                                      placeholder="PhD"
+                                      required
+                                      className="w-full"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="specialization">Specialization</Label>
+                                    <Input
+                                      id="specialization"
+                                      value={editingUser?.specialization || ''}
+                                      onChange={(e) =>
+                                        setEditingUser((prev) => ({
+                                          ...prev,
+                                          specialization: e.target.value,
+                                        }))
+                                      }
+                                      placeholder="Cardiology"
+                                      required
+                                      className="w-full"
                                     />
                                   </div>
                                 </div>
                                 <div className="flex justify-end">
-                                  <Button type="submit">Update User</Button>
+                                  <Button type="submit">Save Changes</Button>
                                 </div>
                               </form>
                             </DialogContent>
                           </Dialog>
-                          <Button variant="outline" size="sm" onClick={() => handleDeleteUser(user.id)}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => deleteUser(user._id)}
+                          >
                             <Trash2 className="w-4 h-4 mr-2" />
                             Delete
                           </Button>
@@ -260,5 +540,5 @@ export default function AdminUserManagementPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }
