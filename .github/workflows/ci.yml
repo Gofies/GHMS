@@ -23,10 +23,7 @@ jobs:
 
       - name: Build and start services
         run: |
-          mkdir -p ./ssl
-          chmod +x ./gen_dev_ssl_cert.sh
-          ./gen_dev_ssl_cert.sh
-          docker-compose up -d --build
+          make
 
       - name: Wait for services to be healthy
         run: |
@@ -50,33 +47,3 @@ jobs:
           path: |
             ./frontend/coverage
             ./backend/coverage
-
-  # lint:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: "18"
-
-  #     - name: Cache npm dependencies
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: ~/.npm
-  #         key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.OS }}-node-
-
-  #     - name: Install and Lint Frontend
-  #       working-directory: ./frontend
-  #       run: |
-  #         npm ci
-  #         npm run lint
-
-  #     - name: Install and Lint Backend
-  #       working-directory: ./backend
-  #       run: |
-  #         npm ci
-  #         npm run lint

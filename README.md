@@ -6,7 +6,7 @@ This is a full-stack hospital management system built using:
 
 - **Frontend:** React with Tailwind CSS
 - **Backend:** Node.js with Express
-- **Databases:** MongoDB, PostgreSQL with Citus
+- **Database:** MongoDB cluster (shard, router, and config services)
 - **AI Model:** An LLM used for live chat functionality
 - **DevOps:** Docker, Docker Compose, GitHub Actions for CI
 
@@ -56,31 +56,24 @@ Before you can run the project, make sure you have the following installed:
    sudo apt install make
    ```
 
-4. set up the project by running:
+4. To set up the project and start the services, run:
 
    ```bash
-   make build
+   make all
    ```
 
-5. To start the services, run:
+   This will spin up the Docker containers for MongoDB services, and both the frontend and backend.
+
+5. To stop and clean the services:
 
    ```bash
-   make up
+   sudo make clean
    ```
 
-   This will spin up the Docker containers for MongoDB, PostgreSQL citus, and both the frontend and backend.
-
-6. If you face an error regarding the database init.sh file, you can try run the following commands, the second one is for windows users mainly:
+6. To remove unnecessary, outdated, or temporary files that may have been created during the build or development process:
 
    ```bash
-   chmod +x ./database/citus/init.sh
-   dos2unix ./database/citus/init.sh
-   ```
-
-7. To stop the services:
-
-   ```bash
-   make down
+   make prune
    ```
 
 ## Makefile Commands
@@ -89,13 +82,14 @@ The project uses a Makefile to simplify common tasks. Below are the available co
 
 | Command                                                    | Description                                                       |
 | ---------------------------------------------------------- | ----------------------------------------------------------------- |
-| `make build`                                               | Build all service images (MongoDB, PostgreSQL, frontend, backend) |
-| `make up`                                                  | Start all services (MongoDB, PostgreSQL, frontend, backend)       |
+| `make all`                                                 | Build and start all services (MongoDB cluster, frontend backend)  |
+| `make build`                                               | Build all service images                                          |
+| `make up`                                                  | Start all services                                                |
 | `make down`                                                | Stop all running services.                                        |
-| `make up service=<frontend/backend/etc...> "overloaded"`   | Start a specific service (MongoDB, PostgreSQL, frontend, backend) |
-| `make down service=<frontend/backend/etc...> "overloaded"` | Stop a specific service (MongoDB, PostgreSQL, frontend, backend)  |
+| `make up service=<frontend/backend/etc...> "overloaded"`   | Start a specific service.                                         |
+| `make down service=<frontend/backend/etc...> "overloaded"` | Stop a specific service.                                          |
 | `make restart`                                             | Restart all running services.                                     |
-| `make clean`                                               | Remove all Docker images, containers, and volumes.                |
+| `sudo make clean`                                          | Remove all Docker images, containers, and volumes.                |
 | `make status`                                              | Show the status of all running services.                          |
 | `make logs`                                                | View logs for all services.                                       |
 
@@ -105,24 +99,22 @@ To attach to one of the running containers, you can use the following commands:
 
 | Command                                 | Description                                                            |
 | --------------------------------------- | ---------------------------------------------------------------------- |
-| `make attach service=<postgres/etc...>` | Attach to a running container (MongoDB, PostgreSQL, frontend, backend) |
-| `make attach-psql`                      | Attach to the PostgreSQL container's cli.                              |
-| `make attach-mongo`                     | Attach to the MongoDB container's cli.                                 |
+| `make attach service=<backend/etc...>`  | Attach to a running container (MongoDB services, frontend, backend)    |
+| `make attach-mongos`                    | Attach to the MongoDB cluster router container's cli.                  |
 
 When running the commands make sure to check the `.env` file for the environment variables needed for the services to run. It is used to determine whether the services are running in development or production mode.
 
 ## Running the Project
 
-1. Start all services: Use `make up-all` to start the Docker containers for the databases, backend, and frontend.
+1. Start all services: Use `make all` to start the Docker containers for the database, backend, and frontend.
 
 2. Accessing the services:
 
    - **Frontend:** [http://localhost:3000](http://localhost:3000)
-   - **Backend:** [http://localhost:5000](http://localhost:5000)
-   - **MongoDB:** `mongodb://localhost:27017`
-   - **PostgreSQL citus:** `postgres://localhost:5432`
+   - **Backend:** [https://localhost:5000](https://localhost)
+   - **MongoDB cluster:** `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@router01:27117,router02:27118/HospitalDatabase?authMechanism=DEFAULT`
 
-3. Stopping services: To stop and remove all running services, run `make down`.
+3. Stopping services: To stop and remove all running services, run `sudo make clean`.
 
 ## Pushing Code and Branching Patterns
 

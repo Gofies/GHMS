@@ -1,8 +1,12 @@
 include .env
 export $(shell sed 's/=.*//' .env)
 
-up:
-	docker-compose up $(service)
+all: build up
+
+deploy: build-deploy up
+
+up: mongo-up
+	docker-compose up -d $(service)
 
 # Bring down services dynamically
 down:
@@ -13,20 +17,24 @@ logs:
 	docker-compose logs -f $(service)
 
 # Build all services
-build:
+build: mongo-build
 	mkdir -p ssl
 	bash gen_dev_ssl_cert.sh
-	dos2unix ./database/citus/init.sh
 	docker-compose build
+
+build-deploy: mongo-build
+	docker-compose build
+	
+prune:
+	docker system prune -f
 
 # Clean all services
 clean:
-	docker-compose down --rmi all --volumes --remove-orphans
+	docker-compose down --volumes --remove-orphans
 	rm -rf ssl
-
-# prune all services
-prune:
-	docker system prune -f
+	rm -rf ./database/init_log.txt
+	rm -rf ./database/persistant
+	rm -rf ./database/mongodb-build/auth/mongodb-keyfile
 
 # Restart all services
 restart:
@@ -34,7 +42,7 @@ restart:
 
 # Show status of all services
 status:
-	docker-compose ps
+	docker-compose ps -a
 
 #attach to a running container
 attach:
@@ -42,26 +50,16 @@ attach:
 
 certificates:
 	./gen_dev_ssl_cert.sh
-  
-##### Database Makefile Commands #####
 
-attach-citus-master:
-	docker exec -it softeng-citus-master-1 psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
-
-attach-citus-worker:
-	docker exec -it softeng-citus-worker-1 psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
-
-attach-mongo:
-	docker exec -it softeng-mongo-1 mongosh -u admin -p admin
+##### Database Commands #####
+mongo-build:
+	openssl rand -base64 756 > ./database/mongodb-build/auth/mongodb-keyfile
+	chmod 400 ./database/mongodb-build/auth/mongodb-keyfile
 
 mongo-up:
-	docker-compose up -d mongo
+	docker-compose up -d router01 router02 configsvr01 configsvr02 configsvr03 shard01-a shard01-b shard02-a shard02-b shard03-a shard03-b
+	chmod +x ./database/init.sh
+	./database/init.sh
 
-citus-up:
-	docker-compose up -d citus-master citus-worker citus-init
-
-citus-down:
-	docker-compose down citus-master citus-worker citus-init
-
-citus-logs:
-	docker-compose logs -f citus-master citus-worker citus-init
+attach-mongo:
+	docker-compose exec router01 mongosh HospitalDatabase --port 27117 -u ${MONGO_USERNAME} -p ${MONGO_PASSWORD} --authenticationDatabase admin

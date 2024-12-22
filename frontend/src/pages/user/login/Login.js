@@ -29,7 +29,7 @@ export default function LoginPage() {
     if (isAuthenticated) {
       switch (role) {
         case "admin":
-          navigate("/admin/");
+          navigate(`/admin/${userId}/`);
           break;
         case "doctor":
           navigate(`/doctor/${userId}/`);

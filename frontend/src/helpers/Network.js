@@ -6,8 +6,10 @@ export const Endpoint = {
   LOGIN: "/auth/login",
   LOGOUT: "/auth/logout",
   SIGNUP: "/patient/auth/signup",
+  CHANGE_PASSWORD: "/patient/auth/change-password",
   GET_PATIENT_APPOINTMENTS: "/patient/appointments",
   GET_PROFILE: "/patient/profile",
+  UPDATE_PROFILE: "/patient/profile",
   GET_LAB_TESTS: "/patient/medical-record/lab-tests",
   GET_OTHER_TESTS: "/patient/medical-record/other-tests",
   GET_DIAGNOSES: "/patient/medical-record/diagnoses",
@@ -16,6 +18,11 @@ export const Endpoint = {
   PUT_HEALTH_METRICS: "/patient/metrics",
 
   GET_DOCTOR_HOME: "/doctor",
+  GET_ADMIN_DOCTOR: "/admin/doctor",
+
+  GET_ADMIN_POLYCLINIC: "/admin/polyclinic",
+  GET_ADMIN_HOSPITAL: "/admin/hospital",
+
   GET_DOCTOR_PATIENTS: "/doctor/patient"
 };
 
@@ -37,7 +44,8 @@ axiosInstance.interceptors.response.use(
 
     if (
       error.response &&
-      (error.response.status === 403) 
+      (error.response.status === 401 || error.response.status === 403) &&
+      !originalRequest._retry
     ) {
       console.log("Unauthorized or Forbidden error, attempting refresh...");
       //originalRequest._retry = true;
@@ -58,9 +66,9 @@ axiosInstance.interceptors.response.use(
 }
 );
 
-export const getRequest = async (url, data= {}, params = {}) => {
+export const getRequest = async (url, params = {}) => {
   try {
-    const response = await axiosInstance.get(url, data, { params });
+    const response = await axiosInstance.get(url, { params });
     return response.data;
   } catch (error) {
     handleError(error);
@@ -81,6 +89,16 @@ export const postRequest = async (url, data = {}, params = {}) => {
 export const putRequest = async (url, data = {}, params = {}) => {
   try {
     const response = await axiosInstance.put(url, data, { params });
+    return response.data;
+  } catch (error) {
+    handleError(error);
+    throw error;
+  }
+};
+
+export const deleteRequest = async (url, data = {}, params = {}) => {
+  try {
+    const response = await axiosInstance.delete(url, data, { params });
     return response.data;
   } catch (error) {
     handleError(error);

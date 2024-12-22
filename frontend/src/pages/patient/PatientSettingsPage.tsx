@@ -8,17 +8,23 @@ import { CalendarDays, Home, User, FileText, PieChart, Settings, LogOut, Moon, B
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
 import { useDarkMode } from '../../helpers/DarkModeContext';
+import { Endpoint, getRequest, putRequest } from "../../helpers/Network.js";
+import { toast } from 'react-toastify'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/patient/appointment/Dialog.jsx"
+import { Input } from '../../components/ui/login/Input';
+//import { Label } from '../../components/ui/login/Label';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
 export default function SettingsPage() {
   const [language, setLanguage] = useState('english')
   const [notifications, setNotifications] = useState(true)
   const [twoFactor, setTwoFactor] = useState(false)
- 
+
   // const [darkMode, setDarkMode] = useState(
   //   localStorage.getItem("darkMode") === "true" // Dark mode durumu yerel depolamadan alınır
   // );
   const [darkMode, setDarkMode] = useState(false);
-  
+
   const handleDarkModeToggle = (checked) => {
     // setDarkMode(checked);
     // if (checked) {
@@ -29,11 +35,41 @@ export default function SettingsPage() {
     //   localStorage.setItem("darkMode", "false"); // Yerel depolamada dark mode'u devre dışı bırakır
     // }
   };
-  
+
   const handleLanguageChange = (value: string) => {
     setLanguage(value)
     // Here you would typically update the language in your app
   }
+
+  const [error, setError] = useState(null);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleChangePassword = async (e) => {
+    //setIsChangePasswordOpen(true);
+    e.preventDefault();
+    console.log("aaa");
+    try {
+      // PUT isteği gönder
+      const response = await putRequest(Endpoint.CHANGE_PASSWORD, {
+        currentPassword: currentPassword, // Eski şifre
+        newPassword: newPassword, // Yeni şifre
+        newPasswordConfirm: newPasswordConfirm
+      });
+
+      // Başarılı yanıt alındığında işlem yap
+      console.log("Password changed successfully:", response);
+      toast("Password changed successfully!"); // Toast mesajı
+    } catch (err) {
+      console.error("Error changing password:", err);
+      toast("Failed to change password. Please try again."); // Toast mesajı
+      setError("Failed to change password. Please try again."); // Hata durumu
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -121,14 +157,138 @@ export default function SettingsPage() {
                   onCheckedChange={setTwoFactor}
                 />
               </div>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full" onClick={() => setIsChangePasswordOpen(true)}>
                 <Lock className="w-4 h-4 mr-2" />
                 Change Password
               </Button>
+
+
+
             </CardContent>
           </Card>
         </div>
       </main>
+      {isChangePasswordOpen && (
+        <Dialog open={isChangePasswordOpen}>
+          <DialogContent>
+            <form onSubmit={handleChangePassword}>
+              <div className="grid gap-2 mt-4">
+                <Label htmlFor="currentPassword">Current Password</Label>
+                <div className="relative">
+                  <Input
+                    id="currentPassword"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="********"
+                    required
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOffIcon className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <EyeIcon className="h-4 w-4 text-gray-500" />
+                    )}
+                    <span className="sr-only">
+                      {showPassword ? "Hide password" : "Show password"}
+                    </span>
+                  </Button>
+                </div>
+                <Label htmlFor="newPassword">New Password</Label>
+                <div className="relative">
+                  <Input
+                    id="newPassword"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="********"
+                    required
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOffIcon className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <EyeIcon className="h-4 w-4 text-gray-500" />
+                    )}
+                    <span className="sr-only">
+                      {showPassword ? "Hide password" : "Show password"}
+                    </span>
+                  </Button>
+                </div>
+                <Label htmlFor="newPasswordConfirm">New Password Confirm</Label>
+                <div className="relative">
+                  <Input
+                    id="newPasswordConfirm"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="********"
+                    required
+                    value={newPasswordConfirm}
+                    onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOffIcon className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <EyeIcon className="h-4 w-4 text-gray-500" />
+                    )}
+                    <span className="sr-only">
+                      {showPassword ? "Hide password" : "Show password"}
+                    </span>
+                  </Button>
+                </div>
+              </div>
+              {/* Display loading state */}
+              {/* {loading && (
+                  <div className="mt-2 text-sm text-blue-600">Logging in...</div>
+                )} */}
+
+              {/* Display error message */}
+              {error && (
+                <div className="mt-2 text-sm text-red-600">
+                  {error.message || "Email or password is incorrect. Please try again."}
+                </div>
+              )}
+              <div className="flex justify-between mt-4">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setIsChangePasswordOpen(false); // Dialog'u kapat
+                    setCurrentPassword(""); // Inputları sıfırla
+                    setNewPassword("");
+                    setNewPasswordConfirm("");
+                  }}
+                >
+                  Close
+                </Button>
+                <Button className="ml-auto" type="submit"> {/* Sağ tarafa yasla */}
+                  Change Password
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
+
+
   )
 }
+
