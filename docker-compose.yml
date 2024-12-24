@@ -12,7 +12,7 @@ services:
     networks:
       - gofies
     healthcheck:
-      test: ["CMD", "curl", "-f", "-k", "https://localhost/health"]
+      test: ["CMD", "curl", "-f", "-k", "https://nginx/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -29,7 +29,7 @@ services:
     networks:
       - gofies
     healthcheck:
-      test: ["CMD", "curl", "-f", "-k", "https://localhost/api/health"]
+      test: ["CMD", "curl", "-f", "-k", "https://nginx/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -68,7 +68,7 @@ services:
     networks:
       - gofies
     healthcheck:
-      test: ["CMD", "curl", "-f", "-k", "https://localhost/llm/health"]
+      test: ["CMD", "curl", "-f", "-k", "https://nginx/llm/health"]
       interval: 30s
       timeout: 10s
       retries: 3
