@@ -28,7 +28,6 @@ services:
       - .env
     networks:
       - gofies
-
     healthcheck:
       test: ["CMD", "curl", "-f", "-k", "https://localhost/api/health"]
       interval: 30s
@@ -66,6 +65,8 @@ services:
       - "3131:3131"
     volumes:
       - ./AI/llm/uploads:/app/uploads
+    networks:
+      - gofies
     healthcheck:
       test: ["CMD", "curl", "-f", "-k", "https://localhost/llm/health"]
       interval: 30s
