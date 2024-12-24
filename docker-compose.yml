@@ -28,7 +28,6 @@ services:
       - .env
     networks:
       - gofies
-
     healthcheck:
       test: ["CMD", "curl", "-f", "-k", "https://nginx/api/health"]
       interval: 30s
@@ -49,6 +48,7 @@ services:
     depends_on:
       - frontend
       - backend
+      - llm
     networks:
       - gofies
     healthcheck:
@@ -57,6 +57,22 @@ services:
       timeout: 5s
       retries: 5
 
+  llm:
+    build:
+      context: ./AI
+      dockerfile: Dockerfile
+    ports:
+      - "3131:3131"
+    volumes:
+      - ./AI/llm/uploads:/app/uploads
+    networks:
+      - gofies
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-k", "https://nginx/llm/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      
   router01:
     build: 
       context: ./database/mongodb-build
