@@ -13,79 +13,46 @@ import { Legend } from 'recharts/es6/component/Legend';
 import { ResponsiveContainer } from 'recharts/es6/component/ResponsiveContainer';
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
-import { Endpoint, putRequest, getRequest } from "../../helpers/Network.js";
+import { Endpoint, putRequest, getRequest, deleteRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify'
-
-const weightData = [
-  { date: '2024-01-01', weight: 70 },
-  { date: '2024-02-01', weight: 71 },
-  { date: '2024-03-01', weight: 69 },
-  { date: '2024-04-01', weight: 68 },
-  { date: '2024-05-01', weight: 67 },
-  { date: '2024-06-01', weight: 66 },
-]
-
-const bloodPressureData = [
-  { date: '2024-01-01', systolic: 120, diastolic: 80 },
-  { date: '2024-02-01', systolic: 118, diastolic: 78 },
-  { date: '2024-03-01', systolic: 122, diastolic: 82 },
-  { date: '2024-04-01', systolic: 116, diastolic: 76 },
-  { date: '2024-05-01', systolic: 120, diastolic: 80 },
-  { date: '2024-06-01', systolic: 118, diastolic: 78 },
-]
-
-const heartRateData = [
-  { date: '2024-01-01', rate: 72 },
-  { date: '2024-02-01', rate: 70 },
-  { date: '2024-03-01', rate: 74 },
-  { date: '2024-04-01', rate: 68 },
-  { date: '2024-05-01', rate: 72 },
-  { date: '2024-06-01', rate: 70 },
-]
 
 export default function HealthMetricsPage() {
   const [activeTab, setActiveTab] = useState('overview');
-  const [editing, setEditing] = useState(null); 
-  const [weight, setWeight] = useState(""); 
-  const [height, setHeight] = useState(""); 
+  const [editing, setEditing] = useState(null);
+  const [weight, setWeight] = useState("");
+  const [height, setHeight] = useState("");
   const [heartRate, setHeartRate] = useState("");
   const [bloodSugar, setBloodSugar] = useState("");
   const [bloodType, setBloodType] = useState("");
   const [bmi, setBmi] = useState("");
   const [bloodPressure, setBloodPressure] = useState("");
-  const [value, setValue] = useState(""); 
+  const [value, setValue] = useState("");
   const [error, setError] = useState("")
-  const [allergies, setAllergies] = useState(null); 
+  const [allergies, setAllergies] = useState(null);
 
   const handleDelete = async (allergyToDelete) => {
-    // try {
-    //   // Backend'e silme isteği gönder
-    //   const response = await fetch("/api/patient/allergies", {
-    //     method: "DELETE",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ allergy: allergyToDelete }),
-    //   });
-
-    //   if (response.ok) {
-    //     // Silme başarılı, listeyi güncelle
-    //     setAllergies((prevAllergies) =>
-    //       prevAllergies.filter((allergy) => allergy !== allergyToDelete)
-    //     );
-    //     toast("Allergy deleted successfully!");
-    //   } else {
-    //     const error = await response.json();
-    //     toast(`Error: ${error.message}`);
-    //   }
-    // } catch (error) {
-    //   toast(`Error deleting allergy: ${error.message}`);
-    // }
+    try {
+      console.log(allergyToDelete);
+      const response = await deleteRequest("/patient/metrics/allergies", {
+        allergyName: allergyToDelete, // Backend'in beklediği format
+      });
+      console.log(response.status);
+      if (response) {
+        setAllergies((prevAllergies) =>
+          prevAllergies.filter((allergy) => allergy !== allergyToDelete)
+        );
+        toast("Allergy deleted successfully!");
+      } else {
+        toast("Error deleting allergy!");
+      }
+    } catch (error) {
+      toast(`Error deleting allergy: ${error.message}`);
+    }
   };
-
+  
 
   const getBmiComment = (bmi) => {
-    if(bmi && !isNaN(bmi)){
+    if (bmi && !isNaN(bmi)) {
       if (bmi < 18.5) {
         return "Underweight";
       } else if (bmi >= 18.5 && bmi < 24.9) {
@@ -99,9 +66,9 @@ export default function HealthMetricsPage() {
   };
 
   const parseBloodPressure = (bloodPressure) => {
-    if (!bloodPressure) return { systolic: "-", diastolic: "-" }; 
-    const [systolic, diastolic] = bloodPressure.split(" "); 
-    return { systolic, diastolic }; 
+    if (!bloodPressure) return { systolic: "-", diastolic: "-" };
+    const [systolic, diastolic] = bloodPressure.split(" ");
+    return { systolic, diastolic };
   };
 
 
@@ -137,12 +104,66 @@ export default function HealthMetricsPage() {
 
   const handleSave = async (type, value) => {
     try {
+      // Validasyonlar
+      if (type === "weight") {
+        if (value < 0 || value > 300) {
+          toast("Weight must be between 30 and 300 kg.");
+          return;
+        }
+      } else if (type === "height") {
+        if (value < 0 || value > 250) {
+          toast("Height must be between 50 and 250 cm.");
+          return;
+        }
+      } else if (type === "blood-pressure") {
+        const normalizedValue = value.replace(/\s+/g, "/");
+        console.log("Normalized Value:", normalizedValue);
+      
+        const [systolic, diastolic] = normalizedValue.split("/").map(Number);
+        if (
+          !systolic ||
+          !diastolic ||
+          systolic < 70 ||
+          systolic > 250 ||
+          diastolic < 40 ||
+          diastolic > 150
+        ) {
+          toast("Blood pressure must be in the format systolic/diastolic and within valid ranges.");
+          return;
+        }
+      }
+      else if (type === "heart-rate") {
+        if (value < 0 || value > 200) {
+          toast("Heart rate must be between 40 and 200 bpm.");
+          return;
+        }
+      } else if (type === "blood-sugar") {
+        if (value < 50 || value > 500) {
+          toast("Blood sugar must be between 50 and 500.");
+          return;
+        }
+      } else if (type === "blood-type") {
+        const validBloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "0+", "0-"];
+        if (!validBloodTypes.includes(value)) {
+          toast("Invalid blood type. Valid types are A+, A-, B+, B-, AB+, AB-, 0+, 0-.");
+          return;
+        }
+      } else if (type === "allergies") {
+        if (value.length > 50) {
+          toast("Allergy descriptions must be less than 50 characters.");
+          return;
+        }
+      }
+
       const response = await putRequest(`${Endpoint.PUT_HEALTH_METRICS}/${type}`, { [type]: value });
+
       if (response) {
         toast(`${type} updated successfully!`);
       } else {
         toast(`Failed to update ${type}.`);
       }
+
+      // Durum güncellemesi
       if (type === "weight") {
         setWeight(response.patient.weight);
       } else if (type === "heart-rate") {
@@ -162,15 +183,16 @@ export default function HealthMetricsPage() {
     } catch (error) {
       toast(`Error updating ${type}: ${error.message}`);
     }
-    setEditing(null); 
+    setEditing(null);
   };
+
 
   const handleTabChange = (value) => {
     setActiveTab(value); // Update the active tab
   };
 
   const handleEditClick = (type) => {
-    setEditing(type); 
+    setEditing(type);
 
     switch (type) {
       case "weight":
@@ -181,7 +203,7 @@ export default function HealthMetricsPage() {
         break;
       case "blood-pressure":
         const parsedBP = parseBloodPressure(bloodPressure);
-        setValue(`${parsedBP.systolic}/${parsedBP.diastolic}`); 
+        setValue(`${parsedBP.systolic}/${parsedBP.diastolic}`);
         break;
       case "heart-rate":
         setValue(heartRate);
@@ -199,11 +221,23 @@ export default function HealthMetricsPage() {
   };
 
   const handleCancelEdit = () => {
-    setEditing(null); 
-    setValue(""); 
+    setEditing(null);
+    setValue("");
   };
 
-  const handleInputChange = (e) => setValue(e.target.value);
+  const handleInputChange = (e) => {
+    const newValue = e.target.value;
+
+    // if (editing === "blood-pressure") {
+    //   // Sadece "sayı/sayı" formatına izin ver
+    //   if (!/^\d*\/?\d*$/.test(newValue)) {
+    //     return; // Geçersiz formatta ise değişikliğe izin verme
+    //   }
+    // }
+
+    setValue(newValue);
+  };
+
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -234,7 +268,7 @@ export default function HealthMetricsPage() {
                   </div>
                 ) : (
                   <>
-                   <div className="text-2xl font-bold">{weight ? `${weight} kg` : "- kg"}</div>
+                    <div className="text-2xl font-bold">{weight ? `${weight} kg` : "- kg"}</div>
                   </>
                 )}
               </CardContent>
@@ -293,10 +327,11 @@ export default function HealthMetricsPage() {
                       placeholder="Enter new blood pressure (e.g., 120/80)"
                       className="border border-gray-300 rounded px-4 py-2 mb-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+
                     <div className="flex space-x-2">
                       <Button variant="outline" onClick={() => handleCancelEdit()}>Close</Button>
                       <Button onClick={() => handleSave("blood-pressure", formatBloodPressure(value))}>Save</Button>
-                    </div>                  
+                    </div>
                   </div>
                 ) : (
                   <>

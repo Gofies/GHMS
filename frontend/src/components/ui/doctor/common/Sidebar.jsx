@@ -23,11 +23,10 @@ export default function Sidebar() {
           icon: User,
         },
         {
-          to: `/doctor/${userId}/prescriptions`,
-          label: "Prescriptions",
-          icon: Clipboard,
+          to: `/doctor/${userId}/settings`,
+          label: "Settings",
+          icon: Settings,
         },
-      
       ];
 
     return (

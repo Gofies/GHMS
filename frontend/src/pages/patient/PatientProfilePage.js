@@ -9,6 +9,7 @@ import { Endpoint, getRequest, putRequest } from "../../helpers/Network.js";
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
 //import { useDarkMode } from '../../helpers/DarkModeContext.js';
+import { toast } from 'react-toastify'
 
 export default function PatientProfile() {
   //const { darkMode } = useDarkMode(); // Dark mode durumu global olarak alınır
@@ -110,17 +111,21 @@ export default function PatientProfile() {
   const saveChanges = async () => {
     try {
       const response = await putRequest(Endpoint.UPDATE_PROFILE, patientInfo);
-      console.log("Profile updated successfully:", response.data);
-      setIsEditing(false);
+      if(response){
+        console.log("Profile updated successfully:", response.data);
+        toast("Profile updated successfully");
+        setIsEditing(false);
+      }
+
     } catch (err) {
       console.error("Error updating profile:", err);
       setError("Failed to update profile.");
     }
   };
 
-  if (error) {
-    return <div>{error}</div>;
-  }
+  // if (error) {
+  //   return <div>{error}</div>;
+  // }
 
   if (!patientInfo) {
     return <div>Loading...</div>;
@@ -140,7 +145,7 @@ export default function PatientProfile() {
               </Avatar>
             </CardHeader>
             <CardContent className="grid gap-4">
-              {error && <p className="text-red-500">{error}</p>}
+              {/* {error && <p className="text-red-500">{error}</p>} */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="name">Name</Label>

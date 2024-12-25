@@ -11,7 +11,7 @@ import { Search, Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../../components/ui/admin/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
-import { Endpoint, postRequest, getRequest,deleteRequest} from "../../helpers/Network.js";
+import { Endpoint, postRequest, getRequest, deleteRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify';
 
 export default function AdminHospitalManagementPage() {
@@ -56,6 +56,17 @@ export default function AdminHospitalManagementPage() {
     }
   };
 
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        await fetchHospitals(); // Hastane verilerini getir
+      } catch (error) {
+        console.error("Error fetching initial data:", error);
+      }
+    };
+
+    fetchInitialData();
+  }, []);
 
 
   const navigate = useNavigate();
@@ -67,7 +78,7 @@ export default function AdminHospitalManagementPage() {
     const requestBody = {
       name,
       address,
-      selecteddoctors, 
+      selecteddoctors,
       establishmentdate,
       phone,
       email,
@@ -91,28 +102,35 @@ export default function AdminHospitalManagementPage() {
     }
   };
 
-
   useEffect(() => {
-    //   if (searchTerm) {
-    //     const filtered = users.filter((user) =>
-    //       `${user.name} ${user.surname}`.toLowerCase().includes(searchTerm.toLowerCase())
-    //     );
-    //     setFilteredUsers(filtered);
-    //   } else {
-    fetchHospitals();
-    //   }
-  }, []);
-  // }, [searchTerm, users]);
+    if (searchTerm) {
+      const filtered = hospitals.filter((hospital) =>
+        hospital.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        hospital.email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredHospitals(filtered); // Filtrelenmiş listeyi güncelle
+    } else {
+      setFilteredHospitals(hospitals); // Tüm listeyi göster
+    }
+  }, [searchTerm, hospitals]);
 
+  // useEffect(() => {
+  //   //   if (searchTerm) {
+  //   //     const filtered = users.filter((user) =>
+  //   //       `${user.name} ${user.surname}`.toLowerCase().includes(searchTerm.toLowerCase())
+  //   //     );
+  //   //     setFilteredUsers(filtered);
+  //   //   } else {
+  //   fetchHospitals();
+  //   //   }
+  // }, []);
+  // // }, [searchTerm, users]);
 
   const handleLocationChange = (hospitalId) => {
     // Mevcut URL'den adminId'yi çekiyoruz
-    const pathParts = window.location.pathname.split("/"); 
+    const pathParts = window.location.pathname.split("/");
     const adminId = pathParts[2]; // "/admin/{adminId}/hospital-management"
-  
-    // Yeni polyclinicId tanımla
-    //const polyclinicId = "673b9827a25ee0e8d7a88ead";
-  
+
     // Yeni URL'yi oluştur ve yönlendir
     window.location.href = `/admin/${adminId}/polyclinic-management/${hospitalId}`;
   };
@@ -131,6 +149,22 @@ export default function AdminHospitalManagementPage() {
       console.error('Error deleting hospital:', error);
       toast.error('An unexpected error occurred while deleting the hospital.');
     }
+  };
+
+  const handleAddPolyclinic = () => {
+    setPolyclinics([...polyclinics, ""]); // Yeni bir boş polyclinic ekle
+  };
+
+  const handleRemovePolyclinic = (index) => {
+    const updatedPolyclinics = [...polyclinics];
+    updatedPolyclinics.splice(index, 1); // Belirtilen indexteki polyclinic'i kaldır
+    setPolyclinics(updatedPolyclinics);
+  };
+
+  const handlePolyclinicChange = (index, value) => {
+    const updatedPolyclinics = [...polyclinics];
+    updatedPolyclinics[index] = value; // Belirtilen indexteki polyclinic'i güncelle
+    setPolyclinics(updatedPolyclinics);
   };
 
   return (
@@ -159,7 +193,7 @@ export default function AdminHospitalManagementPage() {
                   Create Hospital
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="dialog-large">
                 <DialogHeader>
                   <DialogTitle>Create New Hospital</DialogTitle>
                 </DialogHeader>
@@ -232,17 +266,42 @@ export default function AdminHospitalManagementPage() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="polyclinics">Polyclinics</Label>
-                      <Input
-                        id="polyclinics"
-                        value={polyclinics}
-                        onChange={(e) => setPolyclinics(e.target.value)}
-                        placeholder="Cardiology"
-                        required
-                        className="w-full"
-                      />
+                      <Label>Polyclinics</Label>
+                      <div className="border p-2 rounded">
+                        <div className="max-h-40 overflow-y-auto">
+                          {polyclinics.map((clinic, index) => (
+                            <div key={index} className="flex items-center mb-2">
+                              <Input
+                                type="text"
+                                value={clinic}
+                                onChange={(e) => handlePolyclinicChange(index, e.target.value)}
+                                placeholder="Polyclinic Name"
+                                className="mr-2 flex-grow"
+                              />
+                              <Button
+                                type="button"
+                                onClick={() => handleRemovePolyclinic(index)}
+                                className="text-red-500 text-sm px-2 py-1 h-8"
+                              >
+                                X
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-2">
+                          <Button
+                            type="button"
+                            onClick={handleAddPolyclinic}
+                            className="text-sm px-4 py-2 h-8 w-full"
+                          >
+                            Add Polyclinic
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                     
+
+
+
                   </div>
                   <div className="flex justify-end">
                     <Button type="submit">Create Hospital</Button>
