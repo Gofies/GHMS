@@ -323,6 +323,7 @@ services:
     container_name: prometheus
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock  # Expose Docker socket
     ports:
       - "9090:9090"
     networks:
@@ -335,6 +336,23 @@ services:
       test: ["CMD", "wget", "--quiet", "--spider", "http://localhost:9090/"]
       interval: 30s
       retries: 3
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    networks:
+      - gofies
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - /var/log:/var/log
+      - ./monitoring/promtail-config.yml:/etc/promtail/config.yml
+    networks:
+      - gofies
+    depends_on:
+      - loki
 
   grafana:
     image: grafana/grafana:latest
@@ -354,6 +372,60 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:3333/"]
       interval: 30s
       retries: 3
+
+  mongo-exporter:
+    image: percona/mongodb_exporter:0.39
+    container_name: mongo-exporter
+    networks:
+      - gofies
+    environment:
+      MONGODB_URI: mongodb://router01:27117
+    ports:
+      - "9216:9216"
+    depends_on:
+      - router01
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx-exporter
+    command:
+      - "-nginx.scrape-uri=https://nginx/stub_status"
+    ports:
+      - "9113:9113"
+    networks:
+      - gofies
+    depends_on:
+      - nginx
+      
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    networks:
+      - gofies
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    networks:
+      - gofies
+    ports:
+      - "9100:9100"
+    restart: always
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+
 
 networks:
   gofies:
