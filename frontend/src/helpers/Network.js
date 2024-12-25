@@ -28,12 +28,12 @@ export const Endpoint = {
 
 const axiosInstance = axios.create({
   baseURL: 'https://localhost/api/v1/',
-  withCredentials: true, 
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
-    'Cache-Control': 'no-cache', 
-    Pragma: 'no-cache', 
-    Expires: '0', 
+    'Cache-Control': 'no-cache',
+    Pragma: 'no-cache',
+    Expires: '0',
   },
 });
 
@@ -60,10 +60,10 @@ axiosInstance.interceptors.response.use(
         window.location.href = '/'; // Yönlendirme
         return Promise.reject(refreshError);
       }
-    
-    return Promise.reject(error);
+
+      return Promise.reject(error);
+    }
   }
-}
 );
 
 export const getRequest = async (url, params = {}) => {

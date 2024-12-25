@@ -78,6 +78,23 @@ const updateAllergies = async (req, res) => {
     }
 }
 
+const deleteAllergy = async (req, res) => {
+    try {
+        const allergyName = req.body.allergyName;
+
+        const patient = await Patient.findByIdAndUpdate(
+            req.user._id,
+            { $pull: { allergies: { name: allergyName } } }, // Pull from the allergies array
+            { new: true } // Return the updated document
+        );
+
+        return res.status(200).json({ message: 'Allergy deleted successfully', patient });
+    }
+    catch (error) {
+        return res.status(500).json({ message: "patient.deleteAllergy: " + error.message });
+    }
+}
+
 const updateHeartRate = async (req, res) => {
     try {
         const patient = await Patient.findByIdAndUpdate(req.user._id, { heartrate: req.body["heart-rate"] }, { new: true });
@@ -88,7 +105,7 @@ const updateHeartRate = async (req, res) => {
     }
 }
 
-export { getHealthMetric, updateWeight, updateHeight, updateHeartRate, updateBloodPressure, updateBloodSugar, updateBloodType, updateAllergies };
+export { getHealthMetric, updateWeight, updateHeight, updateHeartRate, updateBloodPressure, updateBloodSugar, updateBloodType, updateAllergies, deleteAllergy };
 
 
 

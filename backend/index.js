@@ -18,10 +18,15 @@ import patientHomeRoutes from "./routes/patient.routes/home.route.js";
 import adminDoctorRoutes from "./routes/admin.routes/doctor.routes.js";
 import adminHospitalRoutes from "./routes/admin.routes/hospital.routes.js";
 import adminPolyclinicRoutes from "./routes/admin.routes/polyclinic.routes.js";
+import adminLabTechRoutes from "./routes/admin.routes/labtechnician.routes.js";
 
 import doctorHomeRoutes from "./routes/doctor.routes/home.route.js";
 import doctorPatientRoutes from "./routes/doctor.routes/patient.route.js";
 import doctorAuthRoutes from "./routes/doctor.routes/auth.route.js";
+
+import labTechnicianHomeRoutes from "./routes/lab.routes/home.route.js";
+import labTechnicianAuthRoutes from "./routes/lab.routes/auth.route.js";
+import labTechnicianTestRoutes from "./routes/lab.routes/test.route.js";
 
 //import { serveSwagger, setupSwagger } from "./utils/swagger.js";
 
@@ -47,10 +52,15 @@ app.use("/api/v1/patient/profile", patientProfileRoutes);
 app.use("/api/v1/admin/doctor", adminDoctorRoutes);
 app.use("/api/v1/admin/hospital", adminHospitalRoutes);
 app.use("/api/v1/admin/polyclinic", adminPolyclinicRoutes);
+app.use("/api/v1/admin/labtechnician", adminLabTechRoutes);
 
-app.use("/api/v1/doctor", doctorHomeRoutes);
+app.use("/api/v1/doctor/", doctorHomeRoutes);
 app.use("/api/v1/doctor/patient", doctorPatientRoutes);
 app.use("/api/v1/doctor/auth", doctorAuthRoutes);
+
+app.use("/api/v1/labtechnician", labTechnicianHomeRoutes);
+app.use("/api/v1/labtechnician/auth", labTechnicianAuthRoutes);
+app.use("/api/v1/labtechnician/test", labTechnicianTestRoutes);
 
 
 //ASAGDAKI SILMEEEEEEEEEEEEEEEEEE

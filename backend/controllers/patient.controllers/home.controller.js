@@ -2,7 +2,18 @@ import Patient from '../../models/patient.model.js';
 
 const getPatientHome = async (req, res) => {
     try {
-        const patient = await Patient.findById(req.user.id).select('appointments').populate('appointments');
+        const patient = await Patient.findById(req.user.id).select('appointments')
+            .populate({
+                path: 'appointments',
+                populate: {
+                    path: 'doctor',
+                    select: 'name'
+                },
+                populate: {
+                    path: 'hospital',
+                    select: 'name'
+                }
+            });
         const upcomingAppointments = patient.appointments.filter(appointment => appointment.date > new Date());
         const recentAppointments = patient.appointments.filter(appointment => appointment.date < new Date());
         res.json({ upcomingAppointments, recentAppointments });

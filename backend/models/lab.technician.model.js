@@ -17,6 +17,10 @@ const labTechnicianSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    password: {
+        type: String,
+        required: true
+    },
     birthdate: {
         type: Date,
         required: true
