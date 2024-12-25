@@ -34,15 +34,6 @@ const systemHealth = [
 ]
 
 export default function AdminHomePage() {
-  const [newUser, setNewUser] = useState({ name: '', email: '', role: '' })
-
-  const handleCreateUser = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    // Here you would typically send the new user data to your backend
-    console.log("New user created:", newUser)
-    setNewUser({ name: '', email: '', role: '' })
-  }
-
   return (
     <div className="flex h-screen bg-gray-100">
      <Sidebar />

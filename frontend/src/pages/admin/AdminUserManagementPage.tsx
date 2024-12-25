@@ -11,14 +11,21 @@ import { Search, Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/ui/admin/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
-import { Endpoint, postRequest, getRequest, putRequest ,deleteRequest} from "../../helpers/Network.js";
+import { Endpoint, postRequest, getRequest, putRequest, deleteRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify';
 
 export default function AdminUserManagementPage() {
   const [doctors, setDoctors] = useState([]);
+  const [labTechnicians, setLabTechnicians] = useState([]);
+
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+
   const [showPassword, setShowPassword] = useState(false);
+
+  const [userType, setUserType] = useState('doctor'); // Varsayılan değer olarak 'doctor'
+  const [certificates, setCertificates] = useState(''); // Lab Technician için kullanılan alan
+
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
   const [title, setTitle] = useState('');
@@ -34,7 +41,6 @@ export default function AdminUserManagementPage() {
   const [editingUser, setEditingUser] = useState(null);
   const [updatedPatientUser, setUpdatedPatientUser] = useState(null);
 
-
   const days = Array.from({ length: 31 }, (_, i) => i + 1); // 1-31
   const months = [
     "January", "February", "March", "April", "May", "June",
@@ -49,11 +55,26 @@ export default function AdminUserManagementPage() {
         setDoctors(response.doctors);
         setFilteredUsers(response.doctors);
       } else {
-        toast.error('Failed to fetch users.');
+        toast.error('Failed to fetch doctors.');
       }
     } catch (error) {
-      console.error('Error fetching users:', error);
-      toast.error('An error occurred while fetching user data.');
+      console.error('Error fetching doctors:', error);
+      toast.error('An error occurred while fetching doctor data.');
+    }
+  };
+
+  const fetchLabTechnicians = async () => {
+    try {
+      const response = await getRequest(Endpoint.GET_ADMIN_LAB_TECHNICIANS);
+      if (response) {
+        setLabTechnicians(response.labtechnicians);
+        setFilteredUsers(response.labtechnicians);
+      } else {
+        toast.error('Failed to fetch lab technicians.');
+      }
+    } catch (error) {
+      console.error('Error fetching lab technicians:', error);
+      toast.error('An error occurred while fetching lab technicians data.');
     }
   };
 
@@ -74,6 +95,17 @@ export default function AdminUserManagementPage() {
       alert("Please select a valid date of birth.");
       return;
     }
+
+    if (userType === 'doctor' && !degree) {
+      alert("Please enter the degree for the doctor.");
+      return;
+    }
+
+    if (userType === 'labtechnician' && !certificates) {
+      alert("Please enter the certificates for the lab technician.");
+      return;
+    }
+
     const requestBody = {
       name,
       surname,
@@ -83,17 +115,23 @@ export default function AdminUserManagementPage() {
       birthdate,
       phone,
       jobstartdate,
-      degree,
       specialization,
+      ...(userType === 'doctor' && { degree }),
+      ...(userType === 'labtechnician' && { certificates }),
     };
+
     try {
-      const responseData = await postRequest(Endpoint.GET_ADMIN_DOCTOR, requestBody);
+      let responseData;
+      if (userType === 'doctor') {
+        responseData = await postRequest(Endpoint.GET_ADMIN_DOCTOR, requestBody);
+      } else if (userType === 'labtechnician') {
+        responseData = await postRequest(Endpoint.GET_ADMIN_LAB_TECHNICIANS, requestBody); // bu yok şu an
+      }
+
       if (responseData) {
         toast.success("Account created successfully!");
         if (toast.success) {
-          setTimeout(() => {
-            navigate(0); // Refresh the page or redirect
-          }, 1000);
+          fetchDoctors();
         }
       } else {
         toast.error("An error occurred during user creation.");
@@ -104,17 +142,14 @@ export default function AdminUserManagementPage() {
     }
   };
 
-  const handleEditUser1 = async (e, id) => {
+  const handleEditUser = async (e, id) => {
     e.preventDefault();
     // if (!editingUser) return;
-
-    console.log("a");
     try {
-      const responseData = await getRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`);
+      const responseData = await getRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`); 
       console.log(responseData);
       if (responseData) {
         setEditingUser(responseData.doctor);
-        toast.success("User fetched");
       } else {
         toast.error("An error occurred during user update.");
       }
@@ -124,8 +159,8 @@ export default function AdminUserManagementPage() {
     }
   };
 
-  const handleEditUser2 = async (e, id) => {
-   e.preventDefault();
+  const handleSaveUpdatedUser = async (e, id) => {
+    e.preventDefault();
     if (!editingUser) return;
 
     const birthdate = getFormattedDate();
@@ -135,23 +170,23 @@ export default function AdminUserManagementPage() {
     }
 
     const requestBody = {
-      ...editingUser,
-      name,
-      surname,
-      title,
-      email,
-      phone,
-      jobstartdate,
-      degree,
-      specialization,
-      birthdate,
+      name: editingUser.name || name, // Eğer editingUser'dan gelen boşsa, mevcut state kullan
+      surname: editingUser.surname || surname,
+      title: editingUser.title || title,
+      email: editingUser.email || email,
+      phone: editingUser.phone || phone,
+      jobstartdate: editingUser.jobstartdate || jobstartdate,
+      degree: editingUser.degree || degree,
+      specialization: editingUser.specialization || specialization,
     };
+  console.log(requestBody);
 
     try {
-      const responseData = await putRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`, requestBody);
+      const responseData = await putRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`, requestBody); //  /admin/doctor
       console.log("r", responseData);
       if (responseData) {
         toast.success("User updated successfully!");
+        fetchDoctors(); // Listeyi güncelle
       } else {
         toast.error("An error occurred during user update.");
       }
@@ -173,6 +208,20 @@ export default function AdminUserManagementPage() {
   }, []);
   // }, [searchTerm, users]);
 
+  // useEffect(() => {
+  //   fetchDoctors();
+  // }, []);
+
+  useEffect(() => {
+    // Arama terimine göre filtreleme yap
+    const filtered = doctors.filter((user) =>
+      `${user.name} ${user.email} ${user.title} ${user.specialization}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
+    setFilteredUsers(filtered); // Filtrelenmiş kullanıcı listesini güncelle
+  }, [searchTerm, doctors]);
+
 
   const deleteUser = async (id) => {
     try {
@@ -189,6 +238,9 @@ export default function AdminUserManagementPage() {
       toast.error('An unexpected error occurred while deleting the user.');
     }
   };
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -211,146 +263,178 @@ export default function AdminUserManagementPage() {
             </div>
             <Dialog>
               <DialogTrigger asChild>
-                <Button>
+                <Button onClick={() => setIsDialogOpen(true)}>
                   <Plus className="w-4 h-4 mr-2" />
                   Create User
                 </Button>
               </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create New User</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleCreateUser}>
-                  <div className="grid grid-cols-2 gap-6 py-4">
-                    <div>
-                      <Label htmlFor="name">Name</Label>
-                      <Input
-                        id="name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="John"
-                        required
-                        className="w-full"
-                      />
+              {isDialogOpen && (
+
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New User</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleCreateUser}>
+                    <div className="grid grid-cols-2 gap-6 py-4">
+                      <div>
+                        <Label htmlFor="userType">User Type</Label>
+                        <select
+                          id="userType"
+                          value={userType}
+                          onChange={(e) => setUserType(e.target.value)}
+                          required
+                          className="w-full"
+                        >
+                          <option value="doctor">Doctor</option>
+                          <option value="labtechnician">Lab Technician</option>
+                        </select>
+                      </div>
+                      <div>
+                        <Label htmlFor="name">Name</Label>
+                        <Input
+                          id="name"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          placeholder="John"
+                          required
+                          className="w-full"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="surname">Surname</Label>
+                        <Input
+                          id="surname"
+                          value={surname}
+                          onChange={(e) => setSurname(e.target.value)}
+                          placeholder="Doe"
+                          required
+                          className="w-full"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="email">E-Mail</Label>
+                        <Input
+                          id="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="example@domain.com"
+                          required
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="relative">
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                          id="password"
+                          type={showPassword ? 'text' : 'password'}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Enter your password"
+                          required
+                          className="w-full"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+                        >
+                          {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
+                      </div>
+                      <div>
+                        <Label htmlFor="phone">Phone</Label>
+                        <Input
+                          id="phone"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="+90 123 456 7890"
+                          required
+                          className="w-full"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="title">Title</Label>
+                        <Input
+                          id="title"
+                          value={title}
+                          onChange={(e) => setTitle(e.target.value)}
+                          placeholder="Prof. Dr."
+                          required
+                          className="w-full"
+                        />
+                      </div>
+                      {userType === 'doctor' && (
+                        <div>
+                          <Label htmlFor="degree">Degree</Label>
+                          <Input
+                            id="degree"
+                            value={degree}
+                            onChange={(e) => setDegree(e.target.value)}
+                            placeholder="PhD"
+                            required
+                            className="w-full"
+                          />
+                        </div>
+                      )}
+                      {userType === 'labtechnician' && (
+                        <div>
+                          <Label htmlFor="certificates">Certificates</Label>
+                          <Input
+                            id="certificates"
+                            value={certificates}
+                            onChange={(e) => setCertificates(e.target.value)}
+                            placeholder="Certification details"
+                            required
+                            className="w-full"
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <Label htmlFor="specialization">Specialization</Label>
+                        <Input
+                          id="specialization"
+                          value={specialization}
+                          onChange={(e) => setSpecialization(e.target.value)}
+                          placeholder="Cardiology"
+                          required
+                          className="w-full"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="birthdate">Birthdate</Label>
+                        <Input
+                          id="birthdate"
+                          type="date"
+                          value={getFormattedDate()}
+                          onChange={(e) => {
+                            const [year, month, day] = e.target.value.split('-');
+                            setSelectedYear(parseInt(year, 10));
+                            setSelectedMonth(months[parseInt(month, 10) - 1]);
+                            setSelectedDay(parseInt(day, 10));
+                          }}
+                          required
+                          className="w-full"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="jobstartdate">Job Start Date</Label>
+                        <Input
+                          id="jobstartdate"
+                          type="date"
+                          value={jobstartdate}
+                          onChange={(e) => setJobStartDate(e.target.value)}
+                          required
+                          className="w-full"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <Label htmlFor="surname">Surname</Label>
-                      <Input
-                        id="surname"
-                        value={surname}
-                        onChange={(e) => setSurname(e.target.value)}
-                        placeholder="Doe"
-                        required
-                        className="w-full"
-                      />
+                    <div className="flex justify-between">
+                      <Button type="submit">Create User</Button>
                     </div>
-                    <div>
-                      <Label htmlFor="email">E-Mail</Label>
-                      <Input
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="example@domain.com"
-                        required
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="relative">
-                      <Label htmlFor="password">Password</Label>
-                      <Input
-                        id="password"
-                        type={showPassword ? 'text' : 'password'}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter your password"
-                        required
-                        className="w-full"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
-                      >
-                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                      </button>
-                    </div>
-                    <div>
-                      <Label htmlFor="phone">Phone</Label>
-                      <Input
-                        id="phone"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+90 123 456 7890"
-                        required
-                        className="w-full"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="title">Title</Label>
-                      <Input
-                        id="title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Prof. Dr."
-                        required
-                        className="w-full"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="degree">Degree</Label>
-                      <Input
-                        id="degree"
-                        value={degree}
-                        onChange={(e) => setDegree(e.target.value)}
-                        placeholder="PhD"
-                        required
-                        className="w-full"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="specialization">Specialization</Label>
-                      <Input
-                        id="specialization"
-                        value={specialization}
-                        onChange={(e) => setSpecialization(e.target.value)}
-                        placeholder="Cardiology"
-                        required
-                        className="w-full"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="birthdate">Birthdate</Label>
-                      <Input
-                        id="birthdate"
-                        type="date"
-                        value={getFormattedDate()}
-                        onChange={(e) => {
-                          const [year, month, day] = e.target.value.split('-');
-                          setSelectedYear(parseInt(year, 10));
-                          setSelectedMonth(months[parseInt(month, 10) - 1]);
-                          setSelectedDay(parseInt(day, 10));
-                        }}
-                        required
-                        className="w-full"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="jobstartdate">Job Start Date</Label>
-                      <Input
-                        id="jobstartdate"
-                        type="date"
-                        value={jobstartdate}
-                        onChange={(e) => setJobStartDate(e.target.value)}
-                        required
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <Button type="submit">Create User</Button>
-                  </div>
-                </form>
-              </DialogContent>
+
+                  </form>
+                </DialogContent>
+              )}
             </Dialog>
           </div>
 
@@ -389,7 +473,7 @@ export default function AdminUserManagementPage() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={(e) => { handleEditUser1(e, user._id) }}
+                                onClick={(e) => { handleEditUser(e, user._id) }}
                               >
                                 <Edit className="w-4 h-4 mr-2" />
                                 Edit
@@ -399,7 +483,7 @@ export default function AdminUserManagementPage() {
                               <DialogHeader>
                                 <DialogTitle>Edit User</DialogTitle>
                               </DialogHeader>
-                              <form onSubmit={(e) => { handleEditUser2(e, user._id)}}>
+                              <form onSubmit={(e) => { handleSaveUpdatedUser(e, user._id) }}>
                                 <div className="grid grid-cols-2 gap-6 py-4">
                                   <div>
                                     <Label htmlFor="name">Name</Label>
@@ -416,7 +500,6 @@ export default function AdminUserManagementPage() {
                                       required
                                       className="w-full"
                                     />
-
                                   </div>
                                   <div>
                                     <Label htmlFor="surname">Surname</Label>

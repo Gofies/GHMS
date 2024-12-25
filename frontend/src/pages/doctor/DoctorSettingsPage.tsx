@@ -1,29 +1,30 @@
 import { useState } from 'react'
-import { Button } from "../../components/ui/admin/Button.jsx"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/admin/Card.jsx"
-import { Label } from "../../components/ui/admin/Label.jsx"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/admin/Select.jsx"
-import { Switch } from "../../components/ui/admin/Switch.jsx"
+import { Button } from "../../components/ui/patient/settings/Button.jsx"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/patient/settings/Card.jsx"
+import { Label } from "../../components/ui/patient/settings/Label.jsx"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/patient/settings/Select.jsx"
+import { Switch } from "../../components/ui/patient/settings/Switch.jsx"
 import { CalendarDays, Home, User, FileText, PieChart, Settings, LogOut, Moon, Bell, Lock } from 'lucide-react'
-import Sidebar from "../../components/ui/admin/Sidebar.jsx";
-import Header from "../../components/ui/admin/Header.jsx";
-import { useDarkMode } from '../../helpers/DarkModeContext';
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import Sidebar from "../../components/ui/doctor/common/Sidebar.jsx";
+import Header from "../../components/ui/common/Header.jsx";
+import { useDarkMode } from '../../helpers/DarkModeContext.js';
 import { Endpoint, getRequest, putRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/patient/appointment/Dialog.jsx"
-import { Input } from '../../components/ui/login/Input';
+import { Input } from '../../components/ui/login/Input.jsx';
+//import { Label } from '../../components/ui/login/Label';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
-export default function AdminSettingsPage() {
+export default function DoctorSettingsPage() {
   const [language, setLanguage] = useState('english')
   const [notifications, setNotifications] = useState(true)
   const [twoFactor, setTwoFactor] = useState(false)
- 
+
   // const [darkMode, setDarkMode] = useState(
   //   localStorage.getItem("darkMode") === "true" // Dark mode durumu yerel depolamadan alınır
   // );
   const [darkMode, setDarkMode] = useState(false);
-  
+
   const handleDarkModeToggle = (checked) => {
     // setDarkMode(checked);
     // if (checked) {
@@ -34,7 +35,7 @@ export default function AdminSettingsPage() {
     //   localStorage.setItem("darkMode", "false"); // Yerel depolamada dark mode'u devre dışı bırakır
     // }
   };
-  
+
   const handleLanguageChange = (value: string) => {
     setLanguage(value)
     // Here you would typically update the language in your app
@@ -48,13 +49,13 @@ export default function AdminSettingsPage() {
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleChangePassword = async (e) => { // api gelince çalışacak
+  const handleChangePassword = async (e) => {
     //setIsChangePasswordOpen(true);
     e.preventDefault();
     console.log("aaa");
     try {
       // PUT isteği gönder
-      const response = await putRequest(Endpoint.CHANGE_PASSWORD, {
+      const response = await putRequest(Endpoint.DOCTOR_CHANGE_PASSWORD, {
         currentPassword: currentPassword, // Eski şifre
         newPassword: newPassword, // Yeni şifre
         newPasswordConfirm: newPasswordConfirm
@@ -69,7 +70,7 @@ export default function AdminSettingsPage() {
       setError("Failed to change password. Please try again."); // Hata durumu
     }
   };
-  
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
@@ -158,7 +159,7 @@ export default function AdminSettingsPage() {
               </div> */}
               <Button variant="outline" className="w-full" onClick={() => setIsChangePasswordOpen(true)}>
                 <Lock className="w-4 h-4 mr-2" />
-                  Change Password
+                Change Password
               </Button>
             </CardContent>
           </Card>
@@ -285,3 +286,4 @@ export default function AdminSettingsPage() {
     </div>
   )
 }
+

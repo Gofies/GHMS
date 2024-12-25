@@ -55,7 +55,7 @@ export default function SettingsPage() {
     console.log("aaa");
     try {
       // PUT isteği gönder
-      const response = await putRequest(Endpoint.CHANGE_PASSWORD, {
+      const response = await putRequest(Endpoint.PATIENT_CHANGE_PASSWORD, {
         currentPassword: currentPassword, // Eski şifre
         newPassword: newPassword, // Yeni şifre
         newPasswordConfirm: newPasswordConfirm
@@ -99,7 +99,7 @@ export default function SettingsPage() {
                   onCheckedChange={handleDarkModeToggle}
                 />
               </div>
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <Label htmlFor="language">Language</Label>
                 <Select value={language} onValueChange={handleLanguageChange}>
                   <SelectTrigger id="language">
@@ -112,11 +112,11 @@ export default function SettingsPage() {
                     <SelectItem value="german">Deutsch</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
 
-          <Card className="mt-6">
+          {/* <Card className="mt-6">
             <CardHeader>
               <CardTitle>Notifications</CardTitle>
               <CardDescription>Manage your notification preferences.</CardDescription>
@@ -136,7 +136,7 @@ export default function SettingsPage() {
                 />
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           <Card className="mt-6">
             <CardHeader>
@@ -144,7 +144,7 @@ export default function SettingsPage() {
               <CardDescription>Manage your account security settings.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
+              {/* <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="two-factor">Two-Factor Authentication</Label>
                   <p className="text-sm text-muted-foreground">
@@ -156,14 +156,11 @@ export default function SettingsPage() {
                   checked={twoFactor}
                   onCheckedChange={setTwoFactor}
                 />
-              </div>
+              </div> */}
               <Button variant="outline" className="w-full" onClick={() => setIsChangePasswordOpen(true)}>
                 <Lock className="w-4 h-4 mr-2" />
                 Change Password
               </Button>
-
-
-
             </CardContent>
           </Card>
         </div>
@@ -287,8 +284,6 @@ export default function SettingsPage() {
         </Dialog>
       )}
     </div>
-
-
   )
 }
 
