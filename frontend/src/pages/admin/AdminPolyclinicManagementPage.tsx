@@ -27,14 +27,8 @@ export default function AdminPolyclinicManagementPage() {
   const [doctorIds, setDoctorIds] = useState([]);
 
   const handleLocationChange = () => {
-    // Mevcut URL'den adminId'yi çekiyoruz
     const pathParts = window.location.pathname.split("/");
     const hospitalId = pathParts[4]; // "/admin/{adminId}/hospital-management"
-
-    // Yeni polyclinicId tanımla
-    //const polyclinicId = "673b9827a25ee0e8d7a88ead";
-
-    // Yeni URL'yi oluştur ve yönlendir
     return hospitalId;
   };
 
@@ -212,7 +206,6 @@ export default function AdminPolyclinicManagementPage() {
   // Yeni durumlar
   const [editMode, setEditMode] = useState(false);
   const [editingPolyclinicId, setEditingPolyclinicId] = useState(null);
-
   const [combinedDoctors, setCombinedDoctors] = useState([]);
 
   const handleEditPolyclinic = async (polyclinic) => {
@@ -276,7 +269,38 @@ export default function AdminPolyclinicManagementPage() {
       toast.error("An unexpected error occurred.");
     }
   };
+  // Edit butonuna tıklandığında dialog'u açma
+  const handleEditPolyclinic = (polyclinic) => {
+    //setEditMode(true);
+    setEditingPolyclinicId(polyclinic._id);
+    setName(polyclinic.name); // Poliklinik adını doldur
+    setSelectedDoctors(polyclinic.doctors || []); // Seçili doktorları doldur
+  };
 
+  // Poliklinik güncelleme fonksiyonu
+  const handleUpdatePolyclinic = async (e) => {
+    e.preventDefault();
+    const hospitalId2 = handleLocationChange();
+    const requestBody = {
+      name,
+      hospitalId: hospitalId2,
+      doctors: selectedDoctors
+    };
+
+    try {
+      const responseData = await putRequest(`${Endpoint.GET_ADMIN_POLYCLINIC}/${editingPolyclinicId}`, requestBody);
+      if (responseData) {
+        toast.success("Polyclinic updated successfully!");
+        fetchPolyclinics(); // Güncellemeden sonra listeyi yenile
+        setEditingPolyclinicId(null); // Güncellenen ID'yi temizle
+      } else {
+        toast.error("An error occurred during polyclinic update.");
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("An unexpected error occurred.");
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -480,8 +504,6 @@ export default function AdminPolyclinicManagementPage() {
                     </TableRow>
                   ))}
                 </TableBody>
-
-
               </Table>
             </CardContent>
           </Card>

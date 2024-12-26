@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { setupMetrics, trackRequests } from "./metrics.js";
 
 import dotenv from "dotenv";
 import { connectToMongoDB } from "./config/db.js";
@@ -38,6 +39,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(trackRequests);
+setupMetrics(app);
+
 //app.use('/api-docs', serveSwagger, setupSwagger);
 
 app.use("/api/v1/auth", authRoutes);

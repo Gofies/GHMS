@@ -13,7 +13,6 @@ import { Endpoint, postRequest, getRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify'
 import { useLocation, useNavigate } from 'react-router-dom';
 
-
 const cities = [
   "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Ankara",
   "Antalya", "Ardahan", "Artvin", "Aydın", "Balıkesir", "Bartın", "Batman",
@@ -55,7 +54,6 @@ export default function NewAppointmentsPage() {
 
   const location = useLocation();
   const navigate = useNavigate();
-
 
   const handleSubmit = async () => {
     if (!selectedDoctor || !selectedDate || !selectedTimeSlot) {

@@ -119,7 +119,6 @@ export default function PatientDetails() {
     setTempEditingPrescription({ ...prescription }); // Geçici düzenleme
   };
 
-
   const handleUpdatePrescription = async (e, id) => {
     e.preventDefault();
     try {
@@ -144,7 +143,6 @@ export default function PatientDetails() {
       toast("Failed to update prescription.");
     }
   };
-
 
   const [medicine, setMedicine] = useState([]);
   const [newMedicine, setNewMedicine] = useState({
@@ -212,7 +210,6 @@ export default function PatientDetails() {
       toast("An error occurred while deleting the prescription");
     }
   };
-
 
   // const handleSaveChanges = (id) => {
   //   const updatedPrescriptions = prescriptionHistory.map((prescription) => {
@@ -592,10 +589,6 @@ export default function PatientDetails() {
                 </Card>
               </TabsContent>
 
-
-
-
-
               <TabsContent value="appointment-history">
                 <Card>
                   <CardHeader>
@@ -769,6 +762,7 @@ export default function PatientDetails() {
                   </CardContent>
                 </Card>
               </TabsContent>
+
             </Tabs>
           </div>
         </div>

@@ -135,7 +135,6 @@ export default function AdminUserManagementPage() {
       alert("Please enter the degree for the doctor.");
       return;
     }
-
     if (userType === 'labtechnician' && !certificates) {
       alert("Please enter the certificates for the lab technician.");
       return;
@@ -182,7 +181,7 @@ export default function AdminUserManagementPage() {
     e.preventDefault();
     // if (!editingUser) return;
     try {
-      const responseData = await getRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`);
+      const responseData = await getRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`); 
       console.log(responseData);
       if (responseData) {
         setEditingUser(responseData.doctor);
@@ -216,7 +215,6 @@ export default function AdminUserManagementPage() {
       specialization: editingUser.specialization || specialization,
     };
     console.log(requestBody);
-
     try {
       const responseData = await putRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`, requestBody); //  /admin/doctor
       console.log("r", responseData);
@@ -619,8 +617,6 @@ export default function AdminUserManagementPage() {
                           </div>
                         </div>
                       </div>
-
-
                     </div>
                     <div className="flex justify-between">
                       <Button type="submit">Create User</Button>

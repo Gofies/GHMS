@@ -64,6 +64,27 @@ export default function PatientHomeScreen() {
   //   fetchPatientHome();
   // }, []);
 
+  // useEffect(() => {
+  //   const fetchPatientHome = async () => {
+  //     try {
+  //       const response = await getRequest(Endpoint.GET_HOME_APPOINTMENTS);
+  //       console.log("response", response);
+  //       setRecentAppointments(response.recentAppointments);
+  //       setUpcomingAppointments(response.upcomingAppointments);
+
+  //       const dates = response.recentAppointments
+  //         ? response.recentAppointments.map(appointment => new Date(appointment.date))
+  //         : [];
+  //       setAppointmentDates(dates);
+
+  //     } catch (err) {
+  //       console.error('Error fetching patient profile:', err);
+  //       setError('Failed to load patient profile.');
+  //     }
+  //   };
+  //   fetchPatientHome();
+  // }, []);
+
   useEffect(() => {
     const fetchPatientHome = async () => {
       try {
@@ -83,7 +104,6 @@ export default function PatientHomeScreen() {
           ...(response.upcomingAppointments || []).map((appointment) => new Date(appointment.date)),
         ];
         console.log("all", allDates);
-
         setAppointmentDates(allDates); // Tarihleri state'e ata
       } catch (err) {
         console.error("Error fetching patient profile:", err);
@@ -155,7 +175,6 @@ export default function PatientHomeScreen() {
                       <span>Appointments</span>
                       <span>{date ? formatDate(date) : ""}</span>
                     </h2>
-
                     <div className="max-h-60 overflow-y-auto">
                       {filteredAppointments.length > 0 ? (
                         filteredAppointments.map((appointment) => (
@@ -164,6 +183,7 @@ export default function PatientHomeScreen() {
                               <p className="text-sm font-medium">
                                 {appointment.doctor.name} {appointment.doctor.surname}
                               </p>
+
                               <p className="text-sm text-gray-500">{appointment.polyclinic?.name}</p>
                               <p className="text-xs text-gray-400">{appointment.date.split("T")[0]}</p>
                               <p className="text-xs text-gray-400">{appointment.time}</p>
@@ -254,6 +274,7 @@ export default function PatientHomeScreen() {
                       ) : (
                         <p className="text-sm text-gray-500">No upcoming appointments.</p>
                       )}
+
                     </div>
                   </ScrollArea>
                 </CardContent>
