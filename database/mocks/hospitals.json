@@ -1,6 +1,185 @@
 [
-    {"_id":{"$oid":"6748fb3e92186e0302e622a5"},"name":"Seyrantepe Hamidiye Etfal","address":"Huzur Mah. Cumhuriyet ve Demokrasi Cad. No:1 Sarıyer / İstanbul","establishmentdate":{"$date":"2015-01-01T00:00:00Z"},"phone":"0212 373 50 00","email":"sisli@etfal.com","polyclinics":[{"$oid":"6748a11c903b1ad6cc253342"},{"$oid":"6748fb3e92186e0302e622a9"},{"$oid":"6748fb3e92186e0302e622ab"},{"$oid":"6748fb3e92186e0302e622ad"},{"$oid":"6748fb3e92186e0302e622af"},{"$oid":"6748fb3e92186e0302e622b1"},{"$oid":"6748fb3f92186e0302e622b3"},{"$oid":"6748fb3f92186e0302e622b5"},{"$oid":"6748fb3f92186e0302e622b7"},{"$oid":"6748fb3f92186e0302e622b9"},{"$oid":"6748fb3f92186e0302e622bb"},{"$oid":"6748fb3f92186e0302e622bd"},{"$oid":"6748fb4092186e0302e622bf"},{"$oid":"6748fb4092186e0302e622c1"},{"$oid":"6748fb4092186e0302e622c3"}],"doctors":[{"$oid":"6748f48ce3a18cfa57201c6f"},{"$oid":"6748f470e3a18cfa57201c6c"},{"$oid":"675449c3aebf78d2a0c65742"}],"labTechnicians":[],"itTechnicians":[],"appointments":[],"createdAt":{"$date":"2024-11-28T23:22:38.093Z"},"updatedAt":{"$date":"2024-11-28T23:22:40.455Z"},"__v":1},
-    {"_id":{"$oid":"675434d540385347ead9eb30"},"name":"Mahmutbey Hamidiye Etfal","address":"mahmutbey / İstanbul","establishmentdate":{"$date":"2014-01-01T00:00:00Z"},"phone":"0212 373 50 01","email":"mahmutbey@etfal.com","polyclinics":[{"$oid":"6748a11c903b1ad6cc253342"},{"$oid":"675434d540385347ead9eb34"},{"$oid":"675434d640385347ead9eb36"},{"$oid":"675434d640385347ead9eb38"},{"$oid":"675434d640385347ead9eb3a"},{"$oid":"675434d640385347ead9eb3c"},{"$oid":"675434d640385347ead9eb3e"}],"doctors":[{"$oid":"674c59623a24cac9869f808c"},{"$oid":"67489e41c86125f3a203bebf"}],"labTechnicians":[],"itTechnicians":[],"appointments":[],"createdAt":{"$date":"2024-12-07T11:43:17.614Z"},"updatedAt":{"$date":"2024-12-07T11:43:18.877Z"},"__v":1},
-    {"_id":{"$oid":"6748a11b903b1ad6cc253338"},"name":"Seyrantepe 2 Hamidiye Etfal","address":"Huzur Mah. Cumhuriyet ve Demokrasi Cad. No:1 Sarıyer / İstanbul","establishmentdate":{"$date":"2015-01-01T00:00:00Z"},"phone":"0212 373 50 00","email":"sisli2@etfal.com","polyclinics":[{"$oid":"6748a11c903b1ad6cc253342"},{"$oid":"6748fb3e92186e0302e622a9"},{"$oid":"6748fb3e92186e0302e622ab"},{"$oid":"6748fb3e92186e0302e622ad"},{"$oid":"6748fb3e92186e0302e622af"},{"$oid":"6748fb3e92186e0302e622b1"},{"$oid":"6748fb3f92186e0302e622b3"},{"$oid":"6748fb3f92186e0302e622b5"},{"$oid":"6748fb3f92186e0302e622b7"},{"$oid":"6748fb3f92186e0302e622b9"},{"$oid":"6748fb3f92186e0302e622bb"},{"$oid":"6748fb3f92186e0302e622bd"},{"$oid":"6748fb4092186e0302e622bf"},{"$oid":"6748fb4092186e0302e622c1"},{"$oid":"6748fb4092186e0302e622c3"}],"doctors":[{"$oid":"674c5d3911124350927b2c7c"},{"$oid":"674f24f893fcf3daf8f63d47"}],"labTechnicians":[],"itTechnicians":[],"appointments":[],"createdAt":{"$date":"2024-11-28T23:22:38.093Z"},"updatedAt":{"$date":"2024-11-28T23:22:40.455Z"},"__v":1}
-    
-    ]
+    {
+        "_id": {
+            "$oid": "676db7afdc2d5a014902640f"
+        },
+        "name": "Metropolitan Medical Center",
+        "address": "453 Park Avenue, New York, NY 10022, USA",
+        "establishmentdate": {
+            "$date": "2000-01-01T00:00:00Z"
+        },
+        "phone": "1 212 555 1234",
+        "email": "info@metropolitanmed.com",
+        "polyclinics": [
+            {
+                "$oid": "676db8dadc2d5a01490266eb"
+            },
+            {
+                "$oid": "676db8e2dc2d5a0149026786"
+            }
+        ],
+        "doctors": [],
+        "labTechnicians": [],
+        "itTechnicians": [],
+        "appointments": [],
+        "labTests": [],
+        "createdAt": {
+            "$date": "2024-12-26T20:08:15.469Z"
+        },
+        "updatedAt": {
+            "$date": "2024-12-26T20:13:22.727Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "676db85ddc2d5a0149026435"
+        },
+        "name": "Elite Care Hospital",
+        "address": "1800 Orleans Street, Baltimore, MD 21287, USA",
+        "establishmentdate": {
+            "$date": "2005-01-01T00:00:00Z"
+        },
+        "phone": "1 410 888 2345",
+        "email": "contact@elitecare.com",
+        "polyclinics": [
+            {
+                "$oid": "676db98ddc2d5a0149026baf"
+            }
+        ],
+        "doctors": [],
+        "labTechnicians": [],
+        "itTechnicians": [],
+        "appointments": [],
+        "labTests": [],
+        "createdAt": {
+            "$date": "2024-12-26T20:11:09.108Z"
+        },
+        "updatedAt": {
+            "$date": "2024-12-26T20:16:13.267Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "676db800dc2d5a0149026424"
+        },
+        "name": "Grand Life Hospital",
+        "address": "1501 Pacific Avenue, San Francisco, CA 94109, USA",
+        "establishmentdate": {
+            "$date": "1998-01-01T00:00:00Z"
+        },
+        "phone": "1 415 666 3456",
+        "email": "contact@grandlife-med.com",
+        "polyclinics": [
+            {
+                "$oid": "676db907dc2d5a014902683e"
+            },
+            {
+                "$oid": "676db910dc2d5a01490268d9"
+            }
+        ],
+        "doctors": [],
+        "labTechnicians": [],
+        "itTechnicians": [],
+        "appointments": [],
+        "labTests": [],
+        "createdAt": {
+            "$date": "2024-12-26T20:09:36.772Z"
+        },
+        "updatedAt": {
+            "$date": "2024-12-26T20:14:08.449Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "676db820dc2d5a014902642b"
+        },
+        "name": "Innovation Medical Center",
+        "address": "6565 Fannin Street, Houston, TX 77030, USA",
+        "establishmentdate": {
+            "$date": "1999-01-01T00:00:00Z"
+        },
+        "phone": "1 415 666 3456",
+        "email": " info@innovation-medical.com",
+        "polyclinics": [
+            {
+                "$oid": "676db93edc2d5a0149026a42"
+            }
+        ],
+        "doctors": [],
+        "labTechnicians": [],
+        "itTechnicians": [],
+        "appointments": [],
+        "labTests": [],
+        "createdAt": {
+            "$date": "2024-12-26T20:10:08.479Z"
+        },
+        "updatedAt": {
+            "$date": "2024-12-26T20:14:54.167Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "676db7e2dc2d5a014902641d"
+        },
+        "name": "Sunrise Healthcare Complex",
+        "address": "8700 Beverly Boulevard, Los Angeles, CA 90048, USA",
+        "establishmentdate": {
+            "$date": "1999-01-01T00:00:00Z"
+        },
+        "phone": "1 310 333 9012",
+        "email": "info@sunrisehealthcare.com",
+        "polyclinics": [
+            {
+                "$oid": "676db936dc2d5a01490269a0"
+            }
+        ],
+        "doctors": [],
+        "labTechnicians": [],
+        "itTechnicians": [],
+        "appointments": [],
+        "labTests": [],
+        "createdAt": {
+            "$date": "2024-12-26T20:09:06.115Z"
+        },
+        "updatedAt": {
+            "$date": "2024-12-26T20:14:46.34Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "676db7c8dc2d5a0149026416"
+        },
+        "name": "Central Park Hospital",
+        "address": "2300 N Lake Shore Drive, Chicago, IL 60614, USA",
+        "establishmentdate": {
+            "$date": "1988-01-01T00:00:00Z"
+        },
+        "phone": "1 312 444 5678",
+        "email": "contact@centralpark-hospital.com",
+        "polyclinics": [
+            {
+                "$oid": "676db891dc2d5a0149026456"
+            },
+            {
+                "$oid": "676db89fdc2d5a01490264f1"
+            }
+        ],
+        "doctors": [],
+        "labTechnicians": [],
+        "itTechnicians": [],
+        "appointments": [],
+        "labTests": [],
+        "createdAt": {
+            "$date": "2024-12-26T20:08:40.976Z"
+        },
+        "updatedAt": {
+            "$date": "2024-12-26T20:12:15.719Z"
+        },
+        "__v": 0
+    }
+]
