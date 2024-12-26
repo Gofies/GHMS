@@ -9,17 +9,60 @@ clients:
   - url: http://loki:3100/loki/api/v1/push
 
 scrape_configs:
-  - job_name: system
-    static_configs:
-      - targets:
-          - localhost
-        labels:
-          job: varlogs
-          __path__: /var/log/*.log
+  # Nginx Access and Error Logs
   - job_name: nginx
     static_configs:
       - targets:
           - localhost
         labels:
           job: nginx
-          __path__: /var/log/nginx/*.log
+          service: web
+          __path__: /var/log/containers/nginx/*.log  # Path inside Promtail
+
+  # MongoDB Logs
+  - job_name: mongodb
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: mongodb
+          service: database
+          __path__: /var/log/containers/mongodb/*.log
+
+  # Docker Container Logs (Optional)
+  - job_name: docker
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: docker
+          __path__: /var/lib/docker/containers/*/*.log
+
+  # Frontend Logs
+  - job_name: frontend
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: frontend
+          service: app
+          __path__: /var/log/containers/frontend/*.log
+
+  # Backend API Logs
+  - job_name: backend
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: backend
+          service: api
+          __path__: /var/log/containers/backend/*.log
+
+  # Scrape LLM logs
+  - job_name: llm
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: llm
+          __path__: /var/log/containers/llm/*.log

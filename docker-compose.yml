@@ -6,6 +6,8 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      - ./container-logs/frontend:/var/log/frontend
+      - ./container-logs:/host/logs
     environment:
       - WDS_SOCKET_PORT=0
       - WATCHPACK_POLLING=true
@@ -24,6 +26,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
+      - ./container-logs/backend:/var/log/backend  # Mount logs to host
     env_file: 
       - .env
     networks:
@@ -45,6 +48,7 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx-logs:/var/log/nginx
       - ./ssl:/etc/nginx/ssl:ro
+      - ./container-logs/nginx:/var/log/nginx  # Mount logs to host
     depends_on:
       - frontend
       - backend
@@ -65,6 +69,7 @@ services:
       - "3131:3131"
     volumes:
       - ./AI/llm/uploads:/app/uploads
+      - ./container-logs/llm:/var/log/llm  # Mount logs to host
     networks:
       - gofies
     healthcheck:
@@ -348,7 +353,9 @@ services:
     image: grafana/promtail:latest
     volumes:
       - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers
       - ./monitoring/promtail-config.yml:/etc/promtail/config.yml
+      - ./container-logs:/var/log/containers  # Mount all container logs
     networks:
       - gofies
     depends_on:
@@ -384,6 +391,8 @@ services:
       - "9216:9216"
     depends_on:
       - router01
+    volumes:
+      - ./container-logs/mongodb:/var/log/mongodb  # Mount Mongo logs
 
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:latest
