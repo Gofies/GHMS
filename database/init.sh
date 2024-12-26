@@ -81,14 +81,14 @@ log "MongoDB cluster setup complete."
 
 log "MongoDB mock data addition started..."
 
-json_files=("admins.json" "doctors.json" "appointments.json" "hospitals.json" "patients.json" "polyclinics.json" "prescriptions.json")
+json_files=("admins.json" "doctors.json" "hospitals.json" "patients.json" "polyclinics.json" "appointments.json")
 for json_file in "${json_files[@]}"; do
 
-    docker cp ./database/mocks/$json_file router-01:/data/$json_file
+    execute_with_retry "docker cp ./database/mocks/$json_file router-01:/data/$json_file"
     
     collection_name=$(basename "$json_file" .json)
     
-    docker exec router-01 sh -c "mongoimport --host router-01 --port 27117 --db HospitalDatabase --collection $collection_name --file /data/$json_file --jsonArray --username $MONGO_USERNAME --password $MONGO_PASSWORD --authenticationDatabase admin"
+    execute_with_retry "docker exec router-01 sh -c \"mongoimport --host router-01 --port 27117 --db HospitalDatabase --collection $collection_name --file /data/$json_file --jsonArray --username $MONGO_USERNAME --password $MONGO_PASSWORD --authenticationDatabase admin\""
 done
 
 
