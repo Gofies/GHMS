@@ -107,8 +107,6 @@ const logout = (req, res) => {
     }
 };
 
-
-
 const refreshToken = async (req, res) => {
     try {
         const { refreshToken } = req.cookies;
@@ -122,21 +120,34 @@ const refreshToken = async (req, res) => {
                 return res.status(403).json({ message: 'Invalid refresh token' });
             }
 
-            // Find user based on decoded user ID from the refresh token
-            const patient = await Patient.findById(decoded.id).select('-password');
+            // Kullanıcıyı kontrol etmek için modelleri sırayla kontrol ediyoruz
+            let user = await Patient.findById(decoded.id).select('-password');
 
-            if (!patient) {
+            if (!user) {
+                user = await Doctor.findById(decoded.id).select('-password');
+            }
+
+            if (!user) {
+                user = await Admin.findById(decoded.id).select('-password');
+            }
+
+            if (!user) {
+                user = await LabTechnician.findById(decoded.id).select('-password');
+            }
+
+            if (!user) {
                 return res.status(401).json({ message: 'Unauthorized' });
             }
 
-            // Generate new tokens and send them in response
-            generateJwt(patient._id, res);
+            // Yeni token'lar oluşturulup gönderilir
+            generateJwt(user._id, res);
             return res.status(200).json({ message: 'Token refreshed' });
         });
     } catch (error) {
-        console.log('Error in refresh token endpoint: ', error.message);
+        console.error('Error in refresh token endpoint: ', error.message);
         return res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
+
 
 export { login, logout, refreshToken, adminSignup };

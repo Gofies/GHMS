@@ -6,70 +6,23 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Textarea } from "../../components/ui/doctor/patient-details/TextArea.jsx"
 import { Home, Users, Clipboard, LogOut, FileText, History, Users as FamilyIcon, Pill, Calendar } from 'lucide-react'
 import Link from "../../components/ui/doctor/management/Link.jsx"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/admin/Dialog.jsx";
+import { Search, Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Input } from "../../components/ui/doctor/patient-details/Input.jsx";
+import { Label } from "../../components/ui/doctor/patient-details/Label.jsx";
 
 import Sidebar from "../../components/ui/doctor/common/Sidebar.jsx"
 import Header from "../../components/ui/common/Header.jsx";
 
-import { Endpoint, getRequest, postRequest } from "../../helpers/Network.js";
+import { Endpoint, getRequest, postRequest, putRequest, deleteRequest } from "../../helpers/Network.js";
 
-import { useParams } from "react-router-dom"; // React Router'dan patientId'yi almak için
+import { useParams } from "react-router-dom";
 import { toast } from 'react-toastify'
+//import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@radix-ui/react-accordion";
 
-
-// Mock data for patient details
-const patientDetails = {
-  id: 1,
-  name: "John Doe",
-  age: 45,
-  gender: "Male",
-  bloodType: "A+",
-  height: "180 cm",
-  weight: "75 kg",
-  results: [
-    { id: 1, test: "Blood Test", date: "2023-05-15", result: "Normal" },
-    { id: 2, test: "X-Ray", date: "2023-04-20", result: "Abnormal" },
-  ],
-  patientHistory: [
-    { id: 1, condition: "Hypertension", diagnosedDate: "2020-03-10" },
-    { id: 2, condition: "Type 2 Diabetes", diagnosedDate: "2021-07-22" },
-  ],
-  familyHistory: [
-    { id: 1, relation: "Father", condition: "Heart Disease" },
-    { id: 2, relation: "Mother", condition: "Breast Cancer" },
-  ],
-  prescriptionHistory: [
-    { id: 1, medication: "Lisinopril", dosage: "10mg", startDate: "2020-03-15", endDate: "Ongoing" },
-    { id: 2, medication: "Metformin", dosage: "500mg", startDate: "2021-07-25", endDate: "Ongoing" },
-  ],
-  appointmentHistory: [
-    {
-      id: 1,
-      date: "2023-05-15",
-      symptoms: "Persistent cough, fatigue",
-      possibleDiagnosis: "Upper respiratory infection",
-      actualDiagnosis: "Bronchitis",
-      treatment: "Prescribed antibiotics and rest"
-    },
-    {
-      id: 2,
-      date: "2023-03-02",
-      symptoms: "Joint pain, stiffness in hands",
-      possibleDiagnosis: "Arthritis, Carpal tunnel syndrome",
-      actualDiagnosis: "Early-stage rheumatoid arthritis",
-      treatment: "Referred to rheumatologist, prescribed anti-inflammatory medication"
-    },
-    {
-      id: 3,
-      date: "2023-01-10",
-      symptoms: "Headache, dizziness, high blood pressure reading",
-      possibleDiagnosis: "Hypertension exacerbation",
-      actualDiagnosis: "Hypertension exacerbation",
-      treatment: "Adjusted blood pressure medication dosage"
-    },
-  ],
-}
 
 export default function PatientDetails() {
+  const [editingPrescription, setEditingPrescription] = useState(null);
 
   function calculateAge(birthdate) {
     // Doğum tarihini Date nesnesine çevir
@@ -93,7 +46,7 @@ export default function PatientDetails() {
   const { doctorId, patientId } = useParams();
 
   const [newPrescription, setNewPrescription] = useState('')
- 
+
   const [name, setName] = useState(null);
   const [surname, setSurname] = useState(null);
   const [age, setAge] = useState(null);
@@ -113,33 +66,83 @@ export default function PatientDetails() {
 
   const [updateTrigger, setUpdateTrigger] = useState(false); // Yeni bir trigger
 
+  const [diagnosisHistory, setDiagnosisHistory] = useState([]);
+  const [patientDetails, setPatientDetails] = useState({}); // Diğer temel hasta bilgileri için
 
   useEffect(() => {
     const fetchPatientDetails = async () => {
       try {
-        const response = await postRequest(`/doctor/patient/${patientId}`, { doctorId });
-        console.log("Response:", response);
-        setLabTests(response.patient.labtests);
-        setPatientHistory(response.patient.diagnoses);
-        setFamilyHistory(response.patient.family);
-        setPrescriptionHistory(response.patient.prescriptions);
-        setAppointmentHistory(response.patient.appointments);
-        setAge(calculateAge(response.patient.birthdate));
-        setGender(response.patient.gender);
-        setBloodType(response.patient.bloodtype);
-        setWeight(response.patient.weight);
-        setHeight(response.patient.height);
-        setName(response.patient.name);
-        setSurname(response.patient.surname);
+        // Lab Test Results
+        const labTestResponse = await getRequest(`/doctor/patient/${patientId}/test-results`);
+        setLabTests(labTestResponse.labtests);
 
+        // Appointment History
+        const appointmentResponse = await getRequest(`/doctor/patient/${patientId}/appointment-history`);
+        setAppointmentHistory(appointmentResponse.appointments);
 
-      } catch (error) {
-        console.error("Error fetching patient details:", error);
+        // Diagnosis History
+        const diagnosisResponse = await getRequest(`/doctor/patient/${patientId}/diagnosis-history`);
+        setDiagnosisHistory(diagnosisResponse.diagnoses);
+
+        // Family History
+        const familyResponse = await getRequest(`/doctor/patient/${patientId}/family-history`);
+        setFamilyHistory(familyResponse.family);
+
+        // Prescription History
+        const prescriptionResponse = await getRequest(`/doctor/patient/${patientId}/prescriptions`);
+        setPrescriptionHistory(prescriptionResponse.prescriptions);
+
+        // // Basic Patient Details (optional additional API)
+        const patientDetailsResponse = await getRequest(`/doctor/patient/${patientId}`);
+        console.log("q", patientDetails);
+        setPatientDetails(patientDetailsResponse.patient);
+
+        setLoading(false); // Tüm veri alımı tamamlandı
+      } catch (err) {
+        console.error('Error fetching patient details:', err);
+        //setError('Failed to fetch patient details.');
+        setLoading(false);
       }
     };
 
-    fetchPatientDetails(); // Asenkron fonksiyonu çağır
+    fetchPatientDetails();
   }, [updateTrigger]);
+
+  // const [showEditDialog, setShowEditDialog] = useState(false);
+
+  //const [editingPrescription, setEditingPrescription] = useState(null);
+  const [tempEditingPrescription, setTempEditingPrescription] = useState(null);
+
+
+  const handleEditPrescription = (prescription) => {
+    setEditingPrescription({ ...prescription }); // Mevcut prescription
+    setTempEditingPrescription({ ...prescription }); // Geçici düzenleme
+  };
+
+  const handleUpdatePrescription = async (e, id) => {
+    e.preventDefault();
+    try {
+      const updatedData = {
+        medicine: tempEditingPrescription.medicine,
+        status: tempEditingPrescription.status,
+      };
+
+      const response = await putRequest(
+        `/doctor/patient/${patientId}/prescriptions/${id}`,
+        updatedData
+      );
+
+      if (response) {
+        toast("Prescription updated successfully!");
+        setEditingPrescription(null); // Dialog'u kapat
+        setTempEditingPrescription(null);
+        setUpdateTrigger((prev) => !prev); // Listeyi güncelle
+      }
+    } catch (error) {
+      console.error("Error updating prescription:", error);
+      toast("Failed to update prescription.");
+    }
+  };
 
   const [medicine, setMedicine] = useState([]);
   const [newMedicine, setNewMedicine] = useState({
@@ -150,8 +153,8 @@ export default function PatientDetails() {
   });
   const [status, setStatus] = useState("ongoing");
 
-   // İlacı listeye eklemek için
-   const handleMedicineChange = (e) => {
+  // İlacı listeye eklemek için
+  const handleMedicineChange = (e) => {
     e.preventDefault();
     const { name, value } = e.target;
     setNewMedicine((prev) => ({ ...prev, [name]: value }));
@@ -159,7 +162,6 @@ export default function PatientDetails() {
 
   const handleAddMedicine = (e) => {
     e.preventDefault();
-    console.log("add med")
     if (
       newMedicine.name &&
       newMedicine.quantity &&
@@ -171,15 +173,12 @@ export default function PatientDetails() {
     }
   };
 
-   const handlePrescriptionSubmit = async (e) => {
-    console.log("handle pres");
+  const handlePrescriptionSubmit = async (e) => {
     e.preventDefault();
-
     const prescriptionData = {
       medicine,
       status,
     };
-
     try {
       const response = await postRequest(`/doctor/patient/${patientId}/prescriptions`, prescriptionData);
       if (response) {
@@ -196,10 +195,56 @@ export default function PatientDetails() {
     }
   };
 
+  const handleDeletePrescription = async (prescriptionId) => {
+    try {
+      // Delete request gönder
+      const response = await deleteRequest(`/doctor/patient/${patientId}/prescriptions/${prescriptionId}`);
+      if (response) {
+        toast("Prescription deleted successfully!");
+        setUpdateTrigger((prev) => !prev); // Trigger'ı değiştirerek useEffect'i tetikle
+      } else {
+        toast("Failed to delete prescription");
+      }
+    } catch (error) {
+      console.error("Error deleting prescription:", error);
+      toast("An error occurred while deleting the prescription");
+    }
+  };
 
-  const handleClose = () => {
-    // Add your close card logic here
-    console.log("Card closed");
+  // const handleSaveChanges = (id) => {
+  //   const updatedPrescriptions = prescriptionHistory.map((prescription) => {
+  //     if (prescription._id === id) {
+  //       return editingPrescription;
+  //     }
+  //     return prescription;
+  //   });
+  // }
+
+  // const handleSavePrescription = () => {
+  //   if (editingPrescription) {
+  //     // API'ye uygun body formatını oluştur
+  //     const updatedData = {
+  //       medicine: editingPrescription.medicine.map((med) => ({
+  //         name: med.name,
+  //         quantity: med.quantity,
+  //         time: med.time,
+  //         form: med.form,
+  //       })),
+  //       status: editingPrescription.status,
+  //     };
+
+  //     handleUpdatePrescription(editingPrescription._id, updatedData);
+  //     setEditingPrescription(null); // Dialog'u kapat
+  //   }
+  // };
+
+
+  const handleMedicineChange2 = (index, field, value) => {
+    setEditingPrescription((prev) => {
+      const updatedMedicine = [...prev.medicine];
+      updatedMedicine[index][field] = value;
+      return { ...prev, medicine: updatedMedicine };
+    });
   };
 
   return (
@@ -216,8 +261,8 @@ export default function PatientDetails() {
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                <p><strong>Name:</strong> {name}</p>
-                <p><strong>Surname:</strong> {surname}</p>
+                  <p><strong>Name:</strong> {name}</p>
+                  <p><strong>Surname:</strong> {surname}</p>
 
                   <p><strong>Age:</strong> {age}</p>
                   <p><strong>Gender:</strong> {gender}</p>
@@ -235,13 +280,12 @@ export default function PatientDetails() {
             <Tabs
               defaultValue="results"
               onValueChange={(value) => {
-                console.log("Active Tab Changed:", value); // Konsolda kontrol edebilirsiniz
                 setActiveTab(value);
               }}
             >
               <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="results">Results</TabsTrigger>
-                <TabsTrigger value="patient-history">Patient History</TabsTrigger>
+                <TabsTrigger value="diagnosis-history">Diagnosis History</TabsTrigger>
                 <TabsTrigger value="family-history">Family History</TabsTrigger>
                 <TabsTrigger value="prescription-history">Prescription History</TabsTrigger>
                 <TabsTrigger value="appointment-history">Appointment History</TabsTrigger>
@@ -289,12 +333,12 @@ export default function PatientDetails() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              <TabsContent value="patient-history">
+              <TabsContent value="diagnosis-history">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <History className="w-5 h-5 mr-2" />
-                      Patient History
+                      Diagnosis History
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -306,8 +350,8 @@ export default function PatientDetails() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {patientHistory && patientHistory.length > 0 ? (
-                          patientHistory.map((history) => (
+                        {diagnosisHistory && diagnosisHistory.length > 0 ? (
+                          diagnosisHistory.map((history) => (
                             <TableRow key={history.id}>
                               <TableCell>{history.condition}</TableCell>
                               <TableCell>{history.diagnosedDate}</TableCell>
@@ -316,7 +360,7 @@ export default function PatientDetails() {
                         ) : (
                           <TableRow>
                             <TableCell colSpan={3} style={{ textAlign: "center" }}>
-                              No patient history available.
+                              No diagnosis history available.
                             </TableCell>
                           </TableRow>
                         )}
@@ -365,57 +409,186 @@ export default function PatientDetails() {
                   </CardContent>
                 </Card>
               </TabsContent>
+
+
+
               <TabsContent value="prescription-history">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">
-                      <Pill className="w-5 h-5 mr-2" />
+                      <FileText className="w-5 h-5 mr-2" />
                       Prescription History
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                  <Table>
-  <TableHeader>
-    <TableRow>
-      <TableHead>Medication</TableHead>
-      <TableHead>Dosage</TableHead>
-      <TableHead>Status</TableHead>
-      <TableHead>Start Date</TableHead>
-    </TableRow>
-  </TableHeader>
-  <TableBody>
-    {prescriptionHistory && prescriptionHistory.length > 0 ? (
-      prescriptionHistory.map((prescription) => {
-        // İlaç isimlerini ve dozajlarını birleştir
-        const medicationNames = prescription.medicine
-          .map((med) => med.name)
-          .join(", ");
-        const medicationDosages = prescription.medicine
-          .map((med) => `${med.quantity} ${med.form}`)
-          .join(", ");
+                    <Table>
+                      <TableBody>
+                        <div className="grid gap-4">
+                          {prescriptionHistory && prescriptionHistory.length > 0 ? (
+                            prescriptionHistory.map((prescription) => {
+                              const formattedDate = new Date(prescription.createdAt)
+                                .toISOString()
+                                .split("T")[0];
+                              return (
+                                <Card
+                                  key={prescription._id}
+                                  className="p-4 bg-white rounded-lg shadow-md"
+                                >
+                                  <div className="flex justify-between items-center">
+                                    <h3 className="text-lg font-bold">Prescription</h3>
+                                    <span className="text-sm text-gray-500">
+                                      Status: {prescription.status}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm text-gray-500">
+                                    Start Date: {formattedDate}
+                                  </p>
+                                  <Table className="mt-4">
+                                    <TableHeader>
+                                      <TableRow>
+                                        <TableHead>Medication Name</TableHead>
+                                        <TableHead>Dosage</TableHead>
+                                        <TableHead>Duration (Days)</TableHead>
+                                        <TableHead>Dosage Form</TableHead>
+                                      </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                      {prescription.medicine.map((med, index) => (
+                                        <TableRow key={index}>
+                                          <TableCell>{med.name}</TableCell>
+                                          <TableCell>{med.quantity}</TableCell>
+                                          <TableCell>{med.time}</TableCell>
+                                          <TableCell>{med.form}</TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                  <div className="flex justify-end space-x-2 mt-4">
+                                    <Dialog>
+                                      <DialogTrigger asChild>
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => handleEditPrescription(prescription)}
+                                        >
+                                          Edit
+                                        </Button>
+                                      </DialogTrigger>
+                                      <DialogContent>
+                                        <DialogHeader>
+                                          <DialogTitle>Edit Prescription</DialogTitle>
+                                        </DialogHeader>
+                                        <form onSubmit={(e) => handleUpdatePrescription(e, editingPrescription._id)}>
+                                          {/* Status */}
+                                          <div className="mb-4">
+                                            <Label>Status</Label>
+                                            <select
+                                              value={editingPrescription?.status || ""}
+                                              onChange={(e) =>
+                                                setTempEditingPrescription((prev) => ({
+                                                  ...prev,
+                                                  status: e.target.value,
+                                                }))
+                                              }
+                                              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                                            >
+                                              <option value="ongoing">Ongoing</option>
+                                              <option value="completed">Completed</option>
+                                            </select>
+                                          </div>
+                                          {/* Medicines */}
+                                          {editingPrescription?.medicine.map((med, index) => (
+                                            <div key={index} className="grid grid-cols-4 gap-4 mb-4">
+                                              <div>
+                                                <Label>Medication Name</Label>
+                                                <Input
+                                                  value={med.name}
+                                                  onChange={(e) =>
+                                                    setTempEditingPrescription((prev) => {
+                                                      const updatedMedicine = [...prev.medicine];
+                                                      updatedMedicine[index].name = e.target.value;
+                                                      return { ...prev, medicine: updatedMedicine };
+                                                    })
+                                                  }
+                                                />
+                                              </div>
+                                              <div>
+                                                <Label>Dosage</Label>
+                                                <Input
+                                                  value={med.quantity}
+                                                  onChange={(e) =>
+                                                    setTempEditingPrescription((prev) => {
+                                                      const updatedMedicine = [...prev.medicine];
+                                                      updatedMedicine[index].quantity = e.target.value;
+                                                      return { ...prev, medicine: updatedMedicine };
+                                                    })
+                                                  }
+                                                />
+                                              </div>
+                                              <div>
+                                                <Label>Duration (Days)</Label>
+                                                <Input
+                                                  value={med.time}
+                                                  onChange={(e) =>
+                                                    setTempEditingPrescription((prev) => {
+                                                      const updatedMedicine = [...prev.medicine];
+                                                      updatedMedicine[index].time = e.target.value;
+                                                      return { ...prev, medicine: updatedMedicine };
+                                                    })
+                                                  }
+                                                />
+                                              </div>
+                                              <div>
+                                                <Label>Dosage Form</Label>
+                                                <Input
+                                                  value={med.form}
+                                                  onChange={(e) =>
+                                                    setTempEditingPrescription((prev) => {
+                                                      const updatedMedicine = [...prev.medicine];
+                                                      updatedMedicine[index].form = e.target.value;
+                                                      return { ...prev, medicine: updatedMedicine };
+                                                    })
+                                                  }
+                                                />
+                                              </div>
+                                            </div>
+                                          ))}
+                                          <div className="flex justify-end mt-4 space-x-2">
+                                            <Button type="submit" variant="primary">
+                                              Save
+                                            </Button>
+                                          </div>
+                                        </form>
+                                      </DialogContent>
+                                    </Dialog>
 
-        return (
-          <TableRow key={prescription._id}>
-            <TableCell>{medicationNames}</TableCell>
-            <TableCell>{medicationDosages}</TableCell>
-            <TableCell>{prescription.status}</TableCell>
-            <TableCell>{prescription.createdAt}</TableCell>
-          </TableRow>
-        );
-      })
-    ) : (
-      <TableRow>
-        <TableCell colSpan={4} style={{ textAlign: "center" }}>
-          No prescription history is available.
-        </TableCell>
-      </TableRow>
-    )}
-  </TableBody>
-</Table>
+                                    <Button
+                                      variant="destructive"
+                                      onClick={() =>
+                                        handleDeletePrescription(prescription._id)
+                                      }
+                                    >
+                                      Delete
+                                    </Button>
+                                  </div>
+                                </Card>
+                              );
+                            })
+                          ) : (
+                            <TableRow>
+                              <TableCell colSpan={3} style={{ textAlign: "center" }}>
+                                No prescription history is available.
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </div>
+                      </TableBody>
+                    </Table>
 
                   </CardContent>
                 </Card>
               </TabsContent>
+
               <TabsContent value="appointment-history">
                 <Card>
                   <CardHeader>
@@ -440,15 +613,20 @@ export default function PatientDetails() {
                         </TableHeader>
                         <TableBody>
                           {appointmentHistory && appointmentHistory.length > 0 ? ( // Eğer liste doluysa
-                            appointmentHistory.map((appointment) => (
-                              <TableRow key={appointment._id}>
-                                <TableCell>{appointment.date}</TableCell>
-                                <TableCell>{appointment.symptoms}</TableCell>
-                                <TableCell>{appointment.possibleDiagnosis}</TableCell>
-                                <TableCell>{appointment.actualDiagnosis}</TableCell>
-                                <TableCell>{appointment.treatment}</TableCell>
-                              </TableRow>
-                            ))
+                            appointmentHistory.map((appointment) => {
+                              // Tarihi YYYY-MM-DD formatına dönüştür
+                              const formattedDate = new Date(appointment.date).toISOString().split("T")[0];
+
+                              return (
+                                <TableRow key={appointment._id}>
+                                  <TableCell>{formattedDate}</TableCell>
+                                  <TableCell>{appointment.symptoms}</TableCell>
+                                  <TableCell>{appointment.possibleDiagnosis}</TableCell>
+                                  <TableCell>{appointment.actualDiagnosis}</TableCell>
+                                  <TableCell>{appointment.treatment}</TableCell>
+                                </TableRow>
+                              );
+                            })
                           ) : (
                             <TableRow>
                               <TableCell colSpan={5} style={{ textAlign: "center" }}>
@@ -460,129 +638,131 @@ export default function PatientDetails() {
                       </Table>
                     )}
                   </CardContent>
-
                 </Card>
               </TabsContent>
+
               <TabsContent value="new-prescription">
-              <Card className="p-6 bg-white rounded-lg shadow-md">
-      <CardHeader>
-        <CardTitle className="flex items-center text-lg font-bold">
-          New Prescription
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handlePrescriptionSubmit}>
-          <div className="grid grid-cols-5 gap-4 mb-6 items-center">
-            {/* Medicine Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Medicine Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={newMedicine.name}
-                onChange={handleMedicineChange}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
+                <Card className="p-6 bg-white rounded-lg shadow-md">
+                  <CardHeader>
+                    <CardTitle className="flex items-center text-lg font-bold">
+                      New Prescription
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handlePrescriptionSubmit}>
+                      {/* Status Field */}
+                      <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Status
+                        </label>
+                        <select
+                          value={status}
+                          onChange={(e) => setStatus(e.target.value)}
+                          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        >
+                          <option value="ongoing">Ongoing</option>
+                          <option value="completed">Completed</option>
+                        </select>
+                      </div>
 
-            {/* Quantity */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Quantity
-              </label>
-              <input
-                type="text"
-                name="quantity"
-                value={newMedicine.quantity}
-                onChange={handleMedicineChange}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
+                      {/* Medicine Fields */}
+                      <div className="grid grid-cols-4 gap-4 mb-6 items-center">
+                        {/* Medicine Name */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Medication Name
+                          </label>
+                          <input
+                            type="text"
+                            name="name"
+                            value={newMedicine.name}
+                            onChange={handleMedicineChange}
+                            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                          />
+                        </div>
 
-            {/* Time */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Time (days)
-              </label>
-              <input
-                type="text"
-                name="time"
-                value={newMedicine.time}
-                onChange={handleMedicineChange}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
+                        {/* Quantity */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Dosage
+                          </label>
+                          <input
+                            type="text"
+                            name="quantity"
+                            value={newMedicine.quantity}
+                            onChange={handleMedicineChange}
+                            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                          />
+                        </div>
 
-            {/* Form */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Form
-              </label>
-              <input
-                type="text"
-                name="form"
-                value={newMedicine.form}
-                onChange={handleMedicineChange}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
+                        {/* Time */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Duration (Days)
+                          </label>
+                          <input
+                            type="text"
+                            name="time"
+                            value={newMedicine.time}
+                            onChange={handleMedicineChange}
+                            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                          />
+                        </div>
 
-            {/* Add Button */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status
-              </label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                <option value="ongoing">Ongoing</option>
-                <option value="completed">Completed</option>
-              </select>
-            </div>
-          </div>
+                        {/* Form */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Dosage Form
+                          </label>
+                          <input
+                            type="text"
+                            name="form"
+                            value={newMedicine.form}
+                            onChange={handleMedicineChange}
+                            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                          />
+                        </div>
+                      </div>
 
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              onClick={handleAddMedicine}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600"
-            >
-              Add Medicine
-            </Button>
-          </div>
+                      <div className="flex justify-end">
+                        <Button
+                          type="button"
+                          onClick={handleAddMedicine}
+                          className="px-4 py-2 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600"
+                        >
+                          Add Medicine
+                        </Button>
+                      </div>
 
-          {/* Medicine List */}
-          <div className="mt-4">
-            <h4 className="text-lg font-semibold mb-3">Medicines:</h4>
-            <ul className="space-y-2">
-              {medicine.map((med, index) => (
-                <li
-                  key={index}
-                  className="p-2 bg-gray-100 rounded-md shadow border border-gray-300"
-                >
-                  {med.name} - {med.quantity} - {med.time} days - {med.form}
-                </li>
-              ))}
-            </ul>
-          </div>
+                      {/* Medicine List */}
+                      <div className="mt-4">
+                        <h4 className="text-lg font-semibold mb-3">Medicines:</h4>
+                        <ul className="space-y-2">
+                          {medicine.map((med, index) => (
+                            <li
+                              key={index}
+                              className="p-2 bg-gray-100 rounded-md shadow border border-gray-300"
+                            >
+                              {med.name} - {med.quantity} - {med.time} days - {med.form}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end mt-6">
-            <Button
-              type="submit"
-              className="px-4 py-2 bg-green-500 text-white rounded-md shadow hover:bg-green-600"
-            >
-              Submit Prescription
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+                      {/* Submit Button */}
+                      <div className="flex justify-end mt-6">
+                        <Button
+                          type="submit"
+                          className="px-4 py-2 bg-green-500 text-white rounded-md shadow hover:bg-green-600"
+                        >
+                          Submit Prescription
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
               </TabsContent>
+
             </Tabs>
           </div>
         </div>

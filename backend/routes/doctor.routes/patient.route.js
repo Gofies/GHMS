@@ -1,6 +1,7 @@
 import express from 'express';
 
 import {
+    getPatientDetails,
     getPatients,
     createPrescription,
     updatePrescription,
@@ -13,6 +14,7 @@ const router = express.Router();
 
 router.get('/', protect('doctor'), getPatients);
 router.get('/:patientId', protect('doctor'), getPatient);
+
 router.post('/:patientId/prescriptions', protect('doctor'), createPrescription);
 router.put('/:patientId/prescriptions/:prescriptionId', protect('doctor'), updatePrescription);
 router.delete('/:patientId/prescriptions/:prescriptionId', protect('doctor'), deletePrescription);

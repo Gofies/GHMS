@@ -13,17 +13,12 @@ export default function Sidebar() {
     const links = [
         {
           to: `/admin/${userId}/`,
-          label: "Dashboard",
+          label: "Home",
           icon: Home,
         },
         {
           to: `/admin/${userId}/user-management`,
-          label: "User Management",
-          icon: User,
-        },
-        {
-          to: `/admin/${userId}/polyclinic-management`,
-          label: "Polyclinic Management",
+          label: "Staff Management",
           icon: User,
         },
         {

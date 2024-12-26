@@ -130,71 +130,23 @@ export default function AppointmentsPage() {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Doctor</TableHead>
-                                        <TableHead>Specialty</TableHead>
+                                        <TableHead>Polyclinic</TableHead>
                                         <TableHead>Date</TableHead>
                                         <TableHead>Time</TableHead>
                                         <TableHead>Status</TableHead>
-                                        <TableHead>Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {appointments && appointments.length > 0 ? (
                                         appointments.map((appointment) => {
-                                            // Tarih formatını yyyy-mm-dd olarak al
-                                            const formattedDate = appointment.date.split("T")[0]; // T karakterinden öncesini al
+                                            const formattedDate = appointment.date.split("T")[0]; 
                                             return (
                                                 <TableRow key={appointment.id}>
-                                                    <TableCell>{appointment.doctor}</TableCell>
-                                                    <TableCell>{appointment.specialty}</TableCell>
-                                                    <TableCell>{formattedDate}</TableCell> {/* Formatlanmış tarih */}
+                                                    <TableCell>{`${appointment.doctor?.name || ''} ${appointment.doctor?.surname || ''}`}</TableCell>
+                                                    <TableCell>{appointment.polyclinic?.name}</TableCell>
+                                                    <TableCell>{formattedDate}</TableCell> 
                                                     <TableCell>{appointment.time}</TableCell>
                                                     <TableCell>{appointment.status}</TableCell>
-                                                    <TableCell>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => handleOpenDialog(appointment)}
-                                                        >
-                                                            <Info className="w-4 h-4 mr-2" />
-                                                            Details
-                                                        </Button>
-                                                        {isDialogOpen && selectedAppointment && (
-                                                            <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
-                                                                <DialogContent>
-                                                                    <DialogHeader>
-                                                                        <DialogTitle>Appointment Details</DialogTitle>
-                                                                    </DialogHeader>
-                                                                    <div className="grid gap-4 py-4">
-                                                                        <div>
-                                                                            <h3 className="font-semibold">Doctor:</h3>
-                                                                            <p>{selectedAppointment?.doctor}</p>
-                                                                        </div>
-                                                                        <div>
-                                                                            <h3 className="font-semibold">Specialty:</h3>
-                                                                            <p>{selectedAppointment?.specialty}</p>
-                                                                        </div>
-                                                                        <div>
-                                                                            <h3 className="font-semibold">Date:</h3>
-                                                                            <p>{selectedAppointment?.date.split("T")[0]}</p> {/* Dialog'da da formatlanmış tarih */}
-                                                                        </div>
-                                                                        <div>
-                                                                            <h3 className="font-semibold">Time:</h3>
-                                                                            <p>{selectedAppointment?.time}</p>
-                                                                        </div>
-                                                                        <div>
-                                                                            <h3 className="font-semibold">Status:</h3>
-                                                                            <p>{selectedAppointment?.status}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="flex justify-end mt-4">
-                                                                        <Button variant="outline" onClick={handleCloseDialog}>
-                                                                            Close
-                                                                        </Button>
-                                                                    </div>
-                                                                </DialogContent>
-                                                            </Dialog>
-                                                        )}
-                                                    </TableCell>
                                                 </TableRow>
                                             );
                                         })
@@ -213,7 +165,7 @@ export default function AppointmentsPage() {
             </main>
 
             {/* New Appointment Dialog */}
-           
+
         </div>
     );
 }
