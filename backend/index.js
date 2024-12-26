@@ -23,7 +23,7 @@ import doctorHomeRoutes from "./routes/doctor.routes/home.route.js";
 import doctorPatientRoutes from "./routes/doctor.routes/patient.route.js";
 import doctorAuthRoutes from "./routes/doctor.routes/auth.route.js";
 
-//import { serveSwagger, setupSwagger } from "./utils/swagger.js";
+import {setupSwagger } from "./swager.js";
 
 dotenv.config();
 const PORT = 5000;
@@ -51,7 +51,7 @@ app.use("/api/v1/admin/polyclinic", adminPolyclinicRoutes);
 app.use("/api/v1/doctor", doctorHomeRoutes);
 app.use("/api/v1/doctor/patient", doctorPatientRoutes);
 app.use("/api/v1/doctor/auth", doctorAuthRoutes);
-
+setupSwagger(app);
 
 //ASAGDAKI SILMEEEEEEEEEEEEEEEEEE
 app.get("/api/health", (req, res) => {
