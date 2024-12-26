@@ -11,16 +11,16 @@ import { Badge } from "../../components/ui/admin/Badge.jsx"
 import { Progress } from "../../components/ui/admin/Progress.jsx"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/admin/Tabs.jsx"
 import { Home, Users, Shield, Settings, LogOut, Search, AlertTriangle, Lock, Activity } from 'lucide-react'
-//import Link from 'next/link'
 import Sidebar from "../../components/ui/admin/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
+
 // Mock data for security logs
 const securityLogs = [
-  { id: 1, event: "Failed login attempt", user: "unknown", ip: "192.168.1.100", timestamp: "2023-06-15 10:30:00" },
-  { id: 2, event: "Password changed", user: "john@example.com", ip: "192.168.1.101", timestamp: "2023-06-15 11:15:00" },
-  { id: 3, event: "Unauthorized access attempt", user: "unknown", ip: "192.168.1.102", timestamp: "2023-06-15 12:00:00" },
-  { id: 4, event: "User account locked", user: "jane@example.com", ip: "192.168.1.103", timestamp: "2023-06-15 13:45:00" },
-  { id: 5, event: "New user created", user: "admin@example.com", ip: "192.168.1.104", timestamp: "2023-06-15 14:30:00" },
+  { id: 1, event: "Failed login attempt", user: "unknown", ip: "192.168.1.100", timestamp: "2024-12-15 10:30:00" },
+  { id: 2, event: "Password changed", user: "john@example.com", ip: "192.168.1.101", timestamp: "2024-12-15 11:15:00" },
+  { id: 3, event: "Unauthorized access attempt", user: "unknown", ip: "192.168.1.102", timestamp: "2024-12-15 12:00:00" },
+  { id: 4, event: "User account locked", user: "jane@example.com", ip: "192.168.1.103", timestamp: "2024-12-15 13:45:00" },
+  { id: 5, event: "New user created", user: "admin@example.com", ip: "192.168.1.104", timestamp: "2024-12-15 14:30:00" },
 ]
 
 // Mock data for system health
@@ -34,6 +34,7 @@ const systemHealth = [
 export default function AdminSecurityPage() {
   const [searchTerm, setSearchTerm] = useState('')
 
+  // Dinamik olarak filtrelenen logları hesapla
   const filteredLogs = securityLogs.filter(log =>
     log.event.toLowerCase().includes(searchTerm.toLowerCase()) ||
     log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -66,7 +67,9 @@ export default function AdminSecurityPage() {
                       Security Logs
                     </span>
                     <div className="flex items-center">
-                      <Search className="w-5 h-5 mr-2 text-gray-500" />
+                    <Search
+                        className="w-5 h-5 text-gray-500 cursor-pointer"
+                      />
                       <Input
                         type="text"
                         placeholder="Search logs..."
@@ -88,14 +91,22 @@ export default function AdminSecurityPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredLogs.map((log) => (
-                        <TableRow key={log.id}>
-                          <TableCell>{log.event}</TableCell>
-                          <TableCell>{log.user}</TableCell>
-                          <TableCell>{log.ip}</TableCell>
-                          <TableCell>{log.timestamp}</TableCell>
+                      {filteredLogs.length > 0 ? (
+                        filteredLogs.map((log) => (
+                          <TableRow key={log.id}>
+                            <TableCell>{log.event}</TableCell>
+                            <TableCell>{log.user}</TableCell>
+                            <TableCell>{log.ip}</TableCell>
+                            <TableCell>{log.timestamp}</TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={4} className="text-center">
+                            No logs found.
+                          </TableCell>
                         </TableRow>
-                      ))}
+                      )}
                     </TableBody>
                   </Table>
                 </CardContent>

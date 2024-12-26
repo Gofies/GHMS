@@ -43,7 +43,7 @@ const newDoctor = async (req, res) => {
             specialization
         } = req.body;
 
-        const isExist = Doctor.find({ email });
+        const isExist = await Doctor.findOne({ email });
 
         if (isExist) {
             return res.status(400).json({ message: 'Doctor already exists' });

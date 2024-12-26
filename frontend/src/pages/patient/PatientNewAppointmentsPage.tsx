@@ -11,6 +11,8 @@ import { Input } from "../../components/ui/patient/profile/Input.jsx"
 import { Label } from "../../components/ui/patient/profile/Label.jsx"
 import { Endpoint, postRequest, getRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify'
+import { useLocation, useNavigate } from 'react-router-dom';
+
 
 const cities = [
   "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Ankara",
@@ -51,6 +53,10 @@ const polyclinics = [
 
 export default function NewAppointmentsPage() {
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
+
   const handleSubmit = async () => {
     if (!selectedDoctor || !selectedDate || !selectedTimeSlot) {
       toast("Please select a doctor, date, and time slot before submitting.");
@@ -73,7 +79,8 @@ export default function NewAppointmentsPage() {
       if (response) {
         //const responseData = await response.json();
         toast("Appointment successfully created!");
-        console.log("API Response:", response);
+        const basePath = location.pathname.replace(/\/new$/, '');
+        navigate(basePath);
       } else {
         console.error("Failed to create appointment:", response.statusText);
         toast("Failed to create appointment. Please try again.");

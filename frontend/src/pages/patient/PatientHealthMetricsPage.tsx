@@ -65,6 +65,22 @@ export default function HealthMetricsPage() {
     }
   };
 
+  // BMI'ye Göre Renk Fonksiyonu
+const getBmiColor = (bmi) => {
+  if (bmi && !isNaN(bmi)) {
+    if (bmi < 18.5) {
+      return "text-yellow-500"; // Zayıf
+    } else if (bmi >= 18.5 && bmi < 24.9) {
+      return "text-green-500"; // Normal
+    } else if (bmi >= 25 && bmi < 29.9) {
+      return "text-red-500"; // Fazla Kilolu
+    } else {
+      return "text-red-800"; // Obezite
+    }
+  }
+  return "text-muted-foreground"; // Varsayılan
+};
+
   const parseBloodPressure = (bloodPressure) => {
     if (!bloodPressure) return { systolic: "-", diastolic: "-" };
     const [systolic, diastolic] = bloodPressure.split(" ");
@@ -456,15 +472,17 @@ export default function HealthMetricsPage() {
             </Card>
 
             {/* BMI Card */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">BMI</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{bmi ? bmi : "-"}</div>
-                <p className="text-sm text-muted-foreground">{getBmiComment(bmi)}</p>
-              </CardContent>
-            </Card>
+<Card>
+  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+    <CardTitle className="text-sm font-medium">BMI</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <div className="text-2xl font-bold">{bmi ? bmi : "-"}</div>
+    <p className={`text-sm ${getBmiColor(bmi)}`}>
+      {getBmiComment(bmi)}
+    </p>
+  </CardContent>
+</Card>
 
           </div>
           {/* Allergies Card */}

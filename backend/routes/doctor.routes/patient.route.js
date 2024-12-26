@@ -1,6 +1,7 @@
 import express from 'express';
 
 import {
+    getPatientDetails,
     getPatients,
     getPatientTestResults,
     getPatientAppointmentHistory,
@@ -16,6 +17,7 @@ import { protect } from '../../middlewares/auth.middleware.js';
 const router = express.Router();
 
 router.get('/', protect('doctor'), getPatients);
+router.get('/:patientId', protect('doctor'), getPatientDetails);
 router.get('/:patientId/test-results', protect('doctor'), getPatientTestResults);
 router.get('/:patientId/appointment-history', protect('doctor'), getPatientAppointmentHistory);
 router.get('/:patientId/diagnosis-history', protect('doctor'), getPatientDiagnosisHistory);

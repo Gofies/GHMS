@@ -93,8 +93,9 @@ export default function PatientDetails() {
         setPrescriptionHistory(prescriptionResponse.prescriptions);
 
         // // Basic Patient Details (optional additional API)
-        // const patientDetailsResponse = await getRequest(`/doctor/patient/details/${patientId}`);
-        // setPatientDetails(patientDetailsResponse.patient);
+        const patientDetailsResponse = await getRequest(`/doctor/patient/${patientId}`);
+        console.log("q", patientDetails);
+        setPatientDetails(patientDetailsResponse.patient);
 
         setLoading(false); // Tüm veri alımı tamamlandı
       } catch (err) {
@@ -107,31 +108,43 @@ export default function PatientDetails() {
     fetchPatientDetails();
   }, [updateTrigger]);
 
+  // const [showEditDialog, setShowEditDialog] = useState(false);
+
+  //const [editingPrescription, setEditingPrescription] = useState(null);
+  const [tempEditingPrescription, setTempEditingPrescription] = useState(null);
+
+
   const handleEditPrescription = (prescription) => {
-    // Derin kopya ile prescription'ı editingPrescription'a aktar
-    setEditingPrescription(JSON.parse(JSON.stringify(prescription)));
+    setEditingPrescription({ ...prescription }); // Mevcut prescription
+    setTempEditingPrescription({ ...prescription }); // Geçici düzenleme
   };
+
 
   const handleUpdatePrescription = async (e, id) => {
     e.preventDefault();
     try {
       const updatedData = {
-        medicine: editingPrescription.medicine,
-        status: editingPrescription.status,
+        medicine: tempEditingPrescription.medicine,
+        status: tempEditingPrescription.status,
       };
-      console.log("u", updatedData);
-      const response = await putRequest(`/doctor/patient/${patientId}/prescriptions/${id}`, updatedData);
-      if (response) {
-        toast("Prescription submitted successfully!");
-        console.log("Updated prescription:", response);
-        setUpdateTrigger((prev) => !prev); // Trigger'ı değiştirerek useEffect'i tetikle
 
+      const response = await putRequest(
+        `/doctor/patient/${patientId}/prescriptions/${id}`,
+        updatedData
+      );
+
+      if (response) {
+        toast("Prescription updated successfully!");
+        setEditingPrescription(null); // Dialog'u kapat
+        setTempEditingPrescription(null);
+        setUpdateTrigger((prev) => !prev); // Listeyi güncelle
       }
-      // Listeyi yeniden yükleme işlemi burada yapılabilir.
     } catch (error) {
       console.error("Error updating prescription:", error);
+      toast("Failed to update prescription.");
     }
   };
+
 
   const [medicine, setMedicine] = useState([]);
   const [newMedicine, setNewMedicine] = useState({
@@ -151,7 +164,6 @@ export default function PatientDetails() {
 
   const handleAddMedicine = (e) => {
     e.preventDefault();
-    console.log("add med")
     if (
       newMedicine.name &&
       newMedicine.quantity &&
@@ -164,14 +176,11 @@ export default function PatientDetails() {
   };
 
   const handlePrescriptionSubmit = async (e) => {
-    console.log("handle pres");
     e.preventDefault();
-
     const prescriptionData = {
       medicine,
       status,
     };
-
     try {
       const response = await postRequest(`/doctor/patient/${patientId}/prescriptions`, prescriptionData);
       if (response) {
@@ -403,61 +412,188 @@ export default function PatientDetails() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              <TabsContent value="prescription-history">
-  <div className="grid gap-4">
-    {prescriptionHistory && prescriptionHistory.length > 0 ? (
-      prescriptionHistory.map((prescription) => {
-        const formattedDate = new Date(prescription.createdAt).toISOString().split("T")[0];
 
-        return (
-          <Card key={prescription._id} className="p-4 bg-white rounded-lg shadow-md">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold">Prescription</h3>
-              <span className="text-sm text-gray-500">Status: {prescription.status}</span>
-            </div>
-            <p className="text-sm text-gray-500">Start Date: {formattedDate}</p>
-            <Table className="mt-4">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Medicine Name</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead>Time (Days)</TableHead>
-                  <TableHead>Form</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {prescription.medicine.map((med, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{med.name}</TableCell>
-                    <TableCell>{med.quantity}</TableCell>
-                    <TableCell>{med.time}</TableCell>
-                    <TableCell>{med.form}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <div className="flex justify-end space-x-2 mt-4">
-              <Button
-                variant="outline"
-                onClick={() => handleEditPrescription(prescription)}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => handleDeletePrescription(prescription._id)}
-              >
-                Delete
-              </Button>
-            </div>
-          </Card>
-        );
-      })
-    ) : (
-      <p className="text-gray-500 text-center">No prescription history available.</p>
-    )}
-  </div>
-</TabsContent>
+
+
+              <TabsContent value="prescription-history">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <FileText className="w-5 h-5 mr-2" />
+                      Prescription History
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableBody>
+                        <div className="grid gap-4">
+                          {prescriptionHistory && prescriptionHistory.length > 0 ? (
+                            prescriptionHistory.map((prescription) => {
+                              const formattedDate = new Date(prescription.createdAt)
+                                .toISOString()
+                                .split("T")[0];
+                              return (
+                                <Card
+                                  key={prescription._id}
+                                  className="p-4 bg-white rounded-lg shadow-md"
+                                >
+                                  <div className="flex justify-between items-center">
+                                    <h3 className="text-lg font-bold">Prescription</h3>
+                                    <span className="text-sm text-gray-500">
+                                      Status: {prescription.status}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm text-gray-500">
+                                    Start Date: {formattedDate}
+                                  </p>
+                                  <Table className="mt-4">
+                                    <TableHeader>
+                                      <TableRow>
+                                        <TableHead>Medication Name</TableHead>
+                                        <TableHead>Dosage</TableHead>
+                                        <TableHead>Duration (Days)</TableHead>
+                                        <TableHead>Dosage Form</TableHead>
+                                      </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                      {prescription.medicine.map((med, index) => (
+                                        <TableRow key={index}>
+                                          <TableCell>{med.name}</TableCell>
+                                          <TableCell>{med.quantity}</TableCell>
+                                          <TableCell>{med.time}</TableCell>
+                                          <TableCell>{med.form}</TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                  <div className="flex justify-end space-x-2 mt-4">
+                                    <Dialog>
+                                      <DialogTrigger asChild>
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => handleEditPrescription(prescription)}
+                                        >
+                                          Edit
+                                        </Button>
+                                      </DialogTrigger>
+                                      <DialogContent>
+                                        <DialogHeader>
+                                          <DialogTitle>Edit Prescription</DialogTitle>
+                                        </DialogHeader>
+                                        <form onSubmit={(e) => handleUpdatePrescription(e, editingPrescription._id)}>
+                                          {/* Status */}
+                                          <div className="mb-4">
+                                            <Label>Status</Label>
+                                            <select
+                                              value={editingPrescription?.status || ""}
+                                              onChange={(e) =>
+                                                setTempEditingPrescription((prev) => ({
+                                                  ...prev,
+                                                  status: e.target.value,
+                                                }))
+                                              }
+                                              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                                            >
+                                              <option value="ongoing">Ongoing</option>
+                                              <option value="completed">Completed</option>
+                                            </select>
+                                          </div>
+                                          {/* Medicines */}
+                                          {editingPrescription?.medicine.map((med, index) => (
+                                            <div key={index} className="grid grid-cols-4 gap-4 mb-4">
+                                              <div>
+                                                <Label>Medication Name</Label>
+                                                <Input
+                                                  value={med.name}
+                                                  onChange={(e) =>
+                                                    setTempEditingPrescription((prev) => {
+                                                      const updatedMedicine = [...prev.medicine];
+                                                      updatedMedicine[index].name = e.target.value;
+                                                      return { ...prev, medicine: updatedMedicine };
+                                                    })
+                                                  }
+                                                />
+                                              </div>
+                                              <div>
+                                                <Label>Dosage</Label>
+                                                <Input
+                                                  value={med.quantity}
+                                                  onChange={(e) =>
+                                                    setTempEditingPrescription((prev) => {
+                                                      const updatedMedicine = [...prev.medicine];
+                                                      updatedMedicine[index].quantity = e.target.value;
+                                                      return { ...prev, medicine: updatedMedicine };
+                                                    })
+                                                  }
+                                                />
+                                              </div>
+                                              <div>
+                                                <Label>Duration (Days)</Label>
+                                                <Input
+                                                  value={med.time}
+                                                  onChange={(e) =>
+                                                    setTempEditingPrescription((prev) => {
+                                                      const updatedMedicine = [...prev.medicine];
+                                                      updatedMedicine[index].time = e.target.value;
+                                                      return { ...prev, medicine: updatedMedicine };
+                                                    })
+                                                  }
+                                                />
+                                              </div>
+                                              <div>
+                                                <Label>Dosage Form</Label>
+                                                <Input
+                                                  value={med.form}
+                                                  onChange={(e) =>
+                                                    setTempEditingPrescription((prev) => {
+                                                      const updatedMedicine = [...prev.medicine];
+                                                      updatedMedicine[index].form = e.target.value;
+                                                      return { ...prev, medicine: updatedMedicine };
+                                                    })
+                                                  }
+                                                />
+                                              </div>
+                                            </div>
+                                          ))}
+                                          <div className="flex justify-end mt-4 space-x-2">
+                                            <Button type="submit" variant="primary">
+                                              Save
+                                            </Button>
+                                          </div>
+                                        </form>
+                                      </DialogContent>
+                                    </Dialog>
+
+                                    <Button
+                                      variant="destructive"
+                                      onClick={() =>
+                                        handleDeletePrescription(prescription._id)
+                                      }
+                                    >
+                                      Delete
+                                    </Button>
+                                  </div>
+                                </Card>
+                              );
+                            })
+                          ) : (
+                            <TableRow>
+                              <TableCell colSpan={3} style={{ textAlign: "center" }}>
+                                No prescription history is available.
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </div>
+                      </TableBody>
+                    </Table>
+
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+
+
 
 
               <TabsContent value="appointment-history">
@@ -541,7 +677,7 @@ export default function PatientDetails() {
                         {/* Medicine Name */}
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Medicine Name
+                            Medication Name
                           </label>
                           <input
                             type="text"
@@ -555,7 +691,7 @@ export default function PatientDetails() {
                         {/* Quantity */}
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Quantity
+                            Dosage
                           </label>
                           <input
                             type="text"
@@ -569,7 +705,7 @@ export default function PatientDetails() {
                         {/* Time */}
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Time (days)
+                            Duration (Days)
                           </label>
                           <input
                             type="text"
@@ -583,7 +719,7 @@ export default function PatientDetails() {
                         {/* Form */}
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Form
+                            Dosage Form
                           </label>
                           <input
                             type="text"
@@ -633,7 +769,6 @@ export default function PatientDetails() {
                   </CardContent>
                 </Card>
               </TabsContent>
-
             </Tabs>
           </div>
         </div>

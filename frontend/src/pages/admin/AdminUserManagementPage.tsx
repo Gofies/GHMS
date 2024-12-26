@@ -13,6 +13,7 @@ import Sidebar from "../../components/ui/admin/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
 import { Endpoint, postRequest, getRequest, putRequest, deleteRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/patient/signup/Select.jsx";
 
 export default function AdminUserManagementPage() {
   const [doctors, setDoctors] = useState([]);
@@ -48,12 +49,26 @@ export default function AdminUserManagementPage() {
   ];
   const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i); // Last 100 years
 
+
+  const [selectedJobStartDay, setSelectedJobStartDay] = useState(1);
+  const [selectedJobStartMonth, setSelectedJobStartMonth] = useState(months[0]);
+  const [selectedJobStartYear, setSelectedJobStartYear] = useState(new Date().getFullYear());
+
+  const [isJobStartDayDropdownOpen, setIsJobStartDayDropdownOpen] = useState(false);
+  const [isJobStartMonthDropdownOpen, setIsJobStartMonthDropdownOpen] = useState(false);
+  const [isJobStartYearDropdownOpen, setIsJobStartYearDropdownOpen] = useState(false);
+
   const fetchDoctors = async () => {
     try {
       const response = await getRequest(Endpoint.GET_ADMIN_DOCTOR);
       if (response) {
-        setDoctors(response.doctors);
-        setFilteredUsers(response.doctors);
+        const doctorsWithRole = response.doctors.map((doctor) => ({
+          ...doctor,
+          role: "Doctor",
+      }));
+
+      setDoctors(doctorsWithRole);
+      setFilteredUsers(doctorsWithRole);
       } else {
         toast.error('Failed to fetch doctors.');
       }
@@ -79,22 +94,42 @@ export default function AdminUserManagementPage() {
   };
 
 
-  const getFormattedDate = () => {
-    if (!selectedDay || !selectedMonth || !selectedYear) return null;
+  // const getFormattedDate = () => {
+  //   if (!selectedDay || !selectedMonth || !selectedYear) return null;
 
-    const monthIndex = months.indexOf(selectedMonth) + 1; // Get month index
-    return `${selectedYear}-${String(monthIndex).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
-  };
+  //   const monthIndex = months.indexOf(selectedMonth) + 1; // Get month index
+  //   return `${selectedYear}-${String(monthIndex).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
+  // };
 
   const navigate = useNavigate();
 
+
+  const formatBirthdate = (day, month, year) => {
+    // Ayı sırasına göre indeks bul ve 1 artır
+    const monthIndex = months.indexOf(month) + 1;
+
+    // Gün ve ay tek haneli ise başına '0' ekle
+    const formattedDay = String(day).padStart(2, "0");
+    const formattedMonth = String(monthIndex).padStart(2, "0");
+
+    // Format: DD.MM.YYYY
+    return `${formattedDay}.${formattedMonth}.${year}`;
+  };
+
+  // Kullanım
+
+
   const handleCreateUser = async (e) => {
     e.preventDefault();
-    const birthdate = getFormattedDate();
-    if (!birthdate) {
-      alert("Please select a valid date of birth.");
-      return;
-    }
+    // const birthdate = getFormattedDate();
+    // if (!birthdate) {
+    //   alert("Please select a valid date of birth.");
+    //   return;
+    // }
+    console.log("efsfsdsd")
+    const birthdate = formatBirthdate(selectedDay, selectedMonth, selectedYear);
+    const jobstartdate = formatBirthdate(selectedJobStartDay, selectedJobStartMonth, selectedJobStartYear);
+
 
     if (userType === 'doctor' && !degree) {
       alert("Please enter the degree for the doctor.");
@@ -112,9 +147,9 @@ export default function AdminUserManagementPage() {
       title,
       email,
       password,
-      birthdate,
+      birthdate: birthdate,
       phone,
-      jobstartdate,
+      jobstartdate: jobstartdate,
       specialization,
       ...(userType === 'doctor' && { degree }),
       ...(userType === 'labtechnician' && { certificates }),
@@ -122,12 +157,13 @@ export default function AdminUserManagementPage() {
 
     try {
       let responseData;
+      console.log("t", requestBody);
       if (userType === 'doctor') {
         responseData = await postRequest(Endpoint.GET_ADMIN_DOCTOR, requestBody);
       } else if (userType === 'labtechnician') {
         responseData = await postRequest(Endpoint.GET_ADMIN_LAB_TECHNICIANS, requestBody); // bu yok şu an
       }
-
+      console.log("q", responseData);
       if (responseData) {
         toast.success("Account created successfully!");
         if (toast.success) {
@@ -146,7 +182,7 @@ export default function AdminUserManagementPage() {
     e.preventDefault();
     // if (!editingUser) return;
     try {
-      const responseData = await getRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`); 
+      const responseData = await getRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`);
       console.log(responseData);
       if (responseData) {
         setEditingUser(responseData.doctor);
@@ -163,11 +199,11 @@ export default function AdminUserManagementPage() {
     e.preventDefault();
     if (!editingUser) return;
 
-    const birthdate = getFormattedDate();
-    if (!birthdate) {
-      alert("Please select a valid date of birth.");
-      return;
-    }
+    // const birthdate = getFormattedDate();
+    // if (!birthdate) {
+    //   alert("Please select a valid date of birth.");
+    //   return;
+    // }
 
     const requestBody = {
       name: editingUser.name || name, // Eğer editingUser'dan gelen boşsa, mevcut state kullan
@@ -179,7 +215,7 @@ export default function AdminUserManagementPage() {
       degree: editingUser.degree || degree,
       specialization: editingUser.specialization || specialization,
     };
-  console.log(requestBody);
+    console.log(requestBody);
 
     try {
       const responseData = await putRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`, requestBody); //  /admin/doctor
@@ -195,6 +231,12 @@ export default function AdminUserManagementPage() {
       toast.error("An unexpected error occurred.");
     }
   };
+
+
+  const [isDayDropdownOpen, setIsDayDropdownOpen] = useState(false);
+  const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState(false);
+  const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
+
 
   useEffect(() => {
     //   if (searchTerm) {
@@ -247,7 +289,7 @@ export default function AdminUserManagementPage() {
       <Sidebar />
 
       <main className="flex-1 overflow-y-auto">
-        <Header title="User Management" />
+        <Header title="Staff Management" />
 
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-6">
@@ -274,7 +316,12 @@ export default function AdminUserManagementPage() {
                   <DialogHeader>
                     <DialogTitle>Create New User</DialogTitle>
                   </DialogHeader>
-                  <form onSubmit={handleCreateUser}>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault(); // Varsayılan form gönderimini engelle
+                      handleCreateUser(e);
+                    }}
+                  >
                     <div className="grid grid-cols-2 gap-6 py-4">
                       <div>
                         <Label htmlFor="userType">User Type</Label>
@@ -400,33 +447,180 @@ export default function AdminUserManagementPage() {
                           className="w-full"
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="birthdate">Birthdate</Label>
-                        <Input
-                          id="birthdate"
-                          type="date"
-                          value={getFormattedDate()}
-                          onChange={(e) => {
-                            const [year, month, day] = e.target.value.split('-');
-                            setSelectedYear(parseInt(year, 10));
-                            setSelectedMonth(months[parseInt(month, 10) - 1]);
-                            setSelectedDay(parseInt(day, 10));
-                          }}
-                          required
-                          className="w-full"
-                        />
+                      <div className="grid gap-2">
+                        <Label>Date of Birth</Label>
+                        <div className="flex w-full space-x-4">
+                          {/* Gün Dropdown */}
+                          <div className="flex-1">
+                            <Select>
+                              <SelectTrigger
+                                value={selectedDay}
+                                onClick={(e) => {
+                                  e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                  setIsDayDropdownOpen(!isDayDropdownOpen);
+                                }}
+                              />
+                              <SelectContent isOpen={isDayDropdownOpen}>
+                                <div className="max-h-60 overflow-y-auto">
+                                  {days.map((day) => (
+                                    <SelectItem
+                                      key={day}
+                                      value={day}
+                                      onSelect={() => {
+                                        setSelectedDay(day);
+                                        setIsDayDropdownOpen(false);
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Ay Dropdown */}
+                          <div className="flex-1">
+                            <Select>
+                              <SelectTrigger
+                                value={selectedMonth}
+                                onClick={(e) => {
+                                  e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                  setIsMonthDropdownOpen(!isMonthDropdownOpen);
+                                }}
+                              />
+                              <SelectContent isOpen={isMonthDropdownOpen}>
+                                <div className="max-h-60 overflow-y-auto">
+                                  {months.map((month, index) => (
+                                    <SelectItem
+                                      key={index}
+                                      value={month}
+                                      onSelect={() => {
+                                        setSelectedMonth(month);
+                                        setIsMonthDropdownOpen(false);
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Yıl Dropdown */}
+                          <div className="flex-1">
+                            <Select>
+                              <SelectTrigger
+                                value={selectedYear}
+                                onClick={(e) => {
+                                  e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                  setIsYearDropdownOpen(!isYearDropdownOpen);
+                                }}
+                              />
+                              <SelectContent isOpen={isYearDropdownOpen}>
+                                <div className="max-h-60 overflow-y-auto">
+                                  {years.map((year) => (
+                                    <SelectItem
+                                      key={year}
+                                      value={year}
+                                      onSelect={() => {
+                                        setSelectedYear(year);
+                                        setIsYearDropdownOpen(false);
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <Label htmlFor="jobstartdate">Job Start Date</Label>
-                        <Input
-                          id="jobstartdate"
-                          type="date"
-                          value={jobstartdate}
-                          onChange={(e) => setJobStartDate(e.target.value)}
-                          required
-                          className="w-full"
-                        />
+
+                      {/* dfsdfds */}
+                      <div className="grid gap-2">
+                        <Label>Job Start Date</Label>
+                        <div className="flex w-full space-x-4">
+                          {/* Gün Dropdown */}
+                          <div className="flex-1">
+                            <Select>
+                              <SelectTrigger
+                                value={selectedJobStartDay}
+                                onClick={(e) => {
+                                  e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                  setIsJobStartDayDropdownOpen(!isJobStartDayDropdownOpen);
+                                }}
+                              />
+                              <SelectContent isOpen={isJobStartDayDropdownOpen}>
+                                <div className="max-h-60 overflow-y-auto">
+                                  {days.map((day) => (
+                                    <SelectItem
+                                      key={day}
+                                      value={day}
+                                      onSelect={() => {
+                                        setSelectedJobStartDay(day);
+                                        setIsJobStartDayDropdownOpen(false);
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Ay Dropdown */}
+                          <div className="flex-1">
+                            <Select>
+                              <SelectTrigger
+                                value={selectedJobStartMonth}
+                                onClick={(e) => {
+                                  e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                  setIsJobStartMonthDropdownOpen(!isJobStartMonthDropdownOpen);
+                                }}
+                              />
+                              <SelectContent isOpen={isJobStartMonthDropdownOpen}>
+                                <div className="max-h-60 overflow-y-auto">
+                                  {months.map((month, index) => (
+                                    <SelectItem
+                                      key={index}
+                                      value={month}
+                                      onSelect={() => {
+                                        setSelectedJobStartMonth(month);
+                                        setIsJobStartMonthDropdownOpen(false);
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Yıl Dropdown */}
+                          <div className="flex-1">
+                            <Select>
+                              <SelectTrigger
+                                value={selectedJobStartYear}
+                                onClick={(e) => {
+                                  e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                  setIsJobStartYearDropdownOpen(!isJobStartYearDropdownOpen);
+                                }}
+                              />
+                              <SelectContent isOpen={isJobStartYearDropdownOpen}>
+                                <div className="max-h-60 overflow-y-auto">
+                                  {years.map((year) => (
+                                    <SelectItem
+                                      key={year}
+                                      value={year}
+                                      onSelect={() => {
+                                        setSelectedJobStartYear(year);
+                                        setIsJobStartYearDropdownOpen(false);
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
                       </div>
+
+
                     </div>
                     <div className="flex justify-between">
                       <Button type="submit">Create User</Button>
@@ -440,7 +634,7 @@ export default function AdminUserManagementPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-bold">User List</CardTitle>
+              <CardTitle className="text-xl font-bold">Staff List</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
@@ -448,6 +642,7 @@ export default function AdminUserManagementPage() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
+                    <TableHead>Role</TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>Specialization</TableHead>
                     <TableHead>Status</TableHead>
@@ -459,11 +654,14 @@ export default function AdminUserManagementPage() {
                     <TableRow key={user._id}>
                       <TableCell>{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.role}</TableCell>
                       <TableCell>{user.title}</TableCell>
                       <TableCell>{user.specialization}</TableCell>
                       <TableCell>
-                        <Badge variant={user.status === 'Active' ? 'default' : 'secondary'}>
-                          {user.status}
+                        <Badge
+                          variant={user.polyclinic !== null ? 'success' : 'destructive'}
+                        >
+                          {user.polyclinic ? 'Active' : 'Inactive'}
                         </Badge>
                       </TableCell>
                       <TableCell>
