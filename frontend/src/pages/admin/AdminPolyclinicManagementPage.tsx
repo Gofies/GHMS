@@ -239,8 +239,6 @@ export default function AdminPolyclinicManagementPage() {
     }
   };
 
-
-
   const handleUpdatePolyclinic = async (e) => {
     e.preventDefault();
     const hospitalId2 = handleLocationChange();
