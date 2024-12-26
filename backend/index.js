@@ -29,10 +29,6 @@ import labTechnicianHomeRoutes from "./routes/lab.routes/home.route.js";
 import labTechnicianAuthRoutes from "./routes/lab.routes/auth.route.js";
 import labTechnicianTestRoutes from "./routes/lab.routes/test.route.js";
 
-import labTechnicianHomeRoutes from "./routes/lab.routes/home.route.js";
-import labTechnicianAuthRoutes from "./routes/lab.routes/auth.route.js";
-import labTechnicianTestRoutes from "./routes/lab.routes/test.route.js";
-
 import {setupSwagger } from "./swager.js";
 
 dotenv.config();
