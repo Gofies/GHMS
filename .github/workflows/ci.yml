@@ -29,6 +29,7 @@ jobs:
         run: |
           chmod +x ./health-check.sh
           ./health-check.sh
+          docker ps -a
 
       - name: Run Frontend Tests
         run: sleep 5
