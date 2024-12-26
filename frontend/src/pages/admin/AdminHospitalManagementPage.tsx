@@ -21,6 +21,7 @@ export default function AdminHospitalManagementPage() {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [selecteddoctors, setSelectedDoctors] = useState('');
+  const [selectedPolyclinics, setSelectedPolyclinics] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [establishmentdate, setEstablishmentDate] = useState('');
@@ -56,6 +57,43 @@ export default function AdminHospitalManagementPage() {
     }
   };
 
+  const [formData, setFormData] = useState({
+    name: '',
+    address: '',
+    selecteddoctors: [],
+    establishmentdate: '',
+    phone: '',
+    email: '',
+    polyclinics: []
+  });
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  // For doctors input, we'll need to handle it as an array
+  const handleDoctorsInput = (value) => {
+    // Split the input by commas and trim whitespace
+    const doctorsArray = value.split(',').map(id => id.trim());
+    setFormData(prev => ({
+      ...prev,
+      selecteddoctors: doctorsArray
+    }));
+  };
+
+  // For polyclinics input, we'll handle it as an array
+  const handlePolyclinicsInput = (value) => {
+    const polyclinicsArray = value.split(',').map(clinic => clinic.trim());
+    setFormData(prev => ({
+      ...prev,
+      polyclinics: polyclinicsArray
+    }));
+  };
+
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -75,17 +113,18 @@ export default function AdminHospitalManagementPage() {
 
   const handleCreateHospital = async (e) => {
     e.preventDefault();
-    const requestBody = {
-      name,
-      address,
-      selecteddoctors,
-      establishmentdate,
-      phone,
-      email,
-      polyclinics
-    };
+    // const requestBody = {
+    //   name,
+    //   address,
+    //   selecteddoctors,
+    //   establishmentdate,
+    //   phone,
+    //   email,
+    //   polyclinics
+    // };
     try {
-      const responseData = await postRequest(Endpoint.GET_ADMIN_HOSPITAL, requestBody);
+      console.log(formData);
+      const responseData = await postRequest(Endpoint.GET_ADMIN_HOSPITAL, formData);
       if (responseData) {
         toast.success("Hospital created successfully!");
         if (toast.success) {
@@ -200,9 +239,9 @@ export default function AdminHospitalManagementPage() {
                       <Label htmlFor="name">Name</Label>
                       <Input
                         id="name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="John"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        placeholder="Hospital Name"
                         required
                         className="w-full"
                       />
@@ -211,9 +250,9 @@ export default function AdminHospitalManagementPage() {
                       <Label htmlFor="address">Address</Label>
                       <Input
                         id="address"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        placeholder="Maslak Mak."
+                        value={formData.address}
+                        onChange={handleInputChange}
+                        placeholder="Full Address"
                         required
                         className="w-full"
                       />
@@ -222,8 +261,8 @@ export default function AdminHospitalManagementPage() {
                       <Label htmlFor="email">E-Mail</Label>
                       <Input
                         id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={formData.email}
+                        onChange={handleInputChange}
                         placeholder="example@domain.com"
                         required
                         className="w-full"
@@ -233,21 +272,20 @@ export default function AdminHospitalManagementPage() {
                       <Label htmlFor="phone">Phone</Label>
                       <Input
                         id="phone"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+90 123 456 7890"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        placeholder="0212 XXX XX XX"
                         required
                         className="w-full"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="selecteddoctors">Doctors</Label>
+                      <Label htmlFor="selecteddoctors">Doctors (Comma-separated IDs)</Label>
                       <Input
                         id="selecteddoctors"
-                        value={selecteddoctors}
-                        onChange={(e) => setSelectedDoctors(e.target.value)}
-                        placeholder="Prof. Dr. Ahmet"
-                        required
+                        value={formData.selecteddoctors.join(', ')}
+                        onChange={(e) => handleDoctorsInput(e.target.value)}
+                        placeholder="doctor-id-1, doctor-id-2"
                         className="w-full"
                       />
                     </div>
@@ -255,50 +293,23 @@ export default function AdminHospitalManagementPage() {
                       <Label htmlFor="establishmentdate">Establishment Date</Label>
                       <Input
                         id="establishmentdate"
-                        value={establishmentdate}
-                        onChange={(e) => setEstablishmentDate(e.target.value)}
-                        placeholder="2025"
+                        value={formData.establishmentdate}
+                        onChange={handleInputChange}
+                        placeholder="YYYY"
                         required
                         className="w-full"
                       />
                     </div>
-                    <div>
-                      <Label>Polyclinics</Label>
-                      <div className="border p-2 rounded">
-                        <div className="max-h-40 overflow-y-auto">
-                          {polyclinics.map((clinic, index) => (
-                            <div key={index} className="flex items-center mb-2">
-                              <Input
-                                type="text"
-                                value={clinic}
-                                onChange={(e) => handlePolyclinicChange(index, e.target.value)}
-                                placeholder="Polyclinic Name"
-                                className="mr-2 flex-grow"
-                              />
-                              <Button
-                                type="button"
-                                onClick={() => handleRemovePolyclinic(index)}
-                                className="text-red-500 text-sm px-2 py-1 h-8"
-                              >
-                                X
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="mt-2">
-                          <Button
-                            type="button"
-                            onClick={handleAddPolyclinic}
-                            className="text-sm px-4 py-2 h-8 w-full"
-                          >
-                            Add Polyclinic
-                          </Button>
-                        </div>
-                      </div>
+                    <div className="col-span-2">
+                      <Label htmlFor="polyclinics">Polyclinics (Comma-separated)</Label>
+                      <Input
+                        id="polyclinics"
+                        value={formData.polyclinics.join(', ')}
+                        onChange={(e) => handlePolyclinicsInput(e.target.value)}
+                        placeholder="Cardiology, Neurology, etc."
+                        className="w-full"
+                      />
                     </div>
-
-
-
                   </div>
                   <div className="flex justify-end">
                     <Button type="submit">Create Hospital</Button>
