@@ -1,5 +1,5 @@
 import express from 'express';
-import { getHealthMetric, updateWeight, updateHeight, updateBloodPressure, updateBloodSugar, updateBloodType, updateHeartRate, updateAllergies } from '../../controllers/patient.controllers/health.metric.controller.js';
+import { getHealthMetric, updateWeight, updateHeight, updateBloodPressure, updateBloodSugar, updateBloodType, updateHeartRate, updateAllergies, deleteAllergy } from '../../controllers/patient.controllers/health.metric.controller.js';
 import { protect } from '../../middlewares/auth.middleware.js';
 const router = express.Router();
 
@@ -11,6 +11,7 @@ router.put('/blood-sugar', protect('patient'), updateBloodSugar);
 router.put('/blood-type', protect('patient'), updateBloodType);
 router.put('/heart-rate', protect('patient'), updateHeartRate);
 router.put('/allergies', protect('patient'), updateAllergies);
+router.delete('/allergies/', protect('patient'), deleteAllergy);
 
 
 export default router;

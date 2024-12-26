@@ -9,37 +9,19 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../../components/ui/doctor/common/Sidebar.jsx"
 import Header from "../../components/ui/common/Header.jsx";
 
-// Mock data for appointments
-const appointments = [
-  { id: 1, patient: "John Doe", time: "09:00 AM", type: "Check-up" },
-  { id: 2, patient: "Jane Smith", time: "10:30 AM", type: "Follow-up" },
-  { id: 3, patient: "Bob Johnson", time: "02:00 PM", type: "Consultation" },
-  { id: 4, patient: "Alice Brown", time: "03:30 PM", type: "Check-up" },
-]
-
-// Mock data for recent lab results
-const labResults = [
-  { id: 1, patient: "John Doe", test: "Blood Test", date: "2023-06-01", status: "Normal" },
-  { id: 2, patient: "Jane Smith", test: "X-Ray", date: "2023-06-02", status: "Abnormal" },
-  { id: 3, patient: "Bob Johnson", test: "MRI", date: "2023-06-03", status: "Pending" },
-]
-
 export default function DoctorHomepage() {
 
   const [error, setError] = useState(null);
   const [homeAppointments, setHomeAppointments] = useState(null);
   const [labResults, setLabResults] = useState(null);
-  const [loading, setLoading] = useState(false); // Yükleme durumunu kontrol etmek için state
-  const [isViewAllClicked, setIsViewAllClicked] = useState(false); // "View All Patients" butonuna basılıp basılmadığını kontrol etmek için state
-  const [isViewAllVisible, setIsViewAllVisible] = useState(false); // Liste açık mı kontrolü için state
-
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     const fetchDoctorHome = async () => {
+      console.log("fdh");
       try {
-        const response = await getRequest(Endpoint.GET_DOCTOR_HOME);
+        const response = await getRequest(Endpoint.GET_DOCTOR_HOME); // /doctor
         console.log("response", response);
         setHomeAppointments(response.todaysAppointments);
         setLabResults(response.filteredLabTests);
@@ -51,12 +33,6 @@ export default function DoctorHomepage() {
     };
     fetchDoctorHome();
   }, []);
-  
- const handleViewAllPatients = async () => {
-  navigate(`${location.pathname}patient-management`);
-
-  };
-
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -154,7 +130,7 @@ export default function DoctorHomepage() {
           </div>
 
           {/* Quick Actions Card */}
-      <Card className="mt-6">
+      {/* <Card className="mt-6">
         <CardHeader>
           <CardTitle className="text-xl font-bold">Quick Actions</CardTitle>
         </CardHeader>
@@ -174,7 +150,7 @@ export default function DoctorHomepage() {
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
         </div>
       </main>

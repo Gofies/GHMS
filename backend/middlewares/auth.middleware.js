@@ -8,7 +8,6 @@ export const protect = (requiredRole) => {
     return async (req, res, next) => {
         try {
             const token = req.cookies.accessToken;
-
             // Check if access token exists
             if (!token) {
                 const refreshToken = req.cookies.refreshToken;
@@ -19,6 +18,7 @@ export const protect = (requiredRole) => {
 
                 try {
                     jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
                     return res.status(403).json({ message: 'Forbidden' });
                 } catch (err) {
                     return res.status(401).json({ message: 'Unauthorized' });

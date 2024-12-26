@@ -11,47 +11,34 @@ import { Input } from "../../components/ui/patient/profile/Input.jsx"
 import { Label } from "../../components/ui/patient/profile/Label.jsx"
 import { Endpoint, postRequest, getRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify'
-
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const cities = [
-  "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Ankara",
-  "Antalya", "Ardahan", "Artvin", "Aydın", "Balıkesir", "Bartın", "Batman",
-  "Bayburt", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale",
-  "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Düzce", "Edirne", "Elazığ", "Erzincan",
-  "Erzurum", "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari", "Hatay",
-  "Iğdır", "Isparta", "İstanbul", "İzmir", "Kahramanmaraş", "Karabük", "Karaman",
-  "Kars", "Kastamonu", "Kayseri", "Kırıkkale", "Kırklareli", "Kırşehir", "Kilis",
-  "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Mardin", "Mersin",
-  "Muğla", "Muş", "Nevşehir", "Niğde", "Ordu", "Osmaniye", "Rize", "Sakarya",
-  "Samsun", "Siirt", "Sinop", "Sivas", "Şanlıurfa", "Şırnak", "Tekirdağ",
-
-  "Tokat", "Trabzon", "Tunceli", "Uşak", "Van", "Yalova", "Yozgat", "Zonguldak"
+  "New York",
+  "San Francisco",
+  "Baltimore",
+  "Chicago",
+  "Los Angeles",
+  "Houston"
 ];
 
 const polyclinics = [
-  "Cardiology",
-  "Dermatology",
-  "Endocrinology",
-  "Gastroenterology",
-  "Neurology",
-  "Oncology",
-  "Ophthalmology",
-  "Orthopedics",
-  "Pediatrics",
-  "Psychiatry",
-  "Pulmonology",
-  "Rheumatology",
   "Urology",
-  "Gynecology",
-  "Nephrology",
-  "Hematology",
-  "Infectious Diseases",
-  "Otolaryngology (ENT)",
-  "General Surgery",
-  "Plastic Surgery"
+  "Pediatrics",
+  "Neurology",
+  "Psychiatry",
+  "Cardiology",
+  "Ophthalmology",
+  "Otolaryngology",
+  "Orthopedics",
+  "Dermatology"
 ];
 
 export default function NewAppointmentsPage() {
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const handleSubmit = async () => {
     if (!selectedDoctor || !selectedDate || !selectedTimeSlot) {
       toast("Please select a doctor, date, and time slot before submitting.");
@@ -59,21 +46,23 @@ export default function NewAppointmentsPage() {
     }
 
     const appointmentData = {
-      doctorId: selectedDoctor._id, // Doktorun ID'si
-      date: selectedDate, // Seçilen tarih
-      time: selectedTimeSlot, // Seçilen saat
-      type: "doctor", // Sabit değer
+      doctorId: selectedDoctor._id, 
+      date: selectedDate, 
+      time: selectedTimeSlot, 
+      type: "doctor",
+      testType: "aaa"
     };
 
     console.log("Submitting Appointment:", appointmentData);
 
     try {
-      const response = await postRequest("/patient/appointments", appointmentData);
+      const response = await postRequest("/patient/appointments/new", appointmentData);
       console.log("r", response);
       if (response) {
         //const responseData = await response.json();
         toast("Appointment successfully created!");
-        console.log("API Response:", response);
+        const basePath = location.pathname.replace(/\/new$/, '');
+        navigate(basePath);
       } else {
         console.error("Failed to create appointment:", response.statusText);
         toast("Failed to create appointment. Please try again.");
@@ -191,6 +180,7 @@ export default function NewAppointmentsPage() {
     resetSelections("doctor"); // Altındaki seçimleri temizle
     setSelectedDoctor(doctor); // Doktor objesini kaydet
     setSelectedSchedule(doctor.schedule.map((schedule) => schedule)); // Doktorun programını kaydet
+    console.log(doctor.schedule)
     setSelectedDoctorDates(doctor.schedule.map((schedule) => schedule.date)); // Doktorun tarihlerini al
     setIsDoctorDropdownOpen(false); // Dropdown'u kapat
   };
@@ -224,17 +214,18 @@ export default function NewAppointmentsPage() {
     city: selectedCity,
     polyclinicName: selectedPolyclinic,
   };
-  
+
   const handleApiCall = async () => {
     console.log("API call initiated");
     try {
       console.log("Fetching data...");
-      const response = await getRequest("patient/appointments", params);
-  
+      console.log("p", params);
+      const response = await getRequest("/patient/appointments/new/", params);
+
       if (response) {
         console.log("API Response:", response.queryResults);
         setQueryResults(response.queryResults);
-  
+
         const hospitals = response.queryResults.map((item) => ({
           id: item.hospital._id,
           name: item.hospital.name,
@@ -251,14 +242,14 @@ export default function NewAppointmentsPage() {
       toast("An error occurred while making the API call.");
     }
   };
-  
+
   // City ve Polyclinic değişimlerini izleyen useEffect
   useEffect(() => {
     if (selectedCity && selectedPolyclinic) {
       handleApiCall();
     }
   }, [selectedCity, selectedPolyclinic]);
-  
+
 
 
   return (
@@ -447,23 +438,28 @@ export default function NewAppointmentsPage() {
                       >
                         <SelectTrigger
                           className={`w-full border rounded-md px-4 py-2 text-left ${selectedDoctorDates.length === 0 ? "cursor-not-allowed text-gray-500" : ""}`}
-                          value={selectedDate}
+                          value={selectedDate ? new Date(selectedDate).toISOString().split("T")[0] : "Select a Date"} // Kullanıcıya yyyy-mm-dd formatında göster
                           onClick={() => selectedDoctorDates.length > 0 && setIsDateDropdownOpen(!isDateDropdownOpen)}
                         >
-                          <SelectValue value={selectedDate || "Select a Date"} />
+                          <SelectValue
+                            value={selectedDate ? new Date(selectedDate).toISOString().split("T")[0] : "Select a Date"} // Kullanıcıya yyyy-mm-dd formatında göster
+                          />
                         </SelectTrigger>
+
                         {isDateDropdownOpen && selectedDoctorDates.length > 0 && (
                           <SelectContent isOpen={isDateDropdownOpen} className="absolute z-10 w-full max-w-md bg-white border rounded-md shadow-lg">
                             <div className="max-h-60 overflow-y-auto">
                               {selectedDoctorDates.map((date, index) => (
                                 <SelectItem
                                   key={index}
-                                  value={date}
-                                  onSelect={() => handleDateSelect(date)}
+                                  value={new Date(date).toISOString().split("T")[0]} // Görünüm ve seçim için formatlanmış tarih
+                                  onSelect={() => handleDateSelect(date)} // İşlem için orijinal tarih kullanılıyor
                                 >
-                                  {new Date(date).toLocaleString()}
+                                  {new Date(date).toISOString().split("T")[0]} {/* Kullanıcıya gösterilecek tarih */}
                                 </SelectItem>
                               ))}
+
+
                             </div>
                           </SelectContent>
                         )}

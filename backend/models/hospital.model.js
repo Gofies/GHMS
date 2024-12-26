@@ -46,6 +46,11 @@ const hospitalSchema = new mongoose.Schema({
         ref: 'Appointment',
         required: true
     }],
+    labTests: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'LabTest',
+        required: true
+    }],
 }, { timestamps: true });
 
 const Hospital = mongoose.model('Hospital', hospitalSchema);
