@@ -8,37 +8,10 @@ import { Plus, Info } from 'lucide-react'
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
 import { useNavigate, useLocation } from "react-router-dom";
-
-// Mock data for appointments
-const appointments = [
-    { id: 1, doctor: "Dr. Smith", specialty: "Dermatology", date: "2024-12-03", time: "10:00 AM", status: "Scheduled"  },
-    { id: 2, doctor: "Dr. Johnson", specialty: "Ophthalmology", date: "2024-12-02", time: "12:00 AM", status: "Scheduled"  },
-    { id: 3, doctor: "Dr. Williams", specialty: "Endocrinology", date: "2024-12-01", time: "14:00 AM", status: "Scheduled"  },
-    { id: 4, doctor: "Dr. Brown", specialty: "Cardiology", date: "2024-11-16", time: "10:00 AM", status: "Completed" },
-    { id: 5, doctor: "Dr. Davis", specialty: "Orthopedics", date: "2024-11-15", time: "2:30 PM", status: "Completed" },
-    { id: 6, doctor: "Dr. Miller", specialty: "Neurology", date: "2024-11-14", time: "11:15 AM", status: "Completed" },
-]
-
-// Mock data for specialties and doctors
-const specialties = ["Cardiology", "Orthopedics", "Neurology", "Dermatology", "Pediatrics"]
-const doctors = {
-    "Cardiology": ["Dr. Smith", "Dr. Johnson"],
-    "Orthopedics": ["Dr. Williams", "Dr. Brown"],
-    "Neurology": ["Dr. Davis", "Dr. Miller"],
-    "Dermatology": ["Dr. Wilson", "Dr. Moore"],
-    "Pediatrics": ["Dr. Taylor", "Dr. Anderson"]
-}
-const times = [
-    "09:00 AM",
-    "10:00 AM",
-    "11:00 AM",
-    "02:00 PM",
-    "03:00 PM",
-    "04:00 PM"
-]
+import { Endpoint, getRequest } from "../../helpers/Network.js";
 
 export default function AppointmentsPage() {
-  
+
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
     const [newAppointmentStep, setNewAppointmentStep] = useState(1);
@@ -47,12 +20,15 @@ export default function AppointmentsPage() {
     const [selectedDoctor, setSelectedDoctor] = useState("");
     const [selectedDate, setSelectedDate] = useState("");
     const [selectedTime, setSelectedTime] = useState("");
-    
+
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isSpecialtyOpen, setIsSpecialtyOpen] = useState(false);
     const [isDoctorOpen, setIsDoctorOpen] = useState(false);
     const [isDateOpen, setIsDateOpen] = useState(false);
     const [isTimeOpen, setIsTimeOpen] = useState(false);
+
+    const [appointments, setAppointments] = useState(null);
+
 
     const handleSelectSpecialty = (value) => {
         setSelectedSpecialty(value);
@@ -113,10 +89,23 @@ export default function AppointmentsPage() {
     const location = useLocation();
 
     const handleCreateAppointment = () => {
-        // Implement appointment creation logic here
-        //setIsNewAppointmentOpen(false);
         navigate(`${location.pathname}new`);
-      }
+    }
+
+    useEffect(() => {
+        const fetchPatientAppointments = async () => {
+            try {
+                const response = await getRequest(Endpoint.GET_HOME_APPOINTMENTS);
+                console.log("response", response)
+                setAppointments(response.recentAppointments);
+                // setHomeAppointments(response); 
+            } catch (err) {
+                console.error('Error fetching patient profile:', err);
+                setError('Failed to load patient profile.');
+            }
+        };
+        fetchPatientAppointments();
+    }, []);
 
     //const [appointments, setAppointments] = useState([]);
     const [error, setError] = useState(null);
@@ -141,66 +130,33 @@ export default function AppointmentsPage() {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Doctor</TableHead>
-                                        <TableHead>Specialty</TableHead>
+                                        <TableHead>Polyclinic</TableHead>
                                         <TableHead>Date</TableHead>
                                         <TableHead>Time</TableHead>
                                         <TableHead>Status</TableHead>
-                                        <TableHead>Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {appointments.map((appointment) => (
-                                        <TableRow key={appointment.id}>
-                                            <TableCell>{appointment.doctor}</TableCell>
-                                            <TableCell>{appointment.specialty}</TableCell>
-                                            <TableCell>{appointment.date}</TableCell>
-                                            <TableCell>{appointment.time}</TableCell>
-                                            <TableCell>{appointment.status}</TableCell>
-                                            <TableCell>
-                                                <Button variant="outline" size="sm" onClick={() => handleOpenDialog(appointment)}>
-                                                    <Info className="w-4 h-4 mr-2" />
-                                                    Details
-                                                </Button>
-                                                {isDialogOpen && selectedAppointment && (
-                                                    <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
-                                                        <DialogContent>
-                                                            <DialogHeader>
-                                                                <DialogTitle>Appointment Details</DialogTitle>
-                                                            </DialogHeader>
-                                                            <div className="grid gap-4 py-4">
-                                                                <div>
-                                                                    <h3 className="font-semibold">Doctor:</h3>
-                                                                    <p>{selectedAppointment?.doctor}</p>
-                                                                </div>
-                                                                <div>
-                                                                    <h3 className="font-semibold">Specialty:</h3>
-                                                                    <p>{selectedAppointment?.specialty}</p>
-                                                                </div>
-                                                                <div>
-                                                                    <h3 className="font-semibold">Date:</h3>
-                                                                    <p>{selectedAppointment?.date}</p>
-                                                                </div>
-                                                                <div>
-                                                                    <h3 className="font-semibold">Time:</h3>
-                                                                    <p>{selectedAppointment?.time}</p>
-                                                                </div>
-                                                                <div>
-                                                                    <h3 className="font-semibold">Status:</h3>
-                                                                    <p>{selectedAppointment?.status}</p>
-                                                                </div>
-                                                            </div>
-                                                            {/* Close Button */}
-                                                            <div className="flex justify-end mt-4">
-                                                                <Button variant="outline" onClick={handleCloseDialog}>
-                                                                    Close
-                                                                </Button>
-                                                            </div>
-                                                        </DialogContent>
-                                                    </Dialog>
-                                                )}
+                                    {appointments && appointments.length > 0 ? (
+                                        appointments.map((appointment) => {
+                                            const formattedDate = appointment.date.split("T")[0]; 
+                                            return (
+                                                <TableRow key={appointment.id}>
+                                                    <TableCell>{`${appointment.doctor?.name || ''} ${appointment.doctor?.surname || ''}`}</TableCell>
+                                                    <TableCell>{appointment.polyclinic?.name}</TableCell>
+                                                    <TableCell>{formattedDate}</TableCell> 
+                                                    <TableCell>{appointment.time}</TableCell>
+                                                    <TableCell>{appointment.status}</TableCell>
+                                                </TableRow>
+                                            );
+                                        })
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={6} className="text-center">
+                                                No appointments found.
                                             </TableCell>
                                         </TableRow>
-                                    ))}
+                                    )}
                                 </TableBody>
                             </Table>
                         </CardContent>
@@ -209,189 +165,7 @@ export default function AppointmentsPage() {
             </main>
 
             {/* New Appointment Dialog */}
-            {isNewAppointmentOpen && (
-                <Dialog open={isNewAppointmentOpen} onOpenChange={handleCloseNewAppointmentDialog}>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>New Appointment</DialogTitle>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            {/* Step 1: Select Specialty */}
-                            {newAppointmentStep === 1 && (
-                                <div>
-                                    <div className="flex items-center w-full">
-                                        <div className="flex-1">
-                                            <Select className="w-3/4">
-                                                <SelectTrigger
-                                                    value={selectedSpecialty || "Select a specialty..."}
-                                                    onClick={() => setIsSpecialtyOpen(!isSpecialtyOpen)}
-                                                    className="h-full"
-                                                />
-                                                <SelectContent isOpen={isSpecialtyOpen}>
-                                                    {specialties.map((specialty) => (
-                                                        <SelectItem
-                                                            key={specialty}
-                                                            value={specialty}
-                                                            onSelect={handleSelectSpecialty}
-                                                        >
-                                                            {specialty}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        {selectedSpecialty && (
-                                            <button
-                                                className="ml-2 w-10 h-[38px] flex justify-center items-center text-white bg-blue-600 rounded hover:bg-blue-700"
-                                                onClick={() => handleSelectSpecialty("")}
-                                            >
-                                                ✖
-                                            </button>
-                                        )}
-                                    </div>
-                                    {!selectedSpecialty && (
-                                        <p className="text-red-500 text-sm mt-2">Please select a specialty.</p>
-                                    )}
-                                </div>
-                            )}
-                            {/* Step 2: Select Doctor */}
-                            {newAppointmentStep === 2 && selectedSpecialty && (
-                                <div>
-                                    <div className="flex items-center w-full">
-                                        <div className="flex-1">
-                                            <Select className="w-3/4">
-                                                <SelectTrigger
-                                                    value={selectedDoctor || "Select a doctor..."}
-                                                    onClick={() => setIsDoctorOpen(!isDoctorOpen)}
-                                                    className="h-full"
-                                                />
-                                                <SelectContent isOpen={isDoctorOpen}>
-                                                    {doctors[selectedSpecialty]?.map((doctor) => (
-                                                        <SelectItem
-                                                            key={doctor}
-                                                            value={doctor}
-                                                            onSelect={handleSelectDoctor}
-                                                        >
-                                                            {doctor}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        {selectedDoctor && (
-                                            <button
-                                                className="ml-2 w-10 h-[38px] flex justify-center items-center text-white bg-blue-600 rounded hover:bg-blue-700"
-                                                onClick={() => handleSelectDoctor("")}
-                                            >
-                                                ✖
-                                            </button>
-                                        )}
-                                    </div>
-                                    {!selectedDoctor && (
-                                        <p className="text-red-500 text-sm mt-2">Please select a doctor.</p>
-                                    )}
-                                </div>
-                            )}
 
-                            {/* Step 3: Select Date and Time */}
-                            {newAppointmentStep === 3 && selectedSpecialty && selectedDoctor && (
-                                <div>
-                                    {/* Date Selection */}
-                                    <div className="flex items-center w-full gap-2">
-                                        <div className="flex-1">
-                                            <div className="w-full h-[38px] p-2 border rounded">
-                                                <input
-                                                    type="date"
-                                                    value={selectedDate}
-                                                    onChange={handleSelectDate}
-                                                    className="w-full"
-                                                />
-                                            </div>
-                                        </div>
-                                        {selectedDate && (
-                                            <button
-                                                className="w-10 h-[38px] flex justify-center items-center text-white bg-blue-600 rounded hover:bg-blue-700"
-                                                onClick={() => setSelectedDate("")}
-                                            >
-                                                ✖
-                                            </button>
-                                        )}
-                            
-                                    </div>
-                                    <div> 
-                                        {!selectedDate && (
-                                            <p className="text-red-500 text-sm mt-2">Please select a date.</p>
-                                        )}
-                                    </div>
-
-                                    {/* Time Selection */}
-                                    <div className="flex items-center w-full gap-2 mt-4">
-                                        <div className="flex-1">
-                                            <Select className="w-full">
-                                                <SelectTrigger
-                                                    value={selectedTime || "Select a time..."}
-                                                    onClick={() => setIsTimeOpen((prev) => !prev)}
-                                                    className="h-full w-full"
-                                                />
-                                                <SelectContent isOpen={isTimeOpen}>
-                                                    {times.map((time) => (
-                                                        <SelectItem
-                                                            key={time}
-                                                            value={time}
-                                                            onSelect={handleSelectTime}
-                                                        >
-                                                            {time}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        {selectedTime && (
-                                            <button
-                                                className="w-10 h-[38px] flex justify-center items-center text-white bg-blue-600 rounded hover:bg-blue-700"
-                                                onClick={() => handleSelectTime("")}
-                                            >
-                                                ✖
-                                            </button>
-                                        )}
-                                    </div>
-                                    <div> 
-                                        {!selectedTime && (
-                                            <p className="text-red-500 text-sm mt-2">Please select a time.</p>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Navigation Buttons */}
-                        <div className="flex justify-between mt-4">
-                            <Button variant="outline" onClick={handleCloseNewAppointmentDialog}>
-                                Close
-                            </Button>
-                            {newAppointmentStep > 1 && (
-                                <Button onClick={handlePreviousStep}>Previous</Button>
-                            )}
-                            {/* Conditionally render the Next button */}
-                            {newAppointmentStep === 1 && selectedSpecialty && (
-                                <Button onClick={handleNextStep}>Next</Button>
-                            )}
-                            {newAppointmentStep === 2 && selectedSpecialty && selectedDoctor && (
-                                <Button onClick={handleNextStep}>Next</Button>
-                            )}
-                            {newAppointmentStep === 3 && selectedDate && selectedTime && (
-                                <Button
-                                    onClick={handleCreateAppointment}
-                                    disabled={!selectedDate || !selectedTime}
-                                >
-                                    Create Appointment
-                                </Button>
-
-                            )}
-                        </div>
-                    </DialogContent>
-                </Dialog>
-            )}
         </div>
     );
 }

@@ -22,20 +22,21 @@ const labTestSchema = new mongoose.Schema({
     },
     testtype: { // doctor, lab, radiology
         type: String,
-        required: true
     },
     resultdate: {
         type: Date,
-        required: true
     },
     result: {
         type: String,
-        required: true
     },
     status: {
         type: String,
-        required: true
-    }
+        required: true,
+        default: 'pending'
+    },
+    urgency: {
+        type: String, // low medium high
+    },
 }, { timestamps: true });
 
 const LabTest = mongoose.model('LabTest', labTestSchema);

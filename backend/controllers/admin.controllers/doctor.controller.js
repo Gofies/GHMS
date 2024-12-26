@@ -3,7 +3,7 @@ import bcryptjs from 'bcryptjs';
 
 const getDoctors = async (req, res) => {
     try {
-        const doctors = await Doctor.find({}, 'name surname specialization');
+        const doctors = await Doctor.find({}, 'name surname title email specialization polyclinic hospital');
         return res.status(200).json({ message: 'Doctors retrieved successfully', doctors });
     } catch (error) {
         return res.status(500).json({ message: "admin.getDoctors: " + error.message });
@@ -12,7 +12,7 @@ const getDoctors = async (req, res) => {
 
 const getDoctorsOfHospital = async (req, res) => {
     try {
-        const doctors = await Doctor.find({ hospital: req.params.hospitalId }, 'name surname specialization');
+        const doctors = await Doctor.find({ hospital: req.params.hospitalId }, 'name surname specialization polyclinic').populate('polyclinic', 'name');
         return res.status(200).json({ message: 'Doctors retrieved successfully', doctors });
     } catch (error) {
         return res.status(500).json({ message: "admin.getDoctorsOfHospital: " + error.message });
@@ -30,7 +30,24 @@ const getDoctor = async (req, res) => {
 
 const newDoctor = async (req, res) => {
     try {
-        const { name, surname, title, email, password, birthdate, phone, jobstartdate, degree, specialization } = req.body;
+        const {
+            name,
+            surname,
+            title,
+            email,
+            password,
+            birthdate,
+            phone,
+            jobstartdate,
+            degree,
+            specialization
+        } = req.body;
+
+        const isExist = Doctor.find({ email });
+
+        if (isExist) {
+            return res.status(400).json({ message: 'Doctor already exists' });
+        }
 
         const hashedPassword = await bcryptjs.hash(password, 10);
 

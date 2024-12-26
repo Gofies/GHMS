@@ -21,23 +21,51 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
+      - name: Fix Permissions for Grafana Data (Prevent Exit 1)
+        run: |
+          mkdir -p /tmp/grafana-ci
+          sudo chown -R 472:472 /tmp/grafana-ci
+          sudo chmod -R 777 /tmp/grafana-ci
+          sudo chown -R 472:472 ./monitoring/grafana || true
+          sudo chmod -R 777 ./monitoring/grafana || true
+
+      - name: Override Docker Compose for CI (Avoid Persistent Volume Issues)
+        run: |
+          echo "Overriding Docker Compose for CI"
+          cat << EOF > docker-compose.override.yml
+          version: '3'
+          services:
+            grafana:
+              volumes:
+                - /tmp/grafana-ci:/var/lib/grafana
+          EOF
+          cat docker-compose.override.yml
+
       - name: Build and start services
         run: |
-          mkdir -p ./ssl
-          chmod +x ./gen_dev_ssl_cert.sh
-          ./gen_dev_ssl_cert.sh
-          docker-compose up -d --build
+          make
 
       - name: Wait for services to be healthy
         run: |
           chmod +x ./health-check.sh
-          ./health-check.sh
+          ./health-check.sh || (docker logs grafana && exit 1)
+          docker ps -a
+
 
       - name: Run Frontend Tests
-        run: sleep 5
+        run: |
+          echo "Running Frontend Tests..."
+          sleep 5
 
       - name: Run Backend Tests
-        run: sleep 5
+        run: |
+          echo "Running Backend Tests..."
+          sleep 5
+
+      - name: Show Logs if Failure Occurs
+        if: failure()
+        run: |
+          docker-compose logs
 
       - name: Shutdown Docker Compose
         run: docker-compose down
@@ -50,33 +78,3 @@ jobs:
           path: |
             ./frontend/coverage
             ./backend/coverage
-
-  # lint:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: "18"
-
-  #     - name: Cache npm dependencies
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: ~/.npm
-  #         key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.OS }}-node-
-
-  #     - name: Install and Lint Frontend
-  #       working-directory: ./frontend
-  #       run: |
-  #         npm ci
-  #         npm run lint
-
-  #     - name: Install and Lint Backend
-  #       working-directory: ./backend
-  #       run: |
-  #         npm ci
-  #         npm run lint

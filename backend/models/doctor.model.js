@@ -44,10 +44,12 @@ const doctorSchema = new mongoose.Schema({
     hospital: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Hospital',
+        default: null
     },
     polyclinic: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Polyclinic'
+        ref: 'Polyclinic',
+        default: null
     },
     appointments: [{
         type: mongoose.Schema.Types.ObjectId,

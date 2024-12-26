@@ -6,6 +6,8 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      - ./container-logs/frontend:/var/log/frontend
+      - ./container-logs:/host/logs
     environment:
       - WDS_SOCKET_PORT=0
       - WATCHPACK_POLLING=true
@@ -24,11 +26,11 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
+      - ./container-logs/backend:/var/log/backend  # Mount logs to host
     env_file: 
       - .env
     networks:
       - gofies
-
     healthcheck:
       test: ["CMD", "curl", "-f", "-k", "https://nginx/api/health"]
       interval: 30s
@@ -44,11 +46,12 @@ services:
       - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx-logs:/var/log/nginx
       - ./ssl:/etc/nginx/ssl:ro
+      - ./container-logs/nginx:/var/log/nginx
     depends_on:
       - frontend
       - backend
+      - llm
     networks:
       - gofies
     healthcheck:
@@ -57,6 +60,23 @@ services:
       timeout: 5s
       retries: 5
 
+  llm:
+    build:
+      context: ./AI
+      dockerfile: Dockerfile
+    ports:
+      - "3131:3131"
+    volumes:
+      - ./AI/llm/uploads:/app/uploads
+      - ./container-logs/llm:/var/log/llm  # Mount logs to host
+    networks:
+      - gofies
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-k", "https://nginx/llm/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      
   router01:
     build: 
       context: ./database/mongodb-build
@@ -301,6 +321,119 @@ services:
         retries: 3
         start_period: 10s
         timeout: 10s
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock  # Expose Docker socket
+    ports:
+      - "9090:9090"
+    networks:
+      - gofies
+    depends_on:
+      - backend
+      - frontend
+      - nginx
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://localhost:9090/"]
+      interval: 30s
+      retries: 3
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    networks:
+      - gofies
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - ./monitoring/promtail-config.yml:/etc/promtail/config.yml
+      - ./container-logs:/var/log/containers  # Mount all container logs
+    networks:
+      - gofies
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    volumes:
+      - ./monitoring/grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_HTTP_PORT=3333
+    ports:
+      - "3333:3333"
+    networks:
+      - gofies
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3333/"]
+      interval: 30s
+      retries: 3
+
+  mongo-exporter:
+    image: percona/mongodb_exporter:0.39
+    container_name: mongo-exporter
+    networks:
+      - gofies
+    environment:
+      MONGODB_URI: mongodb://router01:27117
+    ports:
+      - "9216:9216"
+    depends_on:
+      - router01
+    volumes:
+      - ./container-logs/mongodb:/var/log/mongodb  # Mount Mongo logs
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx-exporter
+    command:
+      - "-nginx.scrape-uri=https://nginx/stub_status"
+    ports:
+      - "9113:9113"
+    networks:
+      - gofies
+    depends_on:
+      - nginx
+      
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    networks:
+      - gofies
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    networks:
+      - gofies
+    ports:
+      - "9100:9100"
+    restart: always
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+
 
 networks:
   gofies:

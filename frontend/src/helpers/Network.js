@@ -6,8 +6,11 @@ export const Endpoint = {
   LOGIN: "/auth/login",
   LOGOUT: "/auth/logout",
   SIGNUP: "/patient/auth/signup",
+  PATIENT_CHANGE_PASSWORD: "/patient/auth/change-password",
+  DOCTOR_CHANGE_PASSWORD: "/doctor/auth/change-password",
   GET_PATIENT_APPOINTMENTS: "/patient/appointments",
   GET_PROFILE: "/patient/profile",
+  UPDATE_PROFILE: "/patient/profile",
   GET_LAB_TESTS: "/patient/medical-record/lab-tests",
   GET_OTHER_TESTS: "/patient/medical-record/other-tests",
   GET_DIAGNOSES: "/patient/medical-record/diagnoses",
@@ -16,17 +19,36 @@ export const Endpoint = {
   PUT_HEALTH_METRICS: "/patient/metrics",
 
   GET_DOCTOR_HOME: "/doctor",
+  GET_ADMIN_DOCTOR: "/admin/doctor",
+
+  GET_ADMIN_POLYCLINIC: "/admin/polyclinic",
+  GET_ADMIN_HOSPITAL: "/admin/hospital",
+
   GET_DOCTOR_PATIENTS: "/doctor/patient"
+};
+
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((promise) => {
+    if (error) {
+      promise.reject(error);
+    } else {
+      promise.resolve(token);
+    }
+  });
+  failedQueue = [];
 };
 
 const axiosInstance = axios.create({
   baseURL: 'https://localhost/api/v1/',
-  withCredentials: true, 
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
-    'Cache-Control': 'no-cache', 
-    Pragma: 'no-cache', 
-    Expires: '0', 
+    'Cache-Control': 'no-cache',
+    Pragma: 'no-cache',
+    Expires: '0',
   },
 });
 
@@ -35,33 +57,40 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (
-      error.response &&
-      (error.response.status === 401 || error.response.status === 403) &&
-      !originalRequest._retry
-    ) {
+    if (error.response && (error.response.status === 401 || error.response.status === 403) && !originalRequest._retry) 
+      {
       console.log("Unauthorized or Forbidden error, attempting refresh...");
-      //originalRequest._retry = true;
+      originalRequest._retry = true;
 
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            return axiosInstance(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
+      isRefreshing = true;
+let res;
       try {
-        await axiosInstance.post('/auth/refresh-token', {});
+        res = await axiosInstance.post('/auth/refresh-token', {});
         console.log("Refresh token successful. Retrying original request...");
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         console.error('Refresh token expired or failed. Logging out...');
-        // Logout user or redirect to login
-        window.location.href = '/'; // Yönlendirme
         return Promise.reject(refreshError);
       }
-    
-    return Promise.reject(error);
+
+      return Promise.reject(error);
+    }
   }
-}
 );
 
-export const getRequest = async (url, data= {}, params = {}) => {
+export const getRequest = async (url, params = {}) => {
   try {
-    const response = await axiosInstance.get(url, data, { params });
+    const response = await axiosInstance.get(url, { params });
     return response.data;
   } catch (error) {
     handleError(error);
@@ -89,9 +118,18 @@ export const putRequest = async (url, data = {}, params = {}) => {
   }
 };
 
+export const deleteRequest = async (url, data = {}, params = {}) => {
+  try {
+    const response = await axiosInstance.delete(url, data, { params });
+    return response.data;
+  } catch (error) {
+    handleError(error);
+    throw error;
+  }
+};
+
 const handleError = (error) => {
   if (error.response) {
-    // Backend'den gelen hata
     console.error('API error response:', error.response.data);
     if (error.response.status === 401) {
       console.error('Unauthorized error. Token may have expired.');
@@ -99,10 +137,8 @@ const handleError = (error) => {
       console.error('Forbidden error. You do not have permission.');
     }
   } else if (error.request) {
-    // Backend'e istek atıldı ama yanıt alınamadı
     console.error('No response received:', error.request);
   } else {
-    // Başka bir hata
     console.error('Unexpected error:', error.message);
   }
 };

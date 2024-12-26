@@ -3,6 +3,8 @@ import Doctor from '../../models/doctor.model.js';
 import Appointment from '../../models/appointment.model.js';
 import Polyclinic from '../../models/polyclinic.model.js';
 import jwt from 'jsonwebtoken';
+import Hospital from '../../models/hospital.model.js';
+import LabTest from '../../models/lab.test.model.js';
 
 
 const getHospitalByPolyclinic = async (req, res, next) => {
@@ -29,7 +31,7 @@ const getHospitalByPolyclinic = async (req, res, next) => {
 
 const newAppointment = async (req, res) => {
     try {
-        const { doctorId, date, time, type } = req.body;
+        const { doctorId, date, time, type, testType } = req.body;
 
         const doctor = await Doctor.findById(doctorId);
 
@@ -38,21 +40,53 @@ const newAppointment = async (req, res) => {
         const patientId = decoded.id;
 
         const polyclinic = doctor.polyclinic;
-
+        const hospital = doctor.hospital;
 
         const appointment = await Appointment.create({
             doctor: doctorId,
             patient: patientId,
             doctorName: doctor.name + ' ' + doctor.surname,
             polyclinic: polyclinic,
+            hospital: hospital,
             date,
             time,
             status: 'Scheduled',
-            type
+            type,
         });
 
+        if (type === 'labtest') {
+            console.log('labtest');
+            const labtest = await LabTest.create({
+                patient: patientId,
+                doctor: doctorId,
+                hospital: hospital,
+                polyclinic: polyclinic,
+                appointment: appointment._id,
+                testtype: testType,
+                status: 'pending',
+                type: 'labtest'
+            });
+
+            appointment.tests.push(labtest._id);
+            await appointment.save();
+
+            await Hospital.findByIdAndUpdate(
+                hospital,
+                {
+                    $addToSet: {
+                        labTests: labtest._id,
+                        appointments: appointment._id
+                    }
+                },
+                { new: true } // Returns the updated document
+            );
+
+        }
+
         await Patient.findByIdAndUpdate(patientId, { $push: { appointments: appointment._id } });
-        await Doctor.findByIdAndUpdate(doctorId, { $push: { appointments: appointment._id } });
+        await Doctor.findByIdAndUpdate(doctorId, { $push: { appointments: appointment._id }, });
+
+
 
         return res.status(201).json({ message: 'Appointment created successfully', appointment });
 
@@ -65,7 +99,24 @@ const getAppointments = async (req, res) => {
     try {
         const patient = await Patient.findById(req.user._id)
             .select('appointments')
-            .populate('appointments');
+            .populate({
+                select: 'doctor date time status',
+                path: 'appointments',
+                model: 'Appointment',
+                populate: [
+                    {
+                        path: 'doctor',
+                        model: 'Doctor',
+                        select: 'name surname _id polyclinic',
+                        populate: {
+                            path: 'polyclinic',
+                            model: 'Polyclinic',
+                            select: 'name',
+                        },
+                    },
+                ],
+            });
+
 
         if (!patient) {
             return res.status(404).json({ message: "Patient not found" });

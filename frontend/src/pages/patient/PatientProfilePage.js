@@ -5,10 +5,11 @@ import { Input } from "../../components/ui/patient/profile/Input.jsx"
 import { Label } from "../../components/ui/patient/profile/Label.jsx"
 import { Textarea } from "../../components/ui/patient/profile/TextArea.jsx"
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/patient/profile/Avatar.jsx"
-import { Endpoint, getRequest, postRequest } from "../../helpers/Network.js";
+import { Endpoint, getRequest, putRequest } from "../../helpers/Network.js";
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
 //import { useDarkMode } from '../../helpers/DarkModeContext.js';
+import { toast } from 'react-toastify'
 
 export default function PatientProfile() {
   //const { darkMode } = useDarkMode(); // Dark mode durumu global olarak alınır
@@ -24,14 +25,14 @@ export default function PatientProfile() {
     address: "",
   });
   const [error, setError] = useState(null);
-  const [validationErrors, setValidationErrors] = useState({}); 
+  const [validationErrors, setValidationErrors] = useState({});
 
   const formatBirthdate = (birthdate) => {
-    const date = new Date(birthdate); 
-    const day = String(date.getDate()).padStart(2, '0'); 
-    const month = String(date.getMonth() + 1).padStart(2, '0'); 
-    const year = String(date.getFullYear()).slice(-4); 
-    return `${day}-${month}-${year}`; 
+    const date = new Date(birthdate);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = String(date.getFullYear()).slice(-4);
+    return `${day}-${month}-${year}`;
   };
 
   const calculateAge = (birthdate) => {
@@ -43,9 +44,9 @@ export default function PatientProfile() {
   useEffect(() => {
     const fetchPatientProfile = async () => {
       try {
-        const response = await getRequest(Endpoint.GET_PROFILE); 
+        const response = await getRequest(Endpoint.GET_PROFILE);
         console.log("response", response)
-        setPatientInfo(response.patient); 
+        setPatientInfo(response.patient);
       } catch (err) {
         console.error('Error fetching patient profile:', err);
         setError('Failed to load patient profile.');
@@ -53,7 +54,7 @@ export default function PatientProfile() {
     };
 
     fetchPatientProfile();
-  }, []); 
+  }, []);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -77,7 +78,7 @@ export default function PatientProfile() {
 
   // Email validasyonu
   const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setValidationErrors((prev) => ({ ...prev, email: "Invalid email format" }));
     } else {
@@ -89,41 +90,45 @@ export default function PatientProfile() {
   };
 
   const validatePhoneNumber = (phone) => {
-    const numericPhone = phone.replace(/[^\d]/g, ""); 
-  
+    const numericPhone = phone.replace(/[^\d]/g, "");
+
     console.log(numericPhone.length)
     if (numericPhone.length === 12) {
-      return null; 
+      return null;
     }
-  
+
     if (numericPhone.length < 12) {
       return "Phone number must have exactly 10 digits after the area code.";
     }
-  
+
     if (numericPhone.length > 12) {
       return "Phone number must not exceed 10 digits after the area code.";
     }
-  
-    return "Invalid phone number format."; 
+
+    return "Invalid phone number format.";
   };
-  
-    const saveChanges = async () => {
+
+  const saveChanges = async () => {
     try {
-      const response = await postRequest(Endpoint.UPDATE_PROFILE, patientInfo);
-      console.log("Profile updated successfully:", response.data);
-      setIsEditing(false);
+      const response = await putRequest(Endpoint.UPDATE_PROFILE, patientInfo);
+      if(response){
+        console.log("Profile updated successfully:", response.data);
+        toast("Profile updated successfully");
+        setIsEditing(false);
+      }
+
     } catch (err) {
       console.error("Error updating profile:", err);
       setError("Failed to update profile.");
     }
   };
 
-  if (error) {
-    return <div>{error}</div>; 
-  }
+  // if (error) {
+  //   return <div>{error}</div>;
+  // }
 
   if (!patientInfo) {
-    return <div>Loading...</div>; 
+    return <div>Loading...</div>;
   }
 
   return (
@@ -140,7 +145,7 @@ export default function PatientProfile() {
               </Avatar>
             </CardHeader>
             <CardContent className="grid gap-4">
-              {error && <p className="text-red-500">{error}</p>}
+              {/* {error && <p className="text-red-500">{error}</p>} */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="name">Name</Label>
@@ -179,9 +184,9 @@ export default function PatientProfile() {
                   <Label htmlFor="phone">Phone</Label>
                   <Input
                     id="phone"
-                    type="tel" 
-                    inputMode="numeric" 
-                    pattern="[0-9]*" 
+                    type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={patientInfo.phone}
                     readOnly={!isEditing}
                     onChange={handleInputChange}
@@ -208,15 +213,21 @@ export default function PatientProfile() {
                 <Textarea id="address" value={patientInfo.address} readOnly={!isEditing} onChange={handleInputChange} />
               </div>
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
-                {isEditing ? "Cancel" : "Edit Profile"}
-              </Button>
+            <CardFooter className="flex justify-end space-x-4">
               {isEditing && (
-                <Button onClick={saveChanges} disabled={Object.values(validationErrors).some((error) => error !== null)}>
+                <Button
+                  onClick={saveChanges}
+                  disabled={Object.values(validationErrors).some((error) => error !== null)}
+                >
                   Save Changes
                 </Button>
               )}
+              <Button
+                variant="outline"
+                onClick={() => setIsEditing(!isEditing)}
+              >
+                {isEditing ? "Cancel" : "Edit Profile"}
+              </Button>
             </CardFooter>
           </Card>
         </div>

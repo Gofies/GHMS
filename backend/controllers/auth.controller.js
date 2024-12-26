@@ -57,6 +57,9 @@ const login = async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
+        const hashedPassword = await bcryptjs.hash(password, 12);
+        console.log(hashedPassword);
+
         if (patient) {
             const validPassword = await bcryptjs.compare(password, patient.password);
             if (!validPassword) {
@@ -72,10 +75,10 @@ const login = async (req, res) => {
             generateJwt(doctor._id, res);
             return res.status(200).json({ message: 'Login successful', id: doctor._id, role: doctor.role });
         } else if (admin) {
-            //const validPassword = await bcryptjs.compare(password, admin.password);
-            //if (!validPassword) {
-            //    return res.status(400).json({ message: 'Invalid credentials' });
-            //}
+            const validPassword = await bcryptjs.compare(password, admin.password);
+            if (!validPassword) {
+                return res.status(400).json({ message: 'Invalid credentials' });
+            }
             generateJwt(admin._id, res);
             return res.status(200).json({ message: 'Login successful', id: admin._id, role: admin.role });
         } else if (labTechnician) {
@@ -103,6 +106,8 @@ const logout = (req, res) => {
         return res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
+
+
 
 const refreshToken = async (req, res) => {
     try {

@@ -1,6 +1,7 @@
 import Hospital from '../../models/hospital.model.js';
 import Polyclinic from '../../models/polyclinic.model.js';
-
+import Doctor from '../../models/doctor.model.js';
+import LabTest from '../../models/lab.test.model.js';
 
 const getHospitals = async (req, res) => {
     try {
@@ -16,7 +17,38 @@ const getHospitals = async (req, res) => {
 
 const getHospital = async (req, res) => {
     try {
-        const hospital = await Hospital.findById(req.params.id).populate('doctors').populate('polyclinics');
+        const hospital = await Hospital.findById(req.params.id).populate({
+            path: 'doctors',
+            select: 'name surname polyclinic',
+            populate: {
+                path: 'polyclinic',
+                select: 'name'
+            }
+        }).populate({
+            path: 'polyclinics',
+            select: 'name doctors',
+            populate: {
+                path: 'doctors',
+                select: 'name surname'
+            }
+
+        })
+            .populate({
+                path: 'labTests',
+                select: 'patient testType urgency doctor',
+                populate: [
+                    {
+                        path: 'patient',
+                        model: 'Patient',
+                        select: 'name surname'
+                    },
+                    {
+                        path: 'doctor',
+                        model: 'Doctor',
+                        select: 'name surname'
+                    }
+                ]
+            });
 
         if (hospital) {
             return res.status(200).json({ hospital });
@@ -81,7 +113,7 @@ const newHospital = async (req, res) => {
 
 const updateHospital = async (req, res) => {
     try {
-        const { name, address, selecteddoctors, establishmentdate, phone, email, polyclinics } = req.body;
+        const { name, address, doctors, establishmentdate, phone, email, polyclinics } = req.body;
         const hospital = await Hospital.findById(req.params.id);
 
         if (!hospital) {
@@ -101,11 +133,18 @@ const updateHospital = async (req, res) => {
             }
         }
 
-        if (selecteddoctors) {
-            for (let i = 0; i < selecteddoctors.length; i++) {
-                hospital.doctors.push(selecteddoctors[i]);
+        if (doctors) {
+            for (let i = 0; i < doctors.length; i++) {
+                hospital.doctors.push(doctors[i]);
+            }
+
+            for (let i = 0; i < doctors.length; i++) {
+                const doctor = await Doctor.findById(doctors[i]);
+                doctor.hospital = hospital._id;
+                await doctor.save();
             }
         }
+
 
         await hospital.save();
 
