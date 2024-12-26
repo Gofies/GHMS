@@ -269,38 +269,6 @@ export default function AdminPolyclinicManagementPage() {
       toast.error("An unexpected error occurred.");
     }
   };
-  // Edit butonuna tıklandığında dialog'u açma
-  const handleEditPolyclinic = (polyclinic) => {
-    //setEditMode(true);
-    setEditingPolyclinicId(polyclinic._id);
-    setName(polyclinic.name); // Poliklinik adını doldur
-    setSelectedDoctors(polyclinic.doctors || []); // Seçili doktorları doldur
-  };
-
-  // Poliklinik güncelleme fonksiyonu
-  const handleUpdatePolyclinic = async (e) => {
-    e.preventDefault();
-    const hospitalId2 = handleLocationChange();
-    const requestBody = {
-      name,
-      hospitalId: hospitalId2,
-      doctors: selectedDoctors
-    };
-
-    try {
-      const responseData = await putRequest(`${Endpoint.GET_ADMIN_POLYCLINIC}/${editingPolyclinicId}`, requestBody);
-      if (responseData) {
-        toast.success("Polyclinic updated successfully!");
-        fetchPolyclinics(); // Güncellemeden sonra listeyi yenile
-        setEditingPolyclinicId(null); // Güncellenen ID'yi temizle
-      } else {
-        toast.error("An error occurred during polyclinic update.");
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error("An unexpected error occurred.");
-    }
-  };
 
   return (
     <div className="flex h-screen bg-gray-100">
