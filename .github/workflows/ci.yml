@@ -23,6 +23,9 @@ jobs:
 
       - name: Fix Permissions for Grafana Data (Prevent Exit 1)
         run: |
+          mkdir -p /tmp/grafana-ci
+          sudo chown -R 472:472 /tmp/grafana-ci
+          sudo chmod -R 777 /tmp/grafana-ci
           sudo chown -R 472:472 ./monitoring/grafana || true
           sudo chmod -R 777 ./monitoring/grafana || true
 
@@ -34,7 +37,7 @@ jobs:
           services:
             grafana:
               volumes:
-                - /dev/null:/var/lib/grafana
+                - /tmp/grafana-ci:/var/lib/grafana
           EOF
           cat docker-compose.override.yml
 
