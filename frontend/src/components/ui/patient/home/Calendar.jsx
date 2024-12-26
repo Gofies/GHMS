@@ -19,7 +19,7 @@ export function Calendars({ selected, onSelect, appointmentDates }) {
       prev2Label={null}
       next2Label={null}
       showNeighboringMonth={false}
-      className="rounded-md border"
+      className="rounded-md border green"
     />
   );
 }

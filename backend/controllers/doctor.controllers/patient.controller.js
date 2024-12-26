@@ -2,6 +2,37 @@ import Doctor from "../../models/doctor.model.js";
 import Prescription from "../../models/prescription.model.js";
 import Diagnosis from "../../models/diagnosis.model.js";
 
+const getPatientDetails = async (req, res) => {
+    try {
+        const { patientId } = req.params; // Query parametresinden hasta ID'si alınıyor
+
+        // Doktorun, verilen ID'ye sahip bir hastası olup olmadığını kontrol ediyoruz
+        const doctor = await Doctor.findById(req.user._id).populate({
+            path: 'appointments',
+            match: { patient: patientId }, // Belirli hastayı filtreliyoruz
+            populate: {
+                path: 'patient',
+                select: 'name surname gender birthdate height weight bloodType', // Hasta bilgilerini seçiyoruz
+            },
+        });
+
+        // Eğer doktor bulunamazsa veya hasta doktorun listesinde değilse hata döndür
+        if (!doctor || !doctor.appointments.length) {
+            return res.status(404).json({ message: 'Patient not found for this doctor' });
+        }
+
+        // Hastanın detaylarını alıyoruz
+        const patientDetails = doctor.appointments[0].patient;
+
+        return res.status(200).json({
+            message: 'Patient details retrieved successfully',
+            patient: patientDetails,
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Error retrieving patient details: ' + error.message });
+    }
+};
+
 
 const getPatients = async (req, res) => {
     try {
@@ -233,6 +264,7 @@ const deletePrescription = async (req, res) => {
 }
 
 export {
+    getPatientDetails,
     getPatients,
     getPatientTestResults,
     getPatientAppointmentHistory,

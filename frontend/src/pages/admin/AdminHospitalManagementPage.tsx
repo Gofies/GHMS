@@ -127,11 +127,8 @@ export default function AdminHospitalManagementPage() {
   // // }, [searchTerm, users]);
 
   const handleLocationChange = (hospitalId) => {
-    // Mevcut URL'den adminId'yi çekiyoruz
     const pathParts = window.location.pathname.split("/");
-    const adminId = pathParts[2]; // "/admin/{adminId}/hospital-management"
-
-    // Yeni URL'yi oluştur ve yönlendir
+    const adminId = pathParts[2]; 
     window.location.href = `/admin/${adminId}/polyclinic-management/${hospitalId}`;
   };
 
@@ -333,7 +330,7 @@ export default function AdminHospitalManagementPage() {
                       <TableCell>{hospital.email}</TableCell>
                       <TableCell>{hospital.phone}</TableCell>
                       <TableCell>
-                        <Badge variant={hospital.status === 'Active' ? 'default' : 'secondary'}>
+                        <Badge variant={hospital.status === 'Active' ? 'destructive' : 'success'}>  
                           {hospital.status}
                         </Badge>
                       </TableCell>

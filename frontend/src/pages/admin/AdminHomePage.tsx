@@ -19,18 +19,18 @@ import Header from "../../components/ui/admin/Header.jsx";
 
 // Mock data for recent activities
 const recentActivities = [
-  { id: 1, action: "User Login", user: "Dr. Smith", timestamp: "2023-06-15 09:30:00", status: "Success" },
-  { id: 2, action: "Password Reset", user: "Nurse Johnson", timestamp: "2023-06-15 10:15:00", status: "Success" },
-  { id: 3, action: "Failed Login Attempt", user: "Unknown", timestamp: "2023-06-15 11:00:00", status: "Failed" },
-  { id: 4, action: "Patient Data Access", user: "Dr. Williams", timestamp: "2023-06-15 11:30:00", status: "Success" },
+  { id: 1, action: "User Login", user: "Dr. Smith", timestamp: "2024-12-15 09:30:00", status: "Success" },
+  { id: 2, action: "Password Reset", user: "Nurse Johnson", timestamp: "2024-12-15 10:15:00", status: "Success" },
+  { id: 3, action: "Failed Login Attempt", user: "Unknown", timestamp: "2024-12-15 11:00:00", status: "Failed" },
+  { id: 4, action: "Patient Data Access", user: "Dr. Williams", timestamp: "2024-12-15 11:30:00", status: "Success" },
 ]
 
 // Mock data for system health
 const systemHealth = [
   { id: 1, name: "Server Uptime", status: "Operational", uptime: "99.99%" },
   { id: 2, name: "Database Performance", status: "Warning", performance: "85%" },
-  { id: 3, name: "Network Security", status: "Operational", lastCheck: "2023-06-15 08:00:00" },
-  { id: 4, name: "Backup System", status: "Operational", lastBackup: "2023-06-15 00:00:00" },
+  { id: 3, name: "Network Security", status: "Operational", lastCheck: "2024-12-15 08:00:00" },
+  { id: 4, name: "Backup System", status: "Operational", lastBackup: "2024-12-15 00:00:00" },
 ]
 
 export default function AdminHomePage() {
@@ -39,7 +39,7 @@ export default function AdminHomePage() {
      <Sidebar />
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
-        <Header title="Welcome"/>
+        <Header title="Home"/>
 
         {/* Dashboard Content */}
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -75,7 +75,7 @@ export default function AdminHomePage() {
                             <TableCell>{activity.user}</TableCell>
                             <TableCell>{activity.timestamp}</TableCell>
                             <TableCell>
-                              <Badge variant={activity.status === 'Success' ? 'default' : 'destructive'}>
+                              <Badge variant={activity.status === 'Success' ? 'success' : 'destructive'}>
                                 {activity.status}
                               </Badge>
                             </TableCell>

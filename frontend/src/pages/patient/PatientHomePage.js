@@ -35,6 +35,34 @@ export default function PatientHomeScreen() {
     navigate(`${location.pathname}appointments/new`);
   }
 
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Aylar 0'dan başlar
+    const day = String(date.getDate()).padStart(2, '0');
+  
+    return `${year}-${month}-${day}`;
+  };
+
+  // useEffect(() => {
+  //   const fetchPatientHome = async () => {
+  //     try {
+  //       const response = await getRequest(Endpoint.GET_HOME_APPOINTMENTS);
+  //       console.log("response", response);
+  //       setRecentAppointments(response.recentAppointments);
+  //       setUpcomingAppointments(response.upcomingAppointments);
+
+  //       const dates = response.recentAppointments
+  //         ? response.recentAppointments.map(appointment => new Date(appointment.date))
+  //         : [];
+  //       setAppointmentDates(dates);
+
+  //     } catch (err) {
+  //       console.error('Error fetching patient profile:', err);
+  //       setError('Failed to load patient profile.');
+  //     }
+  //   };
+  //   fetchPatientHome();
+  // }, []);
 
   // useEffect(() => {
   //   const fetchPatientHome = async () => {
@@ -76,7 +104,6 @@ export default function PatientHomeScreen() {
           ...(response.upcomingAppointments || []).map((appointment) => new Date(appointment.date)),
         ];
         console.log("all", allDates);
-
         setAppointmentDates(allDates); // Tarihleri state'e ata
       } catch (err) {
         console.error("Error fetching patient profile:", err);
@@ -106,8 +133,6 @@ export default function PatientHomeScreen() {
     setIsModalOpen(true);
   };
 
-
-
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
@@ -122,10 +147,10 @@ export default function PatientHomeScreen() {
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle>Calendar</CardTitle>
                   <Button onClick={handleNewAppointment} variant="primary" size="sm" >
-                   <div className="flex items-center">
-                   <Plus className="w-4 h-4 mr-2" />
-                   <span>New Appointment</span>
-                   </div>
+                    <div className="flex items-center">
+                      <Plus className="w-4 h-4 mr-2" />
+                      <span>New Appointment</span>
+                    </div>
                   </Button>
                 </CardHeader>
                 <CardContent>
@@ -143,17 +168,22 @@ export default function PatientHomeScreen() {
               {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                   <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
-                    <h2 className="text-lg font-bold mb-4">
-                      Appointments for {date ? date.toDateString() : ""}
+                    <h2
+                      className="text-lg font-bold mb-4 flex justify-between items-center"
+                      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                    >
+                      <span>Appointments</span>
+                      <span>{date ? formatDate(date) : ""}</span>
                     </h2>
                     <div className="max-h-60 overflow-y-auto">
                       {filteredAppointments.length > 0 ? (
                         filteredAppointments.map((appointment) => (
                           <div key={appointment.id} className="flex items-center space-x-4 mb-4">
                             <div>
-                            <p className="text-sm font-medium">
-                              {appointment.doctor.name} {appointment.doctor.surname}
-                            </p>
+                              <p className="text-sm font-medium">
+                                {appointment.doctor.name} {appointment.doctor.surname}
+                              </p>
+
                               <p className="text-sm text-gray-500">{appointment.polyclinic?.name}</p>
                               <p className="text-xs text-gray-400">{appointment.date.split("T")[0]}</p>
                               <p className="text-xs text-gray-400">{appointment.time}</p>
@@ -216,34 +246,35 @@ export default function PatientHomeScreen() {
                 </CardHeader>
                 <CardContent>
                   <ScrollArea className="h-[200px]">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                    {recentAppointments && recentAppointments.length > 0 ? (
-                      recentAppointments.map((appointment) => {
-                        // Sadece tarih kısmını al
-                        const formattedDate = appointment.date.split("T")[0];
-                        return (
-                          <div key={appointment.id} className="p-2 border rounded-md shadow-sm">
-                            {/* <Avatar>
+                      {recentAppointments && recentAppointments.length > 0 ? (
+                        recentAppointments.map((appointment) => {
+                          // Sadece tarih kısmını al
+                          const formattedDate = appointment.date.split("T")[0];
+                          return (
+                            <div key={appointment.id} className="p-2 border rounded-md shadow-sm">
+                              {/* <Avatar>
                               <AvatarImage
                                 src={`https://api.dicebear.com/6.x/initials/svg?seed=${appointment.doctor}`}
                               />
                               <AvatarFallback>{appointment.doctor.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                             </Avatar> */}
-                            <div>
-                            <p className="text-sm font-medium">
-                              {appointment.doctor.name} {appointment.doctor.surname}
-                            </p>
-                              <p className="text-sm text-gray-500">{appointment.polyclinic?.name}</p>
-                              <p className="text-xs text-gray-400">{formattedDate}</p> {/* Formatlanmış tarih */}
-                              <p className="text-xs text-gray-400">{appointment.time}</p>
+                              <div>
+                                <p className="text-sm font-medium">
+                                  {appointment.doctor.name} {appointment.doctor.surname}
+                                </p>
+                                <p className="text-sm text-gray-500">{appointment.polyclinic?.name}</p>
+                                <p className="text-xs text-gray-400">{formattedDate}</p> {/* Formatlanmış tarih */}
+                                <p className="text-xs text-gray-400">{appointment.time}</p>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <p className="text-sm text-gray-500">No upcoming appointments.</p>
-                    )}
+                          );
+                        })
+                      ) : (
+                        <p className="text-sm text-gray-500">No upcoming appointments.</p>
+                      )}
+
                     </div>
                   </ScrollArea>
                 </CardContent>
