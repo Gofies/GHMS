@@ -3,7 +3,7 @@ export $(shell sed 's/=.*//' .env)
 
 all: build up
 
-deploy: build-deploy up
+deploy: clean-build build-deploy up
 
 up: mongo-up
 	docker-compose up -d $(service)
@@ -27,6 +27,12 @@ build-deploy: mongo-build
 	
 prune:
 	docker system prune -f
+
+clean-build:
+	docker-compose down --volumes --remove-orphans
+	rm -rf ./database/init_log.txt
+	rm -rf ./database/persistant
+	rm -rf ./database/mongodb-build/auth/mongodb-keyfile
 
 # Clean all services
 clean:
