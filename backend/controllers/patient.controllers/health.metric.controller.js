@@ -88,7 +88,7 @@ const deleteAllergy = async (req, res) => {
             { new: true } // Return the updated document
         );
 
-        return res.status(200).json({ message: 'Allergy deleted successfully', patient });
+        return res.status(200).json({ message: 'Allergy deleted successfully' });
     }
     catch (error) {
         return res.status(500).json({ message: "patient.deleteAllergy: " + error.message });

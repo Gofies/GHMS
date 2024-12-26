@@ -1,4 +1,4 @@
-import mongoose, { mongo } from 'mongoose';
+import mongoose from 'mongoose';
 
 const doctorSchema = new mongoose.Schema({
     name: {
@@ -72,20 +72,27 @@ const doctorSchema = new mongoose.Schema({
             }
         ],
         default: () => {
-            // Initialize 14-day schedule
+            // Initialize 14-day schedule, weekdays only
             const schedule = [];
             const today = new Date();
-            for (let i = 0; i < 14; i++) {
-                const currentDay = new Date(today);
-                currentDay.setDate(today.getDate() + i); // Add i days to today
-                const timeSlots = [];
-                for (let hour = 8; hour <= 16; hour++) {
-                    timeSlots.push({
-                        time: `${hour < 10 ? '0' : ''}${hour}:00`,
-                        isFree: true
-                    });
+            let daysAdded = 0;
+            let currentDay = new Date(today);
+
+            while (daysAdded < 14) {
+                // Check if currentDay is a weekday (1 = Monday, 5 = Friday)
+                if (currentDay.getDay() >= 1 && currentDay.getDay() <= 5) {
+                    const timeSlots = [];
+                    for (let hour = 8; hour <= 16; hour++) {
+                        timeSlots.push({
+                            time: `${hour < 10 ? '0' : ''}${hour}:00`,
+                            isFree: true
+                        });
+                    }
+                    schedule.push({ date: new Date(currentDay), timeSlots });
+                    daysAdded++;
                 }
-                schedule.push({ date: currentDay, timeSlots });
+                // Move to the next day
+                currentDay.setDate(currentDay.getDate() + 1);
             }
             return schedule;
         }
@@ -93,28 +100,51 @@ const doctorSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 doctorSchema.methods.updateSchedule = async function () {
-    // Remove the oldest day (yesterday)
-    this.schedule.shift();
+    // Get tomorrow's date at midnight
+    const tomorrow = new Date();
+    tomorrow.setHours(0, 0, 0, 0);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
-    // Add a new day (14th day from now)
-    const today = new Date(this.schedule[this.schedule.length - 1].date);
-    const newDay = new Date(today);
-    newDay.setDate(today.getDate() + 1);
 
-    const timeSlots = [];
-    for (let hour = 8; hour <= 16; hour++) {
-        timeSlots.push({
-            time: `${hour < 10 ? '0' : ''}${hour}:00`,
-            isFree: true
-        });
+    // Get the first date in the current schedule
+    const firstDate = new Date(this.schedule[0]?.date);
+    firstDate.setHours(0, 0, 0, 0); // Normalize time
+
+    if (tomorrow > firstDate) {
+
+        // Remove the first day
+        this.schedule.shift();
+
+        // Add a new weekday at the end
+        let lastDate = new Date(this.schedule[this.schedule.length - 1]?.date);
+
+        while (true) {
+            lastDate.setDate(lastDate.getDate() + 1); // Move to the next day
+            const dayOfWeek = lastDate.getDay(); // 0 = Sunday, 6 = Saturday
+            if (dayOfWeek >= 1 && dayOfWeek <= 5) { // Monday to Friday
+                const timeSlots = [];
+                for (let hour = 8; hour <= 16; hour++) {
+                    timeSlots.push({
+                        time: `${hour < 10 ? '0' : ''}${hour}:00`,
+                        isFree: true,
+                    });
+                }
+                this.schedule.push({ date: new Date(lastDate), timeSlots });
+                break; // Exit loop once a valid weekday is added
+            }
+        }
+
+        // Mark the schedule field as modified for Mongoose
+        this.markModified('schedule');
+
+        // Save the updated schedule to the database
+        await this.save();
+
+
     }
-
-    this.schedule.push({ date: newDay, timeSlots });
-
-    await this.save();
 };
+
 
 const Doctor = mongoose.model('Doctor', doctorSchema);
 
 export default Doctor;
-
