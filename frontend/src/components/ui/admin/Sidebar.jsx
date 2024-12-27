@@ -12,11 +12,6 @@ export default function Sidebar() {
 
     const links = [
         {
-          to: `/admin/${userId}/`,
-          label: "Home",
-          icon: Home,
-        },
-        {
           to: `/admin/${userId}/user-management`,
           label: "Staff Management",
           icon: User,
@@ -26,11 +21,11 @@ export default function Sidebar() {
           label: "Hospital Management",
           icon: User,
         },
-        {
-          to: `/admin/${userId}/security`,
-          label: "Security",
-          icon: Shield,
-        },
+        // {
+        //   to: `/admin/${userId}/security`,
+        //   label: "Security",
+        //   icon: Shield,
+        // },
         {
           to: `/admin/${userId}/system-settings`,
           label: "System Settings",

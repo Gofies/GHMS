@@ -76,7 +76,7 @@ export default function DoctorHomepage() {
                     ) : (
                       <TableRow>
                         <TableCell colSpan={3} style={{ textAlign: 'center' }}>
-                          No records available
+                          No appointments available today.
                         </TableCell>
                       </TableRow>
                     )}

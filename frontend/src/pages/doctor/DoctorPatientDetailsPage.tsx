@@ -47,13 +47,16 @@ export default function PatientDetails() {
 
   const [newPrescription, setNewPrescription] = useState('')
 
-  const [name, setName] = useState(null);
-  const [surname, setSurname] = useState(null);
-  const [age, setAge] = useState(null);
-  const [gender, setGender] = useState(null);
-  const [bloodType, setBloodType] = useState(null);
-  const [height, setHeight] = useState(null);
-  const [weight, setWeight] = useState(null);
+  const [basicInfo, setBasicInfo] = useState({
+    name: null,
+    surname: null,
+    age: null,
+    gender: null,
+    bloodType: null,
+    height: null,
+    weight: null,
+  });
+
 
   const [activeTab, setActiveTab] = useState("results");
   const [labTests, setLabTests] = useState([]);
@@ -69,35 +72,66 @@ export default function PatientDetails() {
   const [diagnosisHistory, setDiagnosisHistory] = useState([]);
   const [patientDetails, setPatientDetails] = useState({}); // Diğer temel hasta bilgileri için
 
+  // useEffect(() => {
+  //   const fetchPatientDetails = async () => {
+  //     try {
+  //       // Lab Test Results
+  //       const labTestResponse = await getRequest(`/doctor/patient/${patientId}/test-results`);
+  //       setLabTests(labTestResponse.labtests);
+
+  //       // Appointment History
+  //       const appointmentResponse = await getRequest(`/doctor/patient/${patientId}/appointment-history`);
+  //       setAppointmentHistory(appointmentResponse.appointments);
+
+  //       // Diagnosis History
+  //       const diagnosisResponse = await getRequest(`/doctor/patient/${patientId}/diagnosis-history`);
+  //       setDiagnosisHistory(diagnosisResponse.diagnoses);
+
+  //       // Family History
+  //       const familyResponse = await getRequest(`/doctor/patient/${patientId}/family-history`);
+  //       setFamilyHistory(familyResponse.family);
+
+  //       // Prescription History
+  //       const prescriptionResponse = await getRequest(`/doctor/patient/${patientId}/prescriptions`);
+  //       setPrescriptionHistory(prescriptionResponse.prescriptions);
+
+  //       // // Basic Patient Details (optional additional API)
+  //       const patientDetailsResponse = await getRequest(`/doctor/patient/${patientId}`);
+  //       console.log("q", patientDetails);
+  //       setPatientDetails(patientDetailsResponse.patient);
+
+  //       setLoading(false); // Tüm veri alımı tamamlandı
+  //     } catch (err) {
+  //       console.error('Error fetching patient details:', err);
+  //       //setError('Failed to fetch patient details.');
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchPatientDetails();
+  // }, [updateTrigger]);
+
+
   useEffect(() => {
-    const fetchPatientDetails = async () => {
+    const fetchAllPatientDetails = async () => {
       try {
-        // Lab Test Results
-        const labTestResponse = await getRequest(`/doctor/patient/${patientId}/test-results`);
-        setLabTests(labTestResponse.labtests);
+        const response = await getRequest(`/doctor/patient/${patientId}`);
+        console.log("r", response);
+        setBasicInfo({
+          name: response.patient.name,
+          surname: response.patient.surname,
+          age: calculateAge(response.patient.birthdate),
+          gender: response.patient.gender,
+          bloodType: response.patient.bloodtype,
+          height: response.patient.height,
+          weight: response.patient.weight,
+        });
+        setLabTests(response.patient.labtests);
+        setDiagnosisHistory(response.patient.diagnoses);
+        setFamilyHistory(response.patient.family);
+        setPrescriptionHistory(response.patient.prescriptions);
+        setAppointmentHistory(response.patient.appointments);
 
-        // Appointment History
-        const appointmentResponse = await getRequest(`/doctor/patient/${patientId}/appointment-history`);
-        setAppointmentHistory(appointmentResponse.appointments);
-
-        // Diagnosis History
-        const diagnosisResponse = await getRequest(`/doctor/patient/${patientId}/diagnosis-history`);
-        setDiagnosisHistory(diagnosisResponse.diagnoses);
-
-        // Family History
-        const familyResponse = await getRequest(`/doctor/patient/${patientId}/family-history`);
-        setFamilyHistory(familyResponse.family);
-
-        // Prescription History
-        const prescriptionResponse = await getRequest(`/doctor/patient/${patientId}/prescriptions`);
-        setPrescriptionHistory(prescriptionResponse.prescriptions);
-
-        // // Basic Patient Details (optional additional API)
-        const patientDetailsResponse = await getRequest(`/doctor/patient/${patientId}`);
-        console.log("q", patientDetails);
-        setPatientDetails(patientDetailsResponse.patient);
-
-        setLoading(false); // Tüm veri alımı tamamlandı
       } catch (err) {
         console.error('Error fetching patient details:', err);
         //setError('Failed to fetch patient details.');
@@ -105,7 +139,7 @@ export default function PatientDetails() {
       }
     };
 
-    fetchPatientDetails();
+    fetchAllPatientDetails();
   }, [updateTrigger]);
 
   // const [showEditDialog, setShowEditDialog] = useState(false);
@@ -115,34 +149,65 @@ export default function PatientDetails() {
 
 
   const handleEditPrescription = (prescription) => {
-    setEditingPrescription({ ...prescription }); // Mevcut prescription
-    setTempEditingPrescription({ ...prescription }); // Geçici düzenleme
+    // Dialog açılırken orijinal değerleri geçici bir state'e kopyalayın
+    setEditingPrescription({ ...prescription });
+    setTempEditingPrescription({ ...prescription }); // Geçici düzenleme için bir kopya oluştur
+    console.log("a", prescription);
+    console.log("Editing Prescription:", editingPrescription);
+console.log("Temp Editing Prescription:", tempEditingPrescription);
+
+  };
+
+  const handleInputChangeInDialog = (index, field, value) => {
+    // Yalnızca geçici state üzerinde değişiklik yap
+    setTempEditingPrescription((prev) => {
+      const updatedMedicine = [...prev.medicine];
+      updatedMedicine[index][field] = value; // İlgili alanı güncelle
+      return { ...prev, medicine: updatedMedicine };
+    });
   };
 
   const handleUpdatePrescription = async (e, id) => {
     e.preventDefault();
+  
+    // Validasyon: Reçetede en az bir ilaç olmalı
+    if (tempEditingPrescription?.medicine.length === 0) {
+      toast.error("A prescription must have at least one medicine.");
+      return;
+    }
+  
+    // Validasyon: Reçete durumunun seçilmiş olması gerekiyor
+    if (!tempEditingPrescription?.status) {
+      toast.error("Please select a prescription status.");
+      return;
+    }
+  
     try {
       const updatedData = {
-        medicine: tempEditingPrescription.medicine,
+        medicine: tempEditingPrescription.medicine, // Yalnızca geçici state'yi kullan
         status: tempEditingPrescription.status,
       };
-
+  
       const response = await putRequest(
         `/doctor/patient/${patientId}/prescriptions/${id}`,
         updatedData
       );
-
+  
       if (response) {
-        toast("Prescription updated successfully!");
-        setEditingPrescription(null); // Dialog'u kapat
+        toast.success("Prescription updated successfully!");
+        setUpdateTrigger((prev) => !prev);
+        setEditingPrescription(null);
         setTempEditingPrescription(null);
-        setUpdateTrigger((prev) => !prev); // Listeyi güncelle
+      } else {
+        toast.error("Failed to update prescription.");
       }
     } catch (error) {
       console.error("Error updating prescription:", error);
-      toast("Failed to update prescription.");
+      toast.error("An error occurred while updating the prescription.");
     }
   };
+  
+
 
   const [medicine, setMedicine] = useState([]);
   const [newMedicine, setNewMedicine] = useState({
@@ -162,38 +227,54 @@ export default function PatientDetails() {
 
   const handleAddMedicine = (e) => {
     e.preventDefault();
+  
+    // Validasyon: Gerekli alanların dolu olması kontrol edilir
     if (
-      newMedicine.name &&
-      newMedicine.quantity &&
-      newMedicine.time &&
-      newMedicine.form
+      !newMedicine.name ||
+      !newMedicine.quantity ||
+      !newMedicine.time ||
+      !newMedicine.form
     ) {
-      setMedicine((prev) => [...prev, newMedicine]);
-      setNewMedicine({ name: "", quantity: "", time: "", form: "" });
+      toast.error("Please fill out all fields before adding a medicine.");
+      return;
     }
+  
+    // Eğer validasyon geçtiyse ilacı ekle
+    setMedicine((prev) => [...prev, newMedicine]);
+    setNewMedicine({ name: "", quantity: "", time: "", form: "" });
   };
+  
 
   const handlePrescriptionSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validasyon: Boş ilaç veya status kontrolü
+    if (medicine.length === 0) {
+      toast.error("Please add at least one medicine.");
+      return;
+    }
+  
     const prescriptionData = {
       medicine,
       status,
     };
+  
     try {
       const response = await postRequest(`/doctor/patient/${patientId}/prescriptions`, prescriptionData);
       if (response) {
-        toast("Prescription submitted successfully!");
-        setMedicine([]); // Clear the form after submission
+        toast.success("Prescription submitted successfully!");
+        setMedicine([]); // Formu temizle
         setStatus("ongoing");
         setUpdateTrigger((prev) => !prev); // Trigger'ı değiştirerek useEffect'i tetikle
-
       } else {
-        toast("Failed to submit prescription");
+        toast.error("Failed to submit prescription");
       }
     } catch (error) {
       console.error("Error submitting prescription:", error);
+      toast.error("An error occurred while submitting the prescription.");
     }
   };
+  
 
   const handleDeletePrescription = async (prescriptionId) => {
     try {
@@ -261,16 +342,15 @@ export default function PatientDetails() {
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p><strong>Name:</strong> {name}</p>
-                  <p><strong>Surname:</strong> {surname}</p>
-
-                  <p><strong>Age:</strong> {age}</p>
-                  <p><strong>Gender:</strong> {gender}</p>
-                  <p><strong>Blood Type:</strong> {bloodType}</p>
+                  <p><strong>Name:</strong> {basicInfo.name}</p>
+                  <p><strong>Surname:</strong> {basicInfo.surname}</p>
+                  <p><strong>Age:</strong> {basicInfo.age}</p>
+                  <p><strong>Gender:</strong> {basicInfo.gender}</p>
                 </div>
                 <div>
-                  <p><strong>Height:</strong> {height}</p>
-                  <p><strong>Weight:</strong> {weight}</p>
+                  <p><strong>Height:</strong> {basicInfo.height} cm</p>
+                  <p><strong>Weight:</strong> {basicInfo.weight} kg</p>
+                  <p><strong>Blood Type:</strong> {basicInfo.bloodType}</p>
                 </div>
               </div>
             </CardContent>
@@ -426,6 +506,7 @@ export default function PatientDetails() {
                         <div className="grid gap-4">
                           {prescriptionHistory && prescriptionHistory.length > 0 ? (
                             prescriptionHistory.map((prescription) => {
+                              console.log("p", prescription);
                               const formattedDate = new Date(prescription.createdAt)
                                 .toISOString()
                                 .split("T")[0];
@@ -483,7 +564,7 @@ export default function PatientDetails() {
                                           <div className="mb-4">
                                             <Label>Status</Label>
                                             <select
-                                              value={editingPrescription?.status || ""}
+                                              value={tempEditingPrescription?.status || ""}
                                               onChange={(e) =>
                                                 setTempEditingPrescription((prev) => ({
                                                   ...prev,
@@ -497,18 +578,14 @@ export default function PatientDetails() {
                                             </select>
                                           </div>
                                           {/* Medicines */}
-                                          {editingPrescription?.medicine.map((med, index) => (
+                                          {tempEditingPrescription?.medicine.map((med, index) => (
                                             <div key={index} className="grid grid-cols-4 gap-4 mb-4">
                                               <div>
                                                 <Label>Medication Name</Label>
                                                 <Input
                                                   value={med.name}
                                                   onChange={(e) =>
-                                                    setTempEditingPrescription((prev) => {
-                                                      const updatedMedicine = [...prev.medicine];
-                                                      updatedMedicine[index].name = e.target.value;
-                                                      return { ...prev, medicine: updatedMedicine };
-                                                    })
+                                                    handleInputChangeInDialog(index, "name", e.target.value)
                                                   }
                                                 />
                                               </div>
@@ -517,11 +594,7 @@ export default function PatientDetails() {
                                                 <Input
                                                   value={med.quantity}
                                                   onChange={(e) =>
-                                                    setTempEditingPrescription((prev) => {
-                                                      const updatedMedicine = [...prev.medicine];
-                                                      updatedMedicine[index].quantity = e.target.value;
-                                                      return { ...prev, medicine: updatedMedicine };
-                                                    })
+                                                    handleInputChangeInDialog(index, "quantity", e.target.value)
                                                   }
                                                 />
                                               </div>
@@ -530,11 +603,7 @@ export default function PatientDetails() {
                                                 <Input
                                                   value={med.time}
                                                   onChange={(e) =>
-                                                    setTempEditingPrescription((prev) => {
-                                                      const updatedMedicine = [...prev.medicine];
-                                                      updatedMedicine[index].time = e.target.value;
-                                                      return { ...prev, medicine: updatedMedicine };
-                                                    })
+                                                    handleInputChangeInDialog(index, "time", e.target.value)
                                                   }
                                                 />
                                               </div>
@@ -543,11 +612,7 @@ export default function PatientDetails() {
                                                 <Input
                                                   value={med.form}
                                                   onChange={(e) =>
-                                                    setTempEditingPrescription((prev) => {
-                                                      const updatedMedicine = [...prev.medicine];
-                                                      updatedMedicine[index].form = e.target.value;
-                                                      return { ...prev, medicine: updatedMedicine };
-                                                    })
+                                                    handleInputChangeInDialog(index, "form", e.target.value)
                                                   }
                                                 />
                                               </div>
@@ -560,6 +625,7 @@ export default function PatientDetails() {
                                           </div>
                                         </form>
                                       </DialogContent>
+
                                     </Dialog>
 
                                     <Button
@@ -614,12 +680,10 @@ export default function PatientDetails() {
                         <TableBody>
                           {appointmentHistory && appointmentHistory.length > 0 ? ( // Eğer liste doluysa
                             appointmentHistory.map((appointment) => {
-                              // Tarihi YYYY-MM-DD formatına dönüştür
-                              const formattedDate = new Date(appointment.date).toISOString().split("T")[0];
-
+                              // const formattedDate = new Date(appointment.date).toISOString().split("T")[0];
                               return (
                                 <TableRow key={appointment._id}>
-                                  <TableCell>{formattedDate}</TableCell>
+                                  {/* <TableCell>{formattedDate}</TableCell> */}
                                   <TableCell>{appointment.symptoms}</TableCell>
                                   <TableCell>{appointment.possibleDiagnosis}</TableCell>
                                   <TableCell>{appointment.actualDiagnosis}</TableCell>

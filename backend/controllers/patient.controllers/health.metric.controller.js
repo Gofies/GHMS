@@ -84,7 +84,7 @@ const deleteAllergy = async (req, res) => {
 
         const patient = await Patient.findByIdAndUpdate(
             req.user._id,
-            { $pull: { allergies: { name: allergyName } } }, // Pull from the allergies array
+            { $pull: { allergies: allergyName } }, // allergies dizisinden eşleşen öğeyi kaldır
             { new: true } // Return the updated document
         );
 

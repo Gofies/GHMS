@@ -229,7 +229,6 @@ export default function PatientHomeScreen() {
                             <p className="text-xs text-gray-400">{appointment.date}</p>
                             <p className="text-xs text-gray-400">{appointment.time}</p>
                           </div>
-                          <Badge variant="outline" className="ml-auto">Upcoming</Badge>
                         </div>
                       ))
                     ) : (

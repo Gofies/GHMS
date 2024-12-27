@@ -62,35 +62,6 @@ export default function AdminPolyclinicManagementPage() {
     }
   };
 
-
-  //   const getDoctorNames = (doctorIds) => {
-  //  //   if (!doctorIds || doctorIds.length === 0) return "No Doctors Assigned";
-  //     const doctorNames = doctorIds
-  //       .map((id) => doctors.find((doctor) => doctor._id === id)?.name)
-  //       .filter((name) => name); // Geçersiz (undefined) isimleri filtrele
-  //       return doctorNames.join(", ");
-  //     //return doctorNames.length > 0 ? doctorNames.join(", ") : "No Doctors Found";
-  //   };
-
-  const getDoctorNames = (doctorIds) => {
-    if (!doctorIds || doctorIds.length === 0) return "No Doctors Assigned";
-
-    const doctorNames = doctorIds
-      .map((id) => doctors.find((doctor) => doctor._id === id)?.name)
-      .filter((name) => name); // Geçersiz (undefined) isimleri filtrele
-
-    return doctorNames.length > 0 ? (
-      <ul className="list-disc list-inside">
-        {doctorNames.map((name, index) => (
-          <li key={index}>{name}</li>
-        ))}
-      </ul>
-    ) : (
-      "No Doctors Found"
-    );
-  };
-
-
   const fetchPolyclinics = async () => {
     try {
       const hospitalId = handleLocationChange();
@@ -312,8 +283,6 @@ export default function AdminPolyclinicManagementPage() {
                         className="w-full"
                       />
                     </div>
-
-
                     <div>
                       <Label>Doctors</Label>
                       <div className="border p-2 rounded">
@@ -354,6 +323,7 @@ export default function AdminPolyclinicManagementPage() {
                     <TableHead>Name</TableHead>
                     <TableHead>Doctors</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -408,6 +378,7 @@ export default function AdminPolyclinicManagementPage() {
                                 size="sm"
                                 onClick={() => handleEditPolyclinic(poly)}
                               >
+                                <Edit className="w-4 h-4 mr-2" />
                                 Edit
                               </Button>
                             </DialogTrigger>

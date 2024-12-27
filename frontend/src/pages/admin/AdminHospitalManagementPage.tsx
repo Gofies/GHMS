@@ -11,7 +11,7 @@ import { Search, Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../../components/ui/admin/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
-import { Endpoint, postRequest, getRequest, deleteRequest } from "../../helpers/Network.js";
+import { Endpoint, postRequest, getRequest, deleteRequest, putRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify';
 
 export default function AdminHospitalManagementPage() {
@@ -27,9 +27,18 @@ export default function AdminHospitalManagementPage() {
   const [establishmentdate, setEstablishmentDate] = useState('');
   const [polyclinics, setPolyclinics] = useState([]);
 
+  const [selectedHospital, setSelectedHospital] = useState(null);
+
+  const handleEditHospital = (hospital) => {
+    console.log(hospital);
+    setSelectedHospital(hospital);
+  };
+
+
   const fetchHospitals = async () => {
     try {
       const response = await getRequest(Endpoint.GET_ADMIN_HOSPITAL);
+      console.log("h", response);
       if (response) {
         setHospitals(response.hospitals);
         setFilteredHospitals(response.hospitals);
@@ -167,7 +176,7 @@ export default function AdminHospitalManagementPage() {
 
   const handleLocationChange = (hospitalId) => {
     const pathParts = window.location.pathname.split("/");
-    const adminId = pathParts[2]; 
+    const adminId = pathParts[2];
     window.location.href = `/admin/${adminId}/polyclinic-management/${hospitalId}`;
   };
 
@@ -187,21 +196,40 @@ export default function AdminHospitalManagementPage() {
     }
   };
 
-  const handleAddPolyclinic = () => {
-    setPolyclinics([...polyclinics, ""]); // Yeni bir boş polyclinic ekle
+  const handleUpdateHospital = async (e) => {
+    e.preventDefault();
+  
+    // Request body, backend'de beklenen alanlarla uyumlu şekilde oluşturuluyor
+    const requestBody = {
+      name: selectedHospital.name,
+      address: selectedHospital.address,
+      establishmentdate: selectedHospital.establishmentdate,
+      phone: selectedHospital.phone,
+      email: selectedHospital.email,
+      polyclinics: selectedHospital.polyclinics, // Polyclinic listesi
+      doctors: selectedHospital.doctors, // Doctor listesi
+    };
+  
+    try {
+      console.log(requestBody);
+      const responseData = await putRequest(`${Endpoint.GET_ADMIN_HOSPITAL}/${selectedHospital._id}`, requestBody);
+      if (responseData) {
+        toast.success("Hospital updated successfully!");
+  
+        // Güncellemeden sonra hospital listesini yeniden fetch et
+        await fetchHospitals();
+  
+        // Dialog kapatma veya state sıfırlama işlemleri
+        setSelectedHospital(null);
+      } else {
+        toast.error("An error occurred during hospital update.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("An unexpected error occurred.");
+    }
   };
-
-  const handleRemovePolyclinic = (index) => {
-    const updatedPolyclinics = [...polyclinics];
-    updatedPolyclinics.splice(index, 1); // Belirtilen indexteki polyclinic'i kaldır
-    setPolyclinics(updatedPolyclinics);
-  };
-
-  const handlePolyclinicChange = (index, value) => {
-    const updatedPolyclinics = [...polyclinics];
-    updatedPolyclinics[index] = value; // Belirtilen indexteki polyclinic'i güncelle
-    setPolyclinics(updatedPolyclinics);
-  };
+  
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -279,16 +307,7 @@ export default function AdminHospitalManagementPage() {
                         className="w-full"
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="selecteddoctors">Doctors (Comma-separated IDs)</Label>
-                      <Input
-                        id="selecteddoctors"
-                        value={formData.selecteddoctors.join(', ')}
-                        onChange={(e) => handleDoctorsInput(e.target.value)}
-                        placeholder="doctor-id-1, doctor-id-2"
-                        className="w-full"
-                      />
-                    </div>
+
                     <div>
                       <Label htmlFor="establishmentdate">Establishment Date</Label>
                       <Input
@@ -300,16 +319,7 @@ export default function AdminHospitalManagementPage() {
                         className="w-full"
                       />
                     </div>
-                    <div className="col-span-2">
-                      <Label htmlFor="polyclinics">Polyclinics (Comma-separated)</Label>
-                      <Input
-                        id="polyclinics"
-                        value={formData.polyclinics.join(', ')}
-                        onChange={(e) => handlePolyclinicsInput(e.target.value)}
-                        placeholder="Cardiology, Neurology, etc."
-                        className="w-full"
-                      />
-                    </div>
+
                   </div>
                   <div className="flex justify-end">
                     <Button type="submit">Create Hospital</Button>
@@ -318,7 +328,6 @@ export default function AdminHospitalManagementPage() {
               </DialogContent>
             </Dialog>
           </div>
-
           <Card>
             <CardHeader>
               <CardTitle className="text-xl font-bold">Hospital List</CardTitle>
@@ -341,7 +350,7 @@ export default function AdminHospitalManagementPage() {
                       <TableCell>{hospital.email}</TableCell>
                       <TableCell>{hospital.phone}</TableCell>
                       <TableCell>
-                        <Badge variant={hospital.status === 'Active' ? 'destructive' : 'success'}>  
+                        <Badge variant={hospital.status === 'Active' ? 'destructive' : 'success'}>
                           {hospital.status}
                         </Badge>
                       </TableCell>
@@ -354,6 +363,120 @@ export default function AdminHospitalManagementPage() {
                           >
                             Polyclinics
                           </Button>
+
+
+
+
+                          <TableCell>
+                            <div className="flex space-x-2">
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleEditHospital(hospital)}
+                                  >
+                                    <Edit className="w-4 h-4 mr-2" />
+                                    Edit
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                  <DialogHeader>
+                                    <DialogTitle>Edit Hospital</DialogTitle>
+                                  </DialogHeader>
+                                  {selectedHospital && (
+                                    <form onSubmit={handleUpdateHospital}>
+                                      <div className="grid grid-cols-2 gap-6 py-4">
+                                        <div>
+                                          <Label htmlFor="name">Name</Label>
+                                          <Input
+                                            id="name"
+                                            value={selectedHospital.name}
+                                            onChange={(e) =>
+                                              setSelectedHospital((prev) => ({
+                                                ...prev,
+                                                name: e.target.value,
+                                              }))
+                                            }
+                                            placeholder="Hospital Name"
+                                            required
+                                            className="w-full"
+                                          />
+                                        </div>
+                                        <div>
+                                          <Label htmlFor="address">Address</Label>
+                                          <Input
+                                            id="address"
+                                            value={selectedHospital.address}
+                                            onChange={(e) =>
+                                              setSelectedHospital((prev) => ({
+                                                ...prev,
+                                                address: e.target.value,
+                                              }))
+                                            }
+                                            placeholder="Hospital Address"
+                                            required
+                                            className="w-full"
+                                          />
+                                        </div>
+                                        <div>
+                                          <Label htmlFor="email">Email</Label>
+                                          <Input
+                                            id="email"
+                                            value={selectedHospital.email}
+                                            onChange={(e) =>
+                                              setSelectedHospital((prev) => ({
+                                                ...prev,
+                                                email: e.target.value,
+                                              }))
+                                            }
+                                            placeholder="example@domain.com"
+                                            required
+                                            className="w-full"
+                                          />
+                                        </div>
+                                        <div>
+                                          <Label htmlFor="phone">Phone</Label>
+                                          <Input
+                                            id="phone"
+                                            value={selectedHospital.phone}
+                                            onChange={(e) =>
+                                              setSelectedHospital((prev) => ({
+                                                ...prev,
+                                                phone: e.target.value,
+                                              }))
+                                            }
+                                            placeholder="0212 XXX XX XX"
+                                            required
+                                            className="w-full"
+                                          />
+                                        </div>
+                                        <div>
+                                          <Label htmlFor="phone">Establishment Date</Label>
+                                          <Input
+                                            id="establishmentDate"
+                                            value={selectedHospital.establishmentdate}
+                                            onChange={(e) =>
+                                              setSelectedHospital((prev) => ({
+                                                ...prev,
+                                                establishmentdate: e.target.value,
+                                              }))
+                                            }
+                                            placeholder="XXXX"
+                                            required
+                                            className="w-full"
+                                          />
+                                        </div>
+                                      </div>
+                                      <div className="flex justify-end">
+                                        <Button type="submit">Save Changes</Button>
+                                      </div>
+                                    </form>
+                                  )}
+                                </DialogContent>
+                              </Dialog>
+                            </div>
+                          </TableCell>
                           <Button
                             variant="outline"
                             size="sm"
