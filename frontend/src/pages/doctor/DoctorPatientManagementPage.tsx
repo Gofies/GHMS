@@ -40,8 +40,10 @@ export default function PatientManagement() {
       try {
         const response = await getRequest(Endpoint.GET_DOCTOR_PATIENTS);
         console.log('Patients:', response.patients);
-        const a = extractPatients(response.patients);
-        setPatients(Array.isArray(a) ? a : []); // Dizi kontrolü
+        setPatients(response.patients);
+        // const a = extractPatients(response.patients);
+        // console.log("a", a);
+        //setPatients(Array.isArray(a) ? a : []); // Dizi kontrolü
       } catch (err) {
         console.error('Error fetching patients:', err);
         setError('Failed to fetch patients. Please try again later.');
@@ -50,26 +52,26 @@ export default function PatientManagement() {
     handleViewAllPatients();
   }, [])
 
-  const extractPatients = (data) => {
-    // Tüm appointments içinden patient bilgilerini toplar ve son randevu tarihini ekler
-    const patientsWithLastVisit = data.appointments.reduce((acc, appointment) => {
-      const patient = appointment.patient;
-      const appointmentDate = new Date(appointment.date);
+  // const extractPatients = (data) => {
+  //   // Tüm appointments içinden patient bilgilerini toplar ve son randevu tarihini ekler
+  //   const patientsWithLastVisit = data.appointments.reduce((acc, appointment) => {
+  //     const patient = appointment.patient;
+  //     const appointmentDate = new Date(appointment.date);
   
-      // Eğer hasta daha önce eklenmemişse veya mevcut randevu tarihi daha yeniyse güncelle
-      if (!acc[patient._id] || acc[patient._id].lastVisit < appointmentDate) {
-        acc[patient._id] = {
-          ...patient,
-          lastVisit: appointmentDate,
-        };
-      }
+  //     // Eğer hasta daha önce eklenmemişse veya mevcut randevu tarihi daha yeniyse güncelle
+  //     if (!acc[patient._id] || acc[patient._id].lastVisit < appointmentDate) {
+  //       acc[patient._id] = {
+  //         ...patient,
+  //         lastVisit: appointmentDate,
+  //       };
+  //     }
   
-      return acc;
-    }, {});
+  //     return acc;
+  //   }, {});
   
-    // Object.values ile benzersiz hastaları dizi olarak döndür
-    return Object.values(patientsWithLastVisit);
-  };
+  //   // Object.values ile benzersiz hastaları dizi olarak döndür
+  //   return Object.values(patientsWithLastVisit);
+  // };
 
   const filteredPatients = Array.isArray(patients)
   ? patients.filter(patient => {
@@ -117,7 +119,7 @@ export default function PatientManagement() {
                     <TableHead>Surname</TableHead>
                     <TableHead>Age</TableHead>
                     <TableHead>Gender</TableHead>
-                    <TableHead>Last Visit</TableHead>
+                    {/* <TableHead>Last Visit</TableHead> */}
                     <TableHead>Action</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -129,7 +131,7 @@ export default function PatientManagement() {
                         <TableCell>{patient.surname}</TableCell>
                         <TableCell>{calculateAge(patient.birthdate)}</TableCell>
                         <TableCell>{patient.gender}</TableCell>
-                        <TableCell>{patient.lastVisit ? patient.lastVisit.toLocaleDateString() : "N/A"}</TableCell>
+                        {/* <TableCell>{patient.lastVisit ? patient.lastVisit.toLocaleDateString() : "N/A"}</TableCell> */}
                         <TableCell>
                           <Link href={`/doctor/${doctorId}/patient-details/${patient._id}`}>
                             <Button variant="outline" size="sm">View Details</Button>

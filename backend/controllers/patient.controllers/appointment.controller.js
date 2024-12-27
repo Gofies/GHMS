@@ -164,13 +164,23 @@ const getAppointments = async (req, res) => {
 
         const appointments = patient.appointments;
 
+        // KONTROL ET BURAYI
         if (appointments) {
-            // Sort appointments by date in descending order (newest to oldest)
+            // Randevuların durumunu kontrol et ve güncelle
+            const currentDate = new Date();
+            for (const appointment of appointments) {
+                if (new Date(appointment.date) < currentDate && appointment.status === 'Scheduled') {
+                    appointment.status = 'Completed';
+                    await appointment.save(); // Durumu kaydet
+                }
+            }
+
+            // Tarihe göre sıralama (yeniden eskiye)
             appointments.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             return res.status(200).json({
                 message: 'Appointments retrieved successfully',
-                appointments
+                appointments,
             });
         }
     } catch (error) {

@@ -27,8 +27,9 @@ export default function AppointmentsPage() {
     const [isDateOpen, setIsDateOpen] = useState(false);
     const [isTimeOpen, setIsTimeOpen] = useState(false);
 
-    const [appointments, setAppointments] = useState(null);
-
+    const [appointments, setAppointments] = useState([]);
+    const [recentAppointments, setRecentAppointments] = useState([]);
+    const [upcomingAppointments, setUpcomingAppointments] = useState([]);
 
     const handleSelectSpecialty = (value) => {
         setSelectedSpecialty(value);
@@ -97,8 +98,15 @@ export default function AppointmentsPage() {
             try {
                 const response = await getRequest(Endpoint.GET_HOME_APPOINTMENTS);
                 console.log("response", response)
-                setAppointments(response.recentAppointments);
-                // setHomeAppointments(response); 
+                setRecentAppointments(response.recentAppointments);
+                setUpcomingAppointments(response.upcomingAppointments);
+                const combinedAppointments = [
+                    ...response.recentAppointments,
+                    ...response.upcomingAppointments,
+                ];
+
+                setAppointments(combinedAppointments);
+   
             } catch (err) {
                 console.error('Error fetching patient profile:', err);
                 setError('Failed to load patient profile.');
@@ -107,7 +115,6 @@ export default function AppointmentsPage() {
         fetchPatientAppointments();
     }, []);
 
-    //const [appointments, setAppointments] = useState([]);
     const [error, setError] = useState(null);
 
     return (

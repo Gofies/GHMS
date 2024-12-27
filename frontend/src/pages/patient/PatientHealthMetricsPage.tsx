@@ -117,90 +117,104 @@ const getBmiColor = (bmi) => {
     return value.replace("/", " ");
   };
 
-
   const handleSave = async (type, value) => {
     try {
+      let isValid = true;
+  
       // Validasyonlar
       if (type === "weight") {
-        if (value < 0 || value > 300) {
-          toast("Weight must be between 30 and 300 kg.");
-          return;
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue) || numericValue < 30 || numericValue > 300) {
+          toast("Weight must be a valid number between 30 and 300 kg.");
+          isValid = false;
         }
       } else if (type === "height") {
-        if (value < 0 || value > 250) {
-          toast("Height must be between 50 and 250 cm.");
-          return;
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue) || numericValue < 50 || numericValue > 250) {
+          toast("Height must be a valid number between 50 and 250 cm.");
+          isValid = false;
         }
       } else if (type === "blood-pressure") {
-        const normalizedValue = value.replace(/\s+/g, "/");
-        console.log("Normalized Value:", normalizedValue);
-      
-        const [systolic, diastolic] = normalizedValue.split("/").map(Number);
-        if (
-          !systolic ||
-          !diastolic ||
-          systolic < 70 ||
-          systolic > 250 ||
-          diastolic < 40 ||
-          diastolic > 150
-        ) {
-          toast("Blood pressure must be in the format systolic/diastolic and within valid ranges.");
-          return;
+        const normalizedValue = value.trim().replace(/\s+/g, "/");
+        if (!/^(\d{1,3})\/(\d{1,3})$/.test(normalizedValue)) {
+          toast("Blood pressure must be in the format systolic/diastolic (e.g., 120/80).");
+          isValid = false;
+        } else {
+          const [systolic, diastolic] = normalizedValue.split("/").map(Number);
+          if (
+            systolic < 70 || systolic > 250 || 
+            diastolic < 40 || diastolic > 150
+          ) {
+            toast("Blood pressure values must be in valid ranges (Systolic: 70-250, Diastolic: 40-150).");
+            isValid = false;
+          }
         }
-      }
-      else if (type === "heart-rate") {
-        if (value < 0 || value > 200) {
-          toast("Heart rate must be between 40 and 200 bpm.");
-          return;
+      } else if (type === "heart-rate") {
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue) || numericValue < 40 || numericValue > 200) {
+          toast("Heart rate must be a valid number between 40 and 200 bpm.");
+          isValid = false;
         }
       } else if (type === "blood-sugar") {
-        if (value < 50 || value > 500) {
-          toast("Blood sugar must be between 50 and 500.");
-          return;
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue) || numericValue < 50 || numericValue > 500) {
+          toast("Blood sugar must be a valid number between 50 and 500 mg/dL.");
+          isValid = false;
         }
       } else if (type === "blood-type") {
         const validBloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "0+", "0-"];
-        if (!validBloodTypes.includes(value)) {
+        if (!validBloodTypes.includes(value.trim().toUpperCase())) {
           toast("Invalid blood type. Valid types are A+, A-, B+, B-, AB+, AB-, 0+, 0-.");
-          return;
+          isValid = false;
         }
       } else if (type === "allergies") {
-        if (value.length > 50) {
-          toast("Allergy descriptions must be less than 50 characters.");
-          return;
+        if (!value || typeof value !== "string" || value.length > 50 || /[^a-zA-Z0-9\s,]/.test(value)) {
+          toast("Allergy descriptions must be a string with less than 50 characters and only contain letters, numbers, spaces, or commas.");
+          isValid = false;
         }
+      } else {
+        toast("Invalid metric type.");
+        isValid = false;
       }
-
+  
+      if (!isValid) {
+        // Geçersiz giriş durumunda state sıfırlama
+        if (type === "weight") setWeight(null);
+        else if (type === "height") setHeight(null);
+        else if (type === "blood-pressure") setBloodPressure(null);
+        else if (type === "heart-rate") setHeartRate(null);
+        else if (type === "blood-sugar") setBloodSugar(null);
+        else if (type === "blood-type") setBloodType(null);
+        else if (type === "allergies") setAllergies([]);
+        return; // İşlemi sonlandır
+      }
+  
+      // API isteği
       const response = await putRequest(`${Endpoint.PUT_HEALTH_METRICS}/${type}`, { [type]: value });
-
+  
       if (response) {
         toast(`${type} updated successfully!`);
       } else {
         toast(`Failed to update ${type}.`);
       }
-
+  
       // Durum güncellemesi
-      if (type === "weight") {
-        setWeight(response.patient.weight);
-      } else if (type === "heart-rate") {
-        setHeartRate(response.patient.heartrate);
-      } else if (type === "height") {
-        setHeight(response.patient.height);
-      } else if (type === "blood-sugar") {
-        setBloodSugar(response.patient.bloodsugar);
-      } else if (type === "blood-type") {
-        setBloodType(response.patient.bloodtype);
-      } else if (type === "allergies") {
-        setAllergies(response.patient.allergies);
-      } else if (type === "blood-pressure") {
-        setBloodPressure(response.patient.bloodpressure);
-      }
-
+      if (type === "weight") setWeight(response.patient.weight);
+      else if (type === "height") setHeight(response.patient.height);
+      else if (type === "blood-pressure") setBloodPressure(response.patient.bloodpressure);
+      else if (type === "heart-rate") setHeartRate(response.patient.heartrate);
+      else if (type === "blood-sugar") setBloodSugar(response.patient.bloodsugar);
+      else if (type === "blood-type") setBloodType(response.patient.bloodtype);
+      else if (type === "allergies") setAllergies(response.patient.allergies);
+  
     } catch (error) {
       toast(`Error updating ${type}: ${error.message}`);
     }
     setEditing(null);
   };
+  
+  
+  
 
 
   const handleTabChange = (value) => {

@@ -78,14 +78,14 @@ const getPatient = async (req, res) => {
         const patient = await Patient
             .findById(patientId)
             .select('-password -email -address -nationality -emergencycontact -phone -role -createdAt -updatedAt ')
-            .populate({
-                path: 'appointments',
-                select: 'date treatment',
-                populate: {
-                    path: 'treatment',
-                },
-                match: { doctor: doctorId }
-            })
+            // .populate({
+            //     path: 'appointments',
+            //     select: 'date treatment',
+            //     populate: {
+            //         path: 'treatment',
+            //     },
+            //     match: { doctor: doctorId }
+            // })
             .populate('labtests')
             .populate('prescriptions')
             .populate('diagnoses')

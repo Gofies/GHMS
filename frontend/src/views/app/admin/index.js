@@ -5,18 +5,18 @@ import AdminUserManagement from "../../../pages/admin/AdminUserManagementPage.ts
 import AdminPolyclinicManagement from "../../../pages/admin/AdminPolyclinicManagementPage.tsx"
 import AdminHospitalManagement from "../../../pages/admin/AdminHospitalManagementPage.tsx"
 
-import AdminSecurityPage from "../../../pages/admin/AdminSecurityPage.tsx"
+// import AdminSecurityPage from "../../../pages/admin/AdminSecurityPage.tsx"
 import AdminSettingsPage from "../../../pages/admin/AdminSettingsPage.tsx"
 
 
 const AdminView = () => {
   return (
     <Routes>
-      <Route path="/" element={<AdminHomePage />} />
+      <Route path="/" element={<AdminUserManagement />} />
       <Route path="/user-management/*" element={<AdminUserManagement />} />
       <Route path="/polyclinic-management/*" element={<AdminPolyclinicManagement />} />
       <Route path="/hospital-management/*" element={<AdminHospitalManagement />} />
-      <Route path="/security/*" element={<AdminSecurityPage />} />
+      {/* <Route path="/security/*" element={<AdminSecurityPage />} /> */}
       <Route path="/system-settings/*" element={<AdminSettingsPage />} />
 
       {/* Add additional routes here for DoctorView */}

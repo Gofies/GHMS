@@ -58,6 +58,7 @@ export default function AdminUserManagementPage() {
   const [isJobStartMonthDropdownOpen, setIsJobStartMonthDropdownOpen] = useState(false);
   const [isJobStartYearDropdownOpen, setIsJobStartYearDropdownOpen] = useState(false);
 
+  
   const fetchDoctors = async () => {
     try {
       const response = await getRequest(Endpoint.GET_ADMIN_DOCTOR);
@@ -93,14 +94,6 @@ export default function AdminUserManagementPage() {
     }
   };
 
-
-  // const getFormattedDate = () => {
-  //   if (!selectedDay || !selectedMonth || !selectedYear) return null;
-
-  //   const monthIndex = months.indexOf(selectedMonth) + 1; // Get month index
-  //   return `${selectedYear}-${String(monthIndex).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
-  // };
-
   const navigate = useNavigate();
 
 
@@ -121,22 +114,35 @@ export default function AdminUserManagementPage() {
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
-    // const birthdate = getFormattedDate();
-    // if (!birthdate) {
-    //   alert("Please select a valid date of birth.");
-    //   return;
-    // }
-    console.log("efsfsdsd")
+   // Validasyon: Zorunlu alanları kontrol et
+  if (!name || !surname || !email || !password || !phone || !title || !specialization) {
+    toast.error("Please fill in all required fields.");
+    return;
+  }
+
+  // Validasyon: E-posta formatını kontrol et
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    toast.error("Please enter a valid email address.");
+    return;
+  }
+
+  // Validasyon: Şifre uzunluğunu kontrol et
+  if (password.length < 3) {
+    toast.error("Password must be at least 3 characters long.");
+    return;
+  }
+
     const birthdate = formatBirthdate(selectedDay, selectedMonth, selectedYear);
     const jobstartdate = formatBirthdate(selectedJobStartDay, selectedJobStartMonth, selectedJobStartYear);
 
 
     if (userType === 'doctor' && !degree) {
-      alert("Please enter the degree for the doctor.");
+      toast.error("Please enter the degree for the doctor.");
       return;
     }
     if (userType === 'labtechnician' && !certificates) {
-      alert("Please enter the certificates for the lab technician.");
+      toast.error("Please enter the certificates for the lab technician.");
       return;
     }
 
@@ -160,7 +166,7 @@ export default function AdminUserManagementPage() {
       if (userType === 'doctor') {
         responseData = await postRequest(Endpoint.GET_ADMIN_DOCTOR, requestBody);
       } else if (userType === 'labtechnician') {
-        responseData = await postRequest(Endpoint.GET_ADMIN_LAB_TECHNICIANS, requestBody); // bu yok şu an
+        responseData = await postRequest(Endpoint.GET_ADMIN_LAB_TECHNICIANS, requestBody); 
       }
       console.log("q", responseData);
       if (responseData) {
@@ -168,6 +174,23 @@ export default function AdminUserManagementPage() {
         if (toast.success) {
           fetchDoctors();
         }
+
+            // Input alanlarını sıfırla
+      setName('');
+      setSurname('');
+      setTitle('');
+      setEmail('');
+      setPassword('');
+      setPhone('');
+      setDegree('');
+      setCertificates('');
+      setSpecialization('');
+      setSelectedDay(1);
+      setSelectedMonth(months[0]);
+      setSelectedYear(new Date().getFullYear());
+      setSelectedJobStartDay(1);
+      setSelectedJobStartMonth(months[0]);
+      setSelectedJobStartYear(new Date().getFullYear());
       } else {
         toast.error("An error occurred during user creation.");
       }
@@ -196,14 +219,18 @@ export default function AdminUserManagementPage() {
 
   const handleSaveUpdatedUser = async (e, id) => {
     e.preventDefault();
-    if (!editingUser) return;
+  // Validasyon: Zorunlu alanları kontrol et
+  if (!editingUser?.name || !editingUser?.surname || !editingUser?.email || !editingUser?.phone) {
+    toast.error("Please fill in all required fields.");
+    return;
+  }
 
-    // const birthdate = getFormattedDate();
-    // if (!birthdate) {
-    //   alert("Please select a valid date of birth.");
-    //   return;
-    // }
-
+  // Validasyon: E-posta formatını kontrol et
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(editingUser.email)) {
+    toast.error("Please enter a valid email address.");
+    return;
+  }
     const requestBody = {
       name: editingUser.name || name, // Eğer editingUser'dan gelen boşsa, mevcut state kullan
       surname: editingUser.surname || surname,
@@ -221,6 +248,8 @@ export default function AdminUserManagementPage() {
       if (responseData) {
         toast.success("User updated successfully!");
         fetchDoctors(); // Listeyi güncelle
+        setEditingUser(null);
+
       } else {
         toast.error("An error occurred during user update.");
       }
@@ -280,7 +309,6 @@ export default function AdminUserManagementPage() {
   };
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -531,7 +559,6 @@ export default function AdminUserManagementPage() {
                         </div>
                       </div>
 
-                      {/* dfsdfds */}
                       <div className="grid gap-2">
                         <Label>Job Start Date</Label>
                         <div className="flex w-full space-x-4">
@@ -641,6 +668,7 @@ export default function AdminUserManagementPage() {
                     <TableHead>Role</TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>Specialization</TableHead>
+                    <TableHead>Hospital</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -653,11 +681,12 @@ export default function AdminUserManagementPage() {
                       <TableCell>{user.role}</TableCell>
                       <TableCell>{user.title}</TableCell>
                       <TableCell>{user.specialization}</TableCell>
+                      <TableCell>{user.hospital?.name}</TableCell>
                       <TableCell>
                         <Badge
-                          variant={user.polyclinic !== null ? 'success' : 'destructive'}
+                          variant={user.hospital !== null ? 'success' : 'destructive'}
                         >
-                          {user.polyclinic ? 'Active' : 'Inactive'}
+                          {user.hospital ? 'Active' : 'Inactive'}
                         </Badge>
                       </TableCell>
                       <TableCell>
