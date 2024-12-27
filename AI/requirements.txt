@@ -1,6 +1,10 @@
 Flask==2.1.2
-werkzeug==2.1.2
-Pillow==9.0.1       # For handling images
-pytesseract==0.3.10 # For OCR (image text extraction)
-PyPDF2==3.0.0       # For PDF text extraction
-prometheus_client==0.16.0  # For exposing Prometheus metrics
+transformers==4.35.0
+torch==2.1.0
+accelerate==0.22.0
+prometheus_client==0.16.0
+einops==0.6.1
+optimum==1.12.0
+auto-gptq==0.4.2
+bitsandbytes=0.45.0
+sacremoses

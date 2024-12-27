@@ -1,5 +1,4 @@
 # src/routes/__init__.py
-from flask import jsonify
 from .health import health_routes
 from .metrics import metrics_routes
 from .processor import processor_routes
