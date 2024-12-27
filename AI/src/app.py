@@ -8,13 +8,11 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
     
-    # Track request time
     @app.before_request
     def start_timer():
         request.start_time = time.time()
     
-    # Initialize services
-    file_service = FileService(app.config['UPLOAD_FOLDER'])
+    file_service = FileService()
     
     register_routes(app, file_service)
     
