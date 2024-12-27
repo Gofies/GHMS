@@ -15,8 +15,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl && \
 # Copy application code
 COPY src/ .
 
-COPY models/* /app/models/*
-
 # Create uploads directory
 RUN mkdir uploads
 
