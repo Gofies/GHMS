@@ -1,8 +1,5 @@
 import LabTest from "../../models/lab.test.model";
-import LabTechnician from "../../models/lab.technician.model";
-import LabTestQueue from "../../models/lab.queue.model";
 import Doctor from "../../models/doctor.model";
-import Patient from "../../models/patient.model";
 import Hospital from "../../models/hospital.model";
 
 const newLabTestRequest = async (req, res) => {
@@ -35,3 +32,5 @@ const newLabTestRequest = async (req, res) => {
         res.status(500).send('Server Error');
     }
 };
+
+export { newLabTestRequest };
