@@ -12,7 +12,7 @@ import { Label } from "../../components/ui/patient/profile/Label.jsx"
 import { Endpoint, postRequest, getRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify'
 import { useLocation, useNavigate } from 'react-router-dom';
-
+import { useDarkMode } from '../../helpers/DarkModeContext.js';
 const cities = [
   "New York",
   "San Francisco",
@@ -35,6 +35,7 @@ const polyclinics = [
 ];
 
 export default function NewAppointmentsPage() {
+  const { darkMode, toggleDarkMode } = useDarkMode(); 
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -253,7 +254,7 @@ export default function NewAppointmentsPage() {
 
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <Header title="New Appointment" />
@@ -264,7 +265,7 @@ export default function NewAppointmentsPage() {
             </CardHeader>
             <CardContent className="grid gap-4">
               <div className="grid gap-2 w-full">
-                <Label className="block text-sm font-medium text-gray-700">Select a City</Label>
+                <Label className="block text-sm font-medium">Select a City</Label>
                 <div className="relative">
                   <Select className="w-full max-w-md"> {/* Sabit genişlik */}
                     <SelectTrigger

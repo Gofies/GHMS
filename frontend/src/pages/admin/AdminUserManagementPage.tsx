@@ -13,11 +13,13 @@ import Sidebar from "../../components/ui/admin/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
 import { Endpoint, postRequest, getRequest, putRequest, deleteRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/patient/signup/Select.jsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/admin/Select.jsx";
+import { useDarkMode } from '../../helpers/DarkModeContext';
 
 export default function AdminUserManagementPage() {
   const [doctors, setDoctors] = useState([]);
   const [labTechnicians, setLabTechnicians] = useState([]);
+  const { darkMode } = useDarkMode();
 
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -311,7 +313,7 @@ export default function AdminUserManagementPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+   <div className={`flex h-screen ${darkMode ? "bg-gray-900 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
 
       <main className="flex-1 overflow-y-auto">
@@ -356,7 +358,11 @@ export default function AdminUserManagementPage() {
                           value={userType}
                           onChange={(e) => setUserType(e.target.value)}
                           required
-                          className="w-full"
+                          className={`w-full px-3 py-2 rounded-md shadow-sm transition-all duration-300 ${
+                            darkMode
+                              ? "bg-gray-800 text-white border border-gray-600 focus:ring-blue-500"
+                              : "bg-white text-gray-900 border border-gray-300 focus:ring-blue-600"
+                          }`}
                         >
                           <option value="doctor">Doctor</option>
                           <option value="labtechnician">Lab Technician</option>

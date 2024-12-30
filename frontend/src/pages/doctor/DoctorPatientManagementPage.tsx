@@ -11,6 +11,7 @@ import { Endpoint, getRequest } from "../../helpers/Network.js";
 
 import Sidebar from "../../components/ui/doctor/common/Sidebar.jsx"
 import Header from "../../components/ui/common/Header.jsx";
+import { useDarkMode } from '../../helpers/DarkModeContext';
 
 function calculateAge(birthdate) {
   const birthDate = new Date(birthdate);
@@ -24,7 +25,7 @@ function calculateAge(birthdate) {
 }
 
 export default function PatientManagement() {
-
+  const { darkMode, toggleDarkMode } = useDarkMode(); 
   const [searchTerm, setSearchTerm] = useState('')
   const [error, setError] = useState(null);
   const [patients, setPatients] = useState([]);
@@ -87,7 +88,7 @@ export default function PatientManagement() {
 
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">

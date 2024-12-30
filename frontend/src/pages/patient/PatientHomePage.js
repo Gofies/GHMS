@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/patient
 import { Badge } from '../../components/ui/patient/home/Badge'
 import { Plus } from 'lucide-react'
 //import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/patient/home/Dialog'
-
+import { useDarkMode } from '../../helpers/DarkModeContext.js';
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
 import { Endpoint, getRequest } from "../../helpers/Network.js";
@@ -18,7 +18,7 @@ export default function PatientHomeScreen() {
 
   const [date, setDate] = useState(null);
   const [error, setError] = useState(null);
-
+  const { darkMode, toggleDarkMode } = useDarkMode(); 
   const [appointmentDates, setAppointmentDates] = useState([]);
   const [recentAppointments, setRecentAppointments] = useState([]);
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
@@ -134,7 +134,7 @@ export default function PatientHomeScreen() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <Header title="Home" />
@@ -155,22 +155,33 @@ export default function PatientHomeScreen() {
                 </CardHeader>
                 <CardContent>
                   <CardContent>
-                    <Calendars
-                      selected={date} // Doğru state'i kullanıyoruz
+                    <div className={`${darkMode ? 'dark' : ''}`}>
+                  <Calendars
+                      selected={date}
                       onSelect={handleDateSelect}
-                      appointmentDates={appointmentDates} // Randevu tarihleri
+                      appointmentDates={appointmentDates}
+                      className={`${darkMode ? "bg-gray-900" : "text-black"}`}
                     />
+                    </div>
                   </CardContent>
                 </CardContent>
 
               </Card>
 
               {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                  <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+                <div
+                  className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-300 ${
+                    darkMode ? "bg-black bg-opacity-70" : "bg-black bg-opacity-50"
+                  }`}
+                >
+                  <div
+                    className={`p-6 rounded-lg shadow-lg w-1/3 transition-all duration-300 ${
+                      darkMode ? "bg-gray-800 text-white border border-gray-700" : "bg-white"
+                    }`}
+                  >
                     <h2
                       className="text-lg font-bold mb-4 flex justify-between items-center"
-                      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                      style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
                     >
                       <span>Appointments</span>
                       <span>{date ? formatDate(date) : ""}</span>
@@ -183,21 +194,32 @@ export default function PatientHomeScreen() {
                               <p className="text-sm font-medium">
                                 {appointment.doctor.name} {appointment.doctor.surname}
                               </p>
-
-                              <p className="text-sm text-gray-500">{appointment.polyclinic?.name}</p>
-                              <p className="text-xs text-gray-400">{appointment.date.split("T")[0]}</p>
-                              <p className="text-xs text-gray-400">{appointment.time}</p>
+                              <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+                                {appointment.polyclinic?.name}
+                              </p>
+                              <p className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>
+                                {appointment.date.split("T")[0]}
+                              </p>
+                              <p className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>
+                                {appointment.time}
+                              </p>
                             </div>
                           </div>
                         ))
                       ) : (
-                        <p className="text-sm text-gray-500">No appointments on this date.</p>
+                        <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+                          No appointments on this date.
+                        </p>
                       )}
                     </div>
                     <div className="flex justify-end mt-4">
                       <button
                         onClick={() => setIsModalOpen(false)}
-                        className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                        className={`px-4 py-2 rounded-md transition-all duration-300 ${
+                          darkMode
+                            ? "bg-blue-600 hover:bg-blue-700 text-white"
+                            : "bg-blue-500 hover:bg-blue-600 text-white"
+                        }`}
                       >
                         Close
                       </button>
@@ -205,6 +227,7 @@ export default function PatientHomeScreen() {
                   </div>
                 </div>
               )}
+
 
 
               {/* Upcoming Appointments */}

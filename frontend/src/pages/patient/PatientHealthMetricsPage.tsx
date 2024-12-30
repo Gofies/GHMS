@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/pa
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/patient/health-metrics/Tabs.jsx"
 import { CalendarDays, Home, User, FileText, PieChart, Settings, LogOut, Activity, Heart, Weight, Ruler } from 'lucide-react'
 import { LineChart } from 'recharts/es6/chart/LineChart';
-import { Line } from 'recharts/es6/cartesian/Line';
+import { Input } from "../../components/ui/patient/health-metrics/Input.jsx"
 import { XAxis } from 'recharts/es6/cartesian/XAxis';
 import { YAxis } from 'recharts/es6/cartesian/YAxis';
 import { CartesianGrid } from 'recharts/es6/cartesian/CartesianGrid';
@@ -14,7 +14,8 @@ import { ResponsiveContainer } from 'recharts/es6/component/ResponsiveContainer'
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
 import { Endpoint, putRequest, getRequest, deleteRequest } from "../../helpers/Network.js";
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
+import { useDarkMode } from '../../helpers/DarkModeContext.js';
 
 export default function HealthMetricsPage() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -29,7 +30,7 @@ export default function HealthMetricsPage() {
   const [value, setValue] = useState("");
   const [error, setError] = useState("")
   const [allergies, setAllergies] = useState(null);
-
+  const { darkMode, toggleDarkMode } = useDarkMode(); 
   const handleDelete = async (allergyToDelete) => {
     try {
       console.log(allergyToDelete);
@@ -270,7 +271,7 @@ const getBmiColor = (bmi) => {
 
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <Header title="Health Metrics" />
@@ -284,7 +285,7 @@ const getBmiColor = (bmi) => {
               <CardContent>
                 {editing === "weight" ? (
                   <div>
-                    <input
+                    <Input
                       type="number"
                       value={value}
                       onChange={handleInputChange}
@@ -317,7 +318,7 @@ const getBmiColor = (bmi) => {
               <CardContent>
                 {editing === "height" ? (
                   <div>
-                    <input
+                    <Input
                       type="number"
                       value={value}
                       onChange={handleInputChange}
@@ -350,7 +351,7 @@ const getBmiColor = (bmi) => {
               <CardContent>
                 {editing === "blood-pressure" ? (
                   <div>
-                    <input
+                    <Input
                       type="text"
                       value={value}
                       onChange={handleInputChange}
@@ -387,7 +388,7 @@ const getBmiColor = (bmi) => {
               <CardContent>
                 {editing === "heart-rate" ? (
                   <div>
-                    <input
+                    <Input
                       type="number"
                       value={value}
                       onChange={handleInputChange}
@@ -422,7 +423,7 @@ const getBmiColor = (bmi) => {
               <CardContent>
                 {editing === "blood-sugar" ? (
                   <div>
-                    <input
+                    <Input
                       type="number"
                       value={value}
                       onChange={handleInputChange}
@@ -456,7 +457,7 @@ const getBmiColor = (bmi) => {
               <CardContent>
                 {editing === "blood-type" ? (
                   <div>
-                    <input
+                    <Input
                       type="text"
                       value={value}
                       onChange={handleInputChange}
@@ -506,28 +507,42 @@ const getBmiColor = (bmi) => {
                 <CardTitle className="text-sm font-medium">Allergies</CardTitle>
               </CardHeader>
               <CardContent>
-                <ul>
-                  {Array.isArray(allergies) && allergies.length > 0 ? (
-                    allergies.map((allergy, index) => (
-                      <li key={index} className="flex items-center justify-between text-sm text-gray-700">
-                        <span>{index + 1}. {allergy}</span>
-                        <Button
-                          className="text-red-500 text-xs"
-                          onClick={() => handleDelete(allergy)}
-                        >
-                          Delete
-                        </Button>
-                      </li>
-                    ))
-                  ) : (
-                    <li className="text-sm text-gray-500">No allergies</li>
-                  )}
-                </ul>
+              <ul>
+                {Array.isArray(allergies) && allergies.length > 0 ? (
+                  allergies.map((allergy, index) => (
+                    <li
+                      key={index}
+                      className={`flex items-center justify-between text-sm transition-all duration-300 ${
+                        darkMode ? "bg-gray-700 text-gray-300" : "text-gray-700"
+                      }`}
+                    >
+                      <span>{index + 1}. {allergy}</span>
+                      <Button
+                        className={`text-xs transition-all duration-300 ${
+                          darkMode ? "text-red-400 hover:text-red-300" : "text-red-500 hover:text-red-400"
+                        }`}
+                        onClick={() => handleDelete(allergy)}
+                      >
+                        Delete
+                      </Button>
+                    </li>
+                  ))
+                ) : (
+                  <li
+                    className={`text-sm transition-all duration-300 ${
+                      darkMode ? "text-gray-500" : "text-gray-400"
+                    }`}
+                  >
+                    No allergies
+                  </li>
+                )}
+              </ul>
+
 
                 {/* Yeni alerji ekleme alanı */}
                 {editing === "allergies" && (
                   <div className="mt-4">
-                    <input
+                    <Input
                       type="text"
                       value={value}
                       onChange={handleInputChange}

@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Search, Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { Input } from "../../components/ui/doctor/patient-details/Input.jsx";
 import { Label } from "../../components/ui/doctor/patient-details/Label.jsx";
-
+import { useDarkMode } from '../../helpers/DarkModeContext';
 import Sidebar from "../../components/ui/doctor/common/Sidebar.jsx"
 import Header from "../../components/ui/common/Header.jsx";
 
@@ -23,7 +23,7 @@ import { toast } from 'react-toastify'
 
 export default function PatientDetails() {
   const [editingPrescription, setEditingPrescription] = useState(null);
-
+  const { darkMode, toggleDarkMode } = useDarkMode(); 
   function calculateAge(birthdate) {
     // Doğum tarihini Date nesnesine çevir
     const birthDate = new Date(birthdate);
@@ -329,7 +329,7 @@ console.log("Temp Editing Prescription:", tempEditingPrescription);
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <Header />
@@ -571,7 +571,11 @@ console.log("Temp Editing Prescription:", tempEditingPrescription);
                                                   status: e.target.value,
                                                 }))
                                               }
-                                              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                                              className={`block w-full px-3 py-2 rounded-md shadow-sm transition-all duration-300 ${
+                                                darkMode
+                                                  ? "bg-gray-800 text-white border-gray-600 focus:ring-blue-500"
+                                                  : "bg-white text-gray-900 border-gray-300 focus:ring-blue-600"
+                                              }`}
                                             >
                                               <option value="ongoing">Ongoing</option>
                                               <option value="completed">Completed</option>
@@ -579,7 +583,7 @@ console.log("Temp Editing Prescription:", tempEditingPrescription);
                                           </div>
                                           {/* Medicines */}
                                           {tempEditingPrescription?.medicine.map((med, index) => (
-                                            <div key={index} className="grid grid-cols-4 gap-4 mb-4">
+                                            <div key={index} className="grid grid-cols-4 gap-8 mb-4">
                                               <div>
                                                 <Label>Medication Name</Label>
                                                 <Input
@@ -590,7 +594,7 @@ console.log("Temp Editing Prescription:", tempEditingPrescription);
                                                 />
                                               </div>
                                               <div>
-                                                <Label>Dosage</Label>
+                                                <Label>Dosage  (Per Day) </Label>
                                                 <Input
                                                   value={med.quantity}
                                                   onChange={(e) =>
@@ -619,7 +623,7 @@ console.log("Temp Editing Prescription:", tempEditingPrescription);
                                             </div>
                                           ))}
                                           <div className="flex justify-end mt-4 space-x-2">
-                                            <Button type="submit" variant="primary">
+                                            <Button type="submit" size="sm" variant="outline">
                                               Save
                                             </Button>
                                           </div>
@@ -627,9 +631,8 @@ console.log("Temp Editing Prescription:", tempEditingPrescription);
                                       </DialogContent>
 
                                     </Dialog>
-
-                                    <Button
-                                      variant="destructive"
+                                    <Button type="submit" size="sm"
+                                      variant="outline"
                                       onClick={() =>
                                         handleDeletePrescription(prescription._id)
                                       }
@@ -716,27 +719,32 @@ console.log("Temp Editing Prescription:", tempEditingPrescription);
                     <form onSubmit={handlePrescriptionSubmit}>
                       {/* Status Field */}
                       <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <Label className="block text-sm font-medium mb-1">
                           Status
-                        </label>
+                        </Label>
                         <select
                           value={status}
                           onChange={(e) => setStatus(e.target.value)}
-                          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                          className={`block w-full px-3 py-2 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 ${
+                            darkMode
+                              ? 'bg-gray-800 text-white border-gray-700 focus:ring-indigo-400 focus:border-indigo-400'
+                              : 'bg-white text-gray-900 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
+                          }`}
                         >
                           <option value="ongoing">Ongoing</option>
                           <option value="completed">Completed</option>
                         </select>
+
                       </div>
 
                       {/* Medicine Fields */}
                       <div className="grid grid-cols-4 gap-4 mb-6 items-center">
                         {/* Medicine Name */}
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <Label className="block text-sm font-medium mb-1">
                             Medication Name
-                          </label>
-                          <input
+                          </Label>
+                          <Input
                             type="text"
                             name="name"
                             value={newMedicine.name}
@@ -747,10 +755,10 @@ console.log("Temp Editing Prescription:", tempEditingPrescription);
 
                         {/* Quantity */}
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <Label className="block text-sm font-medium mb-1">
                             Dosage
-                          </label>
-                          <input
+                          </Label>
+                          <Input
                             type="text"
                             name="quantity"
                             value={newMedicine.quantity}
@@ -761,10 +769,10 @@ console.log("Temp Editing Prescription:", tempEditingPrescription);
 
                         {/* Time */}
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <Label className="block text-sm font-medium mb-1">
                             Duration (Days)
-                          </label>
-                          <input
+                          </Label>
+                          <Input
                             type="text"
                             name="time"
                             value={newMedicine.time}
@@ -775,10 +783,10 @@ console.log("Temp Editing Prescription:", tempEditingPrescription);
 
                         {/* Form */}
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <Label className="block text-sm font-medium mb-1">
                             Dosage Form
-                          </label>
-                          <input
+                          </Label>
+                          <Input
                             type="text"
                             name="form"
                             value={newMedicine.form}
@@ -800,18 +808,29 @@ console.log("Temp Editing Prescription:", tempEditingPrescription);
 
                       {/* Medicine List */}
                       <div className="mt-4">
-                        <h4 className="text-lg font-semibold mb-3">Medicines:</h4>
+                        <h4
+                          className={`text-lg font-semibold mb-3 ${
+                            darkMode ? 'text-white' : 'text-gray-900'
+                          }`}
+                        >
+                          Medicines:
+                        </h4>
                         <ul className="space-y-2">
                           {medicine.map((med, index) => (
                             <li
                               key={index}
-                              className="p-2 bg-gray-100 rounded-md shadow border border-gray-300"
+                              className={`p-2 rounded-md shadow border transition-all duration-300 ${
+                                darkMode
+                                  ? 'bg-gray-800 border-gray-700 text-white'
+                                  : 'bg-gray-100 border-gray-300 text-gray-800'
+                              }`}
                             >
                               {med.name} - {med.quantity} - {med.time} days - {med.form}
                             </li>
                           ))}
                         </ul>
                       </div>
+
 
                       {/* Submit Button */}
                       <div className="flex justify-end mt-6">

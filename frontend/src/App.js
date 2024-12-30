@@ -13,11 +13,11 @@ import ProtectedRoute from "./components/ProtectedRoute.js";
 import { store, persistor } from "./redux/store";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-//import { DarkModeProvider } from '../src/helpers/DarkModeContext.js';
+import { DarkModeProvider } from '../src/helpers/DarkModeContext.js';
 
 function App() {
   return (
-   // <DarkModeProvider>
+   <DarkModeProvider>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
@@ -41,7 +41,7 @@ function App() {
         </BrowserRouter>
       </PersistGate>
     </Provider>
-   // </DarkModeProvider>
+   </DarkModeProvider>
   );
 }
 

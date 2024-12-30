@@ -1,14 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { Home, User, CalendarDays, FileText, PieChart, Settings, Clipboard } from "lucide-react"; // Icon importlarını unutmayın
-import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useDarkMode } from "../../../../helpers/DarkModeContext";
 
 export default function Sidebar() {
     const location = useLocation(); 
-
+    const { darkMode } = useDarkMode();
     const isActive = (path) => location.pathname === path;
 
-   // const { patientId } = useParams();
     const { userId } = useSelector((state) => state.auth);
 
     const links = [
@@ -30,9 +29,9 @@ export default function Sidebar() {
       ];
 
     return (
-        <aside className="w-64 bg-white shadow-md hidden md:block">
+        <aside className={`w-64 hidden md:block shadow-md transition-all duration-300 ${darkMode ? "bg-gray-900 border-r border-gray-700 text-white" : "bg-white border-r border-gray-200 text-gray-800"}`}>
       <div className="p-4">
-        <h2 className="text-2xl font-bold text-gray-800">Hospital System</h2>
+        <h2 className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-800"}`}>Hospital System</h2>
       </div>
       <nav className="mt-6">
         {links.map((link, index) => {
@@ -41,9 +40,13 @@ export default function Sidebar() {
             <Link
               key={index}
               to={link.to}
-              className={`flex items-center px-4 py-2 mt-2 ${
+              className={`flex items-center px-4 py-2 mt-2 rounded-md transition-all duration-300 ${
                 isActive(link.to)
-                  ? "text-gray-800 bg-gray-200 font-bold"
+                  ? darkMode
+                    ? "bg-gray-800 text-white font-semibold"
+                    : "bg-gray-200 text-gray-800 font-bold"
+                  : darkMode
+                  ? "text-gray-400 hover:bg-gray-800 hover:text-white"
                   : "text-gray-600 hover:bg-gray-100"
               }`}
             >

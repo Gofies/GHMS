@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/patient/medical-records/Table.jsx"
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
-
+import { useDarkMode } from '../../helpers/DarkModeContext.js';
 import { Endpoint, getRequest } from "../../helpers/Network.js";
 
 // const testResults = [
@@ -36,6 +36,7 @@ import { Endpoint, getRequest } from "../../helpers/Network.js";
 // ]
 
 export default function MedicalRecordsPage() {
+  const { darkMode, toggleDarkMode } = useDarkMode(); 
   const [activeTab, setActiveTab] = useState("test-results"); 
   const [testResults, setTestResults] = useState(null);
   const [analyses, setAnalyses] = useState(null);
@@ -85,41 +86,61 @@ export default function MedicalRecordsPage() {
   // }
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <Header title="Medical Records" />
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           {/* Tab Başlıkları */}
-          <div className="flex space-x-4 border-b border-gray-300">
+          <div
+            className={`flex space-x-4 border-b ${
+              darkMode ? "border-gray-700" : "border-gray-300"
+            }`}
+          >
             <button
-              className={`px-4 py-2 text-sm font-medium ${activeTab === "test-results"
-                  ? "text-blue-600 border-b-2 border-blue-600"
+              className={`px-4 py-2 text-sm font-medium ${
+                activeTab === "test-results"
+                  ? darkMode
+                    ? "text-blue-400 border-b-2 border-blue-500"
+                    : "text-blue-600 border-b-2 border-blue-600"
+                  : darkMode
+                  ? "text-gray-400 hover:text-gray-200"
                   : "text-gray-600 hover:text-gray-800"
-                }`}
+              }`}
               onClick={() => setActiveTab("test-results")}
             >
               Test Results
             </button>
             <button
-              className={`px-4 py-2 text-sm font-medium ${activeTab === "analyses"
-                  ? "text-blue-600 border-b-2 border-blue-600"
+              className={`px-4 py-2 text-sm font-medium ${
+                activeTab === "analyses"
+                  ? darkMode
+                    ? "text-blue-400 border-b-2 border-blue-500"
+                    : "text-blue-600 border-b-2 border-blue-600"
+                  : darkMode
+                  ? "text-gray-400 hover:text-gray-200"
                   : "text-gray-600 hover:text-gray-800"
-                }`}
+              }`}
               onClick={() => setActiveTab("analyses")}
             >
               Analyses
             </button>
             <button
-              className={`px-4 py-2 text-sm font-medium ${activeTab === "diagnoses"
-                  ? "text-blue-600 border-b-2 border-blue-600"
+              className={`px-4 py-2 text-sm font-medium ${
+                activeTab === "diagnoses"
+                  ? darkMode
+                    ? "text-blue-400 border-b-2 border-blue-500"
+                    : "text-blue-600 border-b-2 border-blue-600"
+                  : darkMode
+                  ? "text-gray-400 hover:text-gray-200"
                   : "text-gray-600 hover:text-gray-800"
-                }`}
+              }`}
               onClick={() => setActiveTab("diagnoses")}
             >
               Diagnoses
             </button>
           </div>
+
 
           {/* Tab İçerikleri */}
           <div className="mt-4">

@@ -13,6 +13,7 @@ import Sidebar from "../../components/ui/admin/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
 import { Endpoint, postRequest, getRequest, deleteRequest, putRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify';
+import { useDarkMode } from '../../helpers/DarkModeContext';
 
 export default function AdminHospitalManagementPage() {
   const [hospitals, setHospitals] = useState([]);
@@ -26,6 +27,7 @@ export default function AdminHospitalManagementPage() {
   const [phone, setPhone] = useState('');
   const [establishmentdate, setEstablishmentDate] = useState('');
   const [polyclinics, setPolyclinics] = useState([]);
+  const { darkMode } = useDarkMode(); // Context'ten alınan değerler
 
   const [selectedHospital, setSelectedHospital] = useState(null);
 
@@ -232,7 +234,7 @@ export default function AdminHospitalManagementPage() {
   
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-900 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
 
       <main className="flex-1 overflow-y-auto">

@@ -13,10 +13,12 @@ import Sidebar from "../../components/ui/admin/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
 import { Endpoint, postRequest, getRequest, putRequest, deleteRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify';
-
+import { useDarkMode } from '../../helpers/DarkModeContext';
 export default function AdminPolyclinicManagementPage() {
   const [doctors, setDoctors] = useState([]);
   const [inactiveDoctors, setInactiveDoctors] = useState([]);
+  const { darkMode } = useDarkMode();
+
 
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [polyclinics, setPolyclinics] = useState([]);
@@ -240,7 +242,7 @@ export default function AdminPolyclinicManagementPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-900 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
 
       <main className="flex-1 overflow-y-auto">
@@ -337,7 +339,7 @@ export default function AdminPolyclinicManagementPage() {
                             overflowY: "auto",
                             overflowX: "hidden",
                             padding: "0.5rem",
-                            backgroundColor: "#f9f9f9",
+                            backgroundColor: darkMode ? "#2d3748" : "#f9f9f9",  // Dark mode adjustment
                             borderRadius: "4px",
                           }}
                         >
@@ -348,10 +350,12 @@ export default function AdminPolyclinicManagementPage() {
                                 key={index}
                                 style={{
                                   padding: "0.5rem",
-                                  backgroundColor: "#fff",
-                                  border: "1px solid #ddd",
+                                  backgroundColor: darkMode ? "#1a202c" : "#fff",  // Dark mode for item
+                                  border: `1px solid ${darkMode ? "#4a5568" : "#ddd"}`,  // Border for dark mode
                                   borderRadius: "4px",
-                                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                                  boxShadow: darkMode
+                                    ? "0 2px 4px rgba(0, 0, 0, 0.4)"  // Darker shadow in dark mode
+                                    : "0 2px 4px rgba(0, 0, 0, 0.1)",
                                   fontSize: "0.875rem",
                                   display: "flex",
                                   alignItems: "center",

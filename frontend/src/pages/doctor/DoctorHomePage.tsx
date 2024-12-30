@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { CalendarDays, Home, Users, FileText, Clipboard, LogOut } from 'lucide-react'
 import { Endpoint, getRequest } from "../../helpers/Network.js";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useDarkMode } from '../../helpers/DarkModeContext';
 
 import Sidebar from "../../components/ui/doctor/common/Sidebar.jsx"
 import Header from "../../components/ui/common/Header.jsx";
@@ -16,7 +17,7 @@ export default function DoctorHomepage() {
   const [labResults, setLabResults] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-
+  const { darkMode, toggleDarkMode } = useDarkMode(); 
   useEffect(() => {
     const fetchDoctorHome = async () => {
       console.log("fdh");
@@ -35,7 +36,7 @@ export default function DoctorHomepage() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
 
       {/* Main Content */}

@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useDarkMode } from "../../../helpers/DarkModeContext";
 
 export function Dialog({ children }) {
   const [isOpen, setIsOpen] = useState(false);
+  const { darkMode } = useDarkMode();
 
   const openDialog = () => setIsOpen(true);
   const closeDialog = () => setIsOpen(false);
@@ -14,15 +16,21 @@ export function Dialog({ children }) {
       {/* Dialog Content */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          className={`fixed inset-0 flex justify-center items-center z-50 transition-all duration-300 ${
+            darkMode ? "bg-black bg-opacity-70" : "bg-black bg-opacity-50"
+          }`}
           onClick={closeDialog}
         >
           <div
-            className="bg-white rounded-lg shadow-lg w-1/3 max-w-lg p-6"
-            onClick={(e) => e.stopPropagation()} // Dialog dışına tıklayınca kapanmasın
+            className={`rounded-lg shadow-lg w-1/3 max-w-lg p-6 transition-all duration-300 ${
+              darkMode ? "bg-gray-800 text-white" : "bg-white"
+            }`}
+            onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+              className={`absolute top-2 right-2 transition-all duration-300 ${
+                darkMode ? "text-gray-400 hover:text-gray-300" : "text-gray-400 hover:text-gray-600"
+              }`}
               onClick={closeDialog}
             >
               &#x2715;
@@ -44,10 +52,19 @@ export function DialogContent({ children }) {
 }
 
 export function DialogHeader({ children }) {
-  return <div className="text-lg font-semibold">{children}</div>;
+  const { darkMode } = useDarkMode();
+  return (
+    <div className={`text-lg font-semibold ${darkMode ? "text-white" : "text-black"}`}>
+      {children}
+    </div>
+  );
 }
 
 export function DialogTitle({ children }) {
-  return <h2 className="text-2xl font-bold">{children}</h2>;
+  const { darkMode } = useDarkMode();
+  return (
+    <h2 className={`text-2xl font-bold ${darkMode ? "text-white" : "text-black"}`}>
+      {children}
+    </h2>
+  );
 }
-

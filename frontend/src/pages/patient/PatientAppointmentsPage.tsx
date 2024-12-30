@@ -9,9 +9,10 @@ import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/common/Header.jsx";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Endpoint, getRequest } from "../../helpers/Network.js";
+import { useDarkMode } from '../../helpers/DarkModeContext.js';
 
 export default function AppointmentsPage() {
-
+    const { darkMode, toggleDarkMode } = useDarkMode(); 
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
     const [newAppointmentStep, setNewAppointmentStep] = useState(1);
@@ -118,7 +119,7 @@ export default function AppointmentsPage() {
     const [error, setError] = useState(null);
 
     return (
-        <div className="flex h-screen bg-gray-100">
+        <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
             <Sidebar />
             <main className="flex-1 overflow-y-auto">
                 <Header title="Appointments" />

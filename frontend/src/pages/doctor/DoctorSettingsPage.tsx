@@ -11,30 +11,18 @@ import { useDarkMode } from '../../helpers/DarkModeContext.js';
 import { Endpoint, getRequest, putRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/patient/appointment/Dialog.jsx"
-import { Input } from '../../components/ui/login/Input.jsx';
+import { Input } from "../../components/ui/patient/settings/Input.jsx"
 //import { Label } from '../../components/ui/login/Label';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
+
 
 export default function DoctorSettingsPage() {
   const [language, setLanguage] = useState('english')
   const [notifications, setNotifications] = useState(true)
   const [twoFactor, setTwoFactor] = useState(false)
+  const { darkMode, toggleDarkMode } = useDarkMode(); 
 
-  // const [darkMode, setDarkMode] = useState(
-  //   localStorage.getItem("darkMode") === "true" // Dark mode durumu yerel depolamadan alınır
-  // );
-  const [darkMode, setDarkMode] = useState(false);
 
-  const handleDarkModeToggle = (checked) => {
-    // setDarkMode(checked);
-    // if (checked) {
-    //   document.documentElement.classList.add("dark"); // `dark` sınıfını ekler
-    //   localStorage.setItem("darkMode", "true"); // Yerel depolamada dark mode'u aktif olarak kaydeder
-    // } else {
-    //   document.documentElement.classList.remove("dark"); // `dark` sınıfını kaldırır
-    //   localStorage.setItem("darkMode", "false"); // Yerel depolamada dark mode'u devre dışı bırakır
-    // }
-  };
 
   const handleLanguageChange = (value: string) => {
     setLanguage(value)
@@ -72,7 +60,7 @@ export default function DoctorSettingsPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
@@ -89,14 +77,11 @@ export default function DoctorSettingsPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="dark-mode">Dark Mode</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Turn on dark mode for a comfortable viewing experience in low light.
-                  </p>
                 </div>
                 <Switch
                   id="dark-mode"
                   checked={darkMode}
-                  onCheckedChange={handleDarkModeToggle}
+                  onCheckedChange={toggleDarkMode}
                 />
               </div>
               {/* <div className="space-y-2">
