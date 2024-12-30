@@ -63,3 +63,6 @@ mongo-up:
 
 attach-mongo:
 	docker-compose exec router01 mongosh HospitalDatabase --port 27117 -u ${MONGO_USERNAME} -p ${MONGO_PASSWORD} --authenticationDatabase admin
+
+attach-mongo-testDb:
+	docker-compose exec router01 mongosh TestHospitalDatabase --port 27117 -u ${MONGO_USERNAME} -p ${MONGO_PASSWORD} --authenticationDatabase admin

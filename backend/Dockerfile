@@ -10,4 +10,4 @@ RUN npm install
 
 COPY backend/ .
 
-CMD ["npm", "run", "start"]
+CMD ["sh", "-c", "npm run start && node test/testDatabase_init.js"]
