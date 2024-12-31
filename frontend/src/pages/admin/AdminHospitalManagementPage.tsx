@@ -19,28 +19,15 @@ export default function AdminHospitalManagementPage() {
   const [hospitals, setHospitals] = useState([]);
   const [filteredHospitals, setFilteredHospitals] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
-  const [selecteddoctors, setSelectedDoctors] = useState('');
-  const [selectedPolyclinics, setSelectedPolyclinics] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [establishmentdate, setEstablishmentDate] = useState('');
-  const [polyclinics, setPolyclinics] = useState([]);
-  const { darkMode } = useDarkMode(); // Context'ten alınan değerler
-
   const [selectedHospital, setSelectedHospital] = useState(null);
-
-  const handleEditHospital = (hospital) => {
-    console.log(hospital);
-    setSelectedHospital(hospital);
-  };
-
+  const [labTechnicians, setLabTechnicians] = useState([]);
+  const [selectedLabTechnicians, setSelectedLabTechnicians] = useState([]);
+  const [combinedLabTechnicians, setCombinedLabTechnicians] = useState([]);
+  const { darkMode } = useDarkMode(); // Context'ten alınan değerler
 
   const fetchHospitals = async () => {
     try {
       const response = await getRequest(Endpoint.GET_ADMIN_HOSPITAL);
-      console.log("h", response);
       if (response) {
         setHospitals(response.hospitals);
         setFilteredHospitals(response.hospitals);
@@ -53,18 +40,19 @@ export default function AdminHospitalManagementPage() {
     }
   };
 
-  const fetchDoctors = async () => {
+  const fetchLabTechnicians = async () => {
     try {
-      const response = await getRequest(Endpoint.GET_ADMIN_HOSPITAL);
+      const response = await getRequest(Endpoint.GET_ADMIN_LAB_TECHNICIAN);
+      console.log("raa", response);
       if (response) {
-        setHospitals(response.hospitals);
-        setFilteredHospitals(response.hospitals);
+        setLabTechnicians(response.labTechnicians);
+        //setFilteredHospitals(response.hospitals);
       } else {
-        toast.error('Failed to fetch hospitals.');
+        toast.error('Failed to fetch labtechs.');
       }
     } catch (error) {
-      console.error('Error fetching hospitals:', error);
-      toast.error('An error occurred while fetching hospital data.');
+      console.error('Error fetching labtechs:', error);
+      toast.error('An error occurred while fetching labtechs data.');
     }
   };
 
@@ -86,34 +74,15 @@ export default function AdminHospitalManagementPage() {
     }));
   };
 
-  // For doctors input, we'll need to handle it as an array
-  const handleDoctorsInput = (value) => {
-    // Split the input by commas and trim whitespace
-    const doctorsArray = value.split(',').map(id => id.trim());
-    setFormData(prev => ({
-      ...prev,
-      selecteddoctors: doctorsArray
-    }));
-  };
-
-  // For polyclinics input, we'll handle it as an array
-  const handlePolyclinicsInput = (value) => {
-    const polyclinicsArray = value.split(',').map(clinic => clinic.trim());
-    setFormData(prev => ({
-      ...prev,
-      polyclinics: polyclinicsArray
-    }));
-  };
-
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
         await fetchHospitals(); // Hastane verilerini getir
+        await fetchLabTechnicians();
       } catch (error) {
         console.error("Error fetching initial data:", error);
       }
     };
-
     fetchInitialData();
   }, []);
 
@@ -124,15 +93,7 @@ export default function AdminHospitalManagementPage() {
 
   const handleCreateHospital = async (e) => {
     e.preventDefault();
-    // const requestBody = {
-    //   name,
-    //   address,
-    //   selecteddoctors,
-    //   establishmentdate,
-    //   phone,
-    //   email,
-    //   polyclinics
-    // };
+
     try {
       console.log(formData);
       const responseData = await postRequest(Endpoint.GET_ADMIN_HOSPITAL, formData);
@@ -164,22 +125,10 @@ export default function AdminHospitalManagementPage() {
     }
   }, [searchTerm, hospitals]);
 
-  // useEffect(() => {
-  //   //   if (searchTerm) {
-  //   //     const filtered = users.filter((user) =>
-  //   //       `${user.name} ${user.surname}`.toLowerCase().includes(searchTerm.toLowerCase())
-  //   //     );
-  //   //     setFilteredUsers(filtered);
-  //   //   } else {
-  //   fetchHospitals();
-  //   //   }
-  // }, []);
-  // // }, [searchTerm, users]);
-
   const handleLocationChange = (hospitalId) => {
     const pathParts = window.location.pathname.split("/");
     const adminId = pathParts[2];
-    window.location.href = `/admin/${adminId}/polyclinic-management/${hospitalId}`;
+    navigate(`/admin/${adminId}/polyclinic-management/${hospitalId}`);
   };
 
   const deleteUser = async (id) => {
@@ -198,10 +147,47 @@ export default function AdminHospitalManagementPage() {
     }
   };
 
+  const handleEditHospital = async (hospital) => {
+    // Poliklinik bilgilerini doldur
+     setSelectedHospital(hospital);
+    //setName(polyclinic.name);
+    setSelectedLabTechnicians(hospital.labTechnicians || []); // Seçili doktorları doldur
+
+    try {
+      // Inactive doktorları getir
+      const response = await getRequest(Endpoint.GET_ADMIN_LAB_TECHNICIAN);
+      if (response) {
+       const inactiveLabTechnicians = response.labTechnicians.filter(tech => !tech.hospital);
+        const combined = [
+          ...inactiveLabTechnicians,
+          ...response.labTechnicians.filter(tech => hospital.labTechnicians.includes(tech._id)),
+        ];
+
+        // combinedDoctors state'ini güncelle
+       setCombinedLabTechnicians(combined);
+       setLabTechnicians(response.labTechnicians)
+
+      } else {
+        toast.error('Failed to fetch labtechs.');
+      }
+    } catch (error) {
+      console.error('Error fetching inactive labtechs:', error);
+      toast.error('An error occurred while fetching labtechs data.');
+    }
+  };
+
+
+  useEffect(() => {
+    if (selectedHospital) {
+      setSelectedLabTechnicians(selectedHospital.labTechnicians || []);
+    }
+  }, [selectedHospital]);
+
+  
+
   const handleUpdateHospital = async (e) => {
     e.preventDefault();
   
-    // Request body, backend'de beklenen alanlarla uyumlu şekilde oluşturuluyor
     const requestBody = {
       name: selectedHospital.name,
       address: selectedHospital.address,
@@ -210,11 +196,15 @@ export default function AdminHospitalManagementPage() {
       email: selectedHospital.email,
       polyclinics: selectedHospital.polyclinics, // Polyclinic listesi
       doctors: selectedHospital.doctors, // Doctor listesi
+      labTechnicians: selectedLabTechnicians || [], // Güncellenmiş laboratuvar teknisyenleri
     };
   
     try {
-      console.log(requestBody);
-      const responseData = await putRequest(`${Endpoint.GET_ADMIN_HOSPITAL}/${selectedHospital._id}`, requestBody);
+      console.log("Request Body:", requestBody);
+      const responseData = await putRequest(
+        `${Endpoint.GET_ADMIN_HOSPITAL}/${selectedHospital._id}`,
+        requestBody
+      );
       if (responseData) {
         toast.success("Hospital updated successfully!");
   
@@ -223,6 +213,8 @@ export default function AdminHospitalManagementPage() {
   
         // Dialog kapatma veya state sıfırlama işlemleri
         setSelectedHospital(null);
+        setSelectedLabTechnicians([]);
+        setCombinedLabTechnicians([]);
       } else {
         toast.error("An error occurred during hospital update.");
       }
@@ -232,6 +224,31 @@ export default function AdminHospitalManagementPage() {
     }
   };
   
+  
+
+  const handleLabTechnicianSelect = (techId) => {
+    setSelectedLabTechnicians((prev) => {
+      let updatedLabTechs;
+      if (prev?.includes(techId)) {
+        // Eğer zaten seçilmişse, çıkar
+        updatedLabTechs = prev.filter((id) => id !== techId);
+      } else {
+        // Eğer seçili değilse, ekle
+        updatedLabTechs = [...prev, techId];
+      }
+  
+      // selectedHospital'ın labTechnicians alanını güncelle
+      setSelectedHospital((prevHospital) => ({
+        ...prevHospital,
+        labTechnicians: updatedLabTechs,
+      }));
+  
+      return updatedLabTechs;
+    });
+  };
+  
+  
+
 
   return (
     <div className={`flex h-screen ${darkMode ? "bg-gray-900 " : "bg-gray-100" }text-gray-900`}>
@@ -365,10 +382,6 @@ export default function AdminHospitalManagementPage() {
                           >
                             Polyclinics
                           </Button>
-
-
-
-
                           <TableCell>
                             <div className="flex space-x-2">
                               <Dialog>
@@ -469,6 +482,28 @@ export default function AdminHospitalManagementPage() {
                                             className="w-full"
                                           />
                                         </div>
+                                        <div>
+                                    <Label>Lab Techs</Label>
+                                    <div className="border p-2 rounded">
+                                      {combinedLabTechnicians?.map((tech) => (
+                                        <div key={tech._id} className="flex items-center mb-2">
+                                          <input
+                                            type="checkbox"
+                                            id={tech._id}
+                                            checked={selectedLabTechnicians?.includes(tech._id)}
+                                            onChange={() => handleLabTechnicianSelect(tech._id)}
+                                            className="mr-2"
+                                          />
+                                          <label htmlFor={tech._id} className="text-sm">
+                                            {tech.name}
+                                          </label>
+                                        </div>
+                                      ))}
+                                    </div>
+                                    <p className="text-sm text-gray-500">
+                                      Select lab techs for this hospital
+                                    </p>
+                                  </div>
                                       </div>
                                       <div className="flex justify-end">
                                         <Button type="submit">Save Changes</Button>

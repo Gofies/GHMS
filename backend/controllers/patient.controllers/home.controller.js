@@ -12,13 +12,27 @@ const getPatientHome = async (req, res) => {
                     { path: 'polyclinic', select: 'name' }
                 ]
             });
-        const upcomingAppointments = patient.appointments.filter(appointment => appointment.date > new Date());
-        const recentAppointments = patient.appointments.filter(appointment => appointment.date < new Date());
+
+        if (!patient) {
+            return res.status(404).json({ message: 'Patient not found' });
+        }
+
+        // Gelecek randevuları tarihine göre azalan sırada sıralayın
+        const upcomingAppointments = patient.appointments
+            .filter(appointment => appointment.date > new Date())
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // Geçmiş randevuları tarihine göre azalan sırada sıralayın
+        const recentAppointments = patient.appointments
+            .filter(appointment => appointment.date < new Date())
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+
         res.json({ upcomingAppointments, recentAppointments });
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');
     }
-}
+};
+
 
 export { getPatientHome };

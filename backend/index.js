@@ -17,6 +17,7 @@ import patientProfileRoutes from "./routes/patient.routes/profile.route.js";
 import patientHomeRoutes from "./routes/patient.routes/home.route.js";
 
 import adminDoctorRoutes from "./routes/admin.routes/doctor.routes.js";
+import adminPatientRoutes from "./routes/admin.routes/patient.routes.js";
 import adminHospitalRoutes from "./routes/admin.routes/hospital.routes.js";
 import adminPolyclinicRoutes from "./routes/admin.routes/polyclinic.routes.js";
 import adminLabTechRoutes from "./routes/admin.routes/labtechnician.routes.js";
@@ -54,6 +55,7 @@ app.use("/api/v1/patient/medical-record", patientMedicalRecordRoutes);
 app.use("/api/v1/patient/profile", patientProfileRoutes);
 
 app.use("/api/v1/admin/doctor", adminDoctorRoutes);
+app.use("/api/v1/admin/patient", adminPatientRoutes);
 app.use("/api/v1/admin/hospital", adminHospitalRoutes);
 app.use("/api/v1/admin/polyclinic", adminPolyclinicRoutes);
 app.use("/api/v1/admin/labtechnician", adminLabTechRoutes);

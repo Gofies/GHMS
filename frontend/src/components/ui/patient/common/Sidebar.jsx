@@ -30,7 +30,7 @@ export default function Sidebar() {
         },
         {
           to: `/patient/${userId}/medical-records`,
-          label: "Medical Records",
+          label: "Lab Tests",
           icon: FileText,
         },
         {

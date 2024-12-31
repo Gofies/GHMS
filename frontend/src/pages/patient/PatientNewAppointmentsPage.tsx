@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/patient/appointment/Table.jsx"
 import { Plus, Info } from 'lucide-react'
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
-import Header from "../../components/ui/common/Header.jsx";
+import Header from "../../components/ui/admin/Header.jsx";
 import { Input } from "../../components/ui/patient/profile/Input.jsx"
 import { Label } from "../../components/ui/patient/profile/Label.jsx"
 import { Endpoint, postRequest, getRequest } from "../../helpers/Network.js";
@@ -220,7 +220,6 @@ export default function NewAppointmentsPage() {
     console.log("API call initiated");
     try {
       console.log("Fetching data...");
-      console.log("p", params);
       const response = await getRequest("/patient/appointments/new/", params);
 
       if (response) {

@@ -55,6 +55,10 @@ const doctorSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Appointment'
     }],
+    labtests: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'LabTest'
+    }],
     role: {
         type: String,
         required: true

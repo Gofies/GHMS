@@ -4,11 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/pa
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/patient/appointment/Dialog.jsx"
 import { Select, SelectContent, SelectItem, SelectTrigger } from "../../components/ui/patient/appointment/Select.jsx"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/patient/appointment/Table.jsx"
-import { Plus, Info } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
-import Header from "../../components/ui/common/Header.jsx";
+import Header from "../../components/ui/admin/Header.jsx";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Endpoint, getRequest } from "../../helpers/Network.js";
+import { Endpoint, getRequest, deleteRequest } from "../../helpers/Network.js";
+import { toast } from 'react-toastify'
 import { useDarkMode } from '../../helpers/DarkModeContext.js';
 
 export default function AppointmentsPage() {
@@ -90,10 +91,6 @@ export default function AppointmentsPage() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const handleCreateAppointment = () => {
-        navigate(`${location.pathname}new`);
-    }
-
     useEffect(() => {
         const fetchPatientAppointments = async () => {
             try {
@@ -102,12 +99,12 @@ export default function AppointmentsPage() {
                 setRecentAppointments(response.recentAppointments);
                 setUpcomingAppointments(response.upcomingAppointments);
                 const combinedAppointments = [
-                    ...response.recentAppointments,
                     ...response.upcomingAppointments,
+                    ...response.recentAppointments,
                 ];
 
                 setAppointments(combinedAppointments);
-   
+
             } catch (err) {
                 console.error('Error fetching patient profile:', err);
                 setError('Failed to load patient profile.');
@@ -115,6 +112,26 @@ export default function AppointmentsPage() {
         };
         fetchPatientAppointments();
     }, []);
+
+    const handleDeleteAppointment = async (id) => {
+        console.log("id", id);
+        try {
+            const response = await deleteRequest(`/patient/appointments/${id}`);
+            if(response){
+                toast.success("Appointment cancelled successfully");
+                const response = await getRequest(Endpoint.GET_HOME_APPOINTMENTS);
+                const combinedAppointments = [
+                    ...response.upcomingAppointments,
+                    ...response.recentAppointments,
+                ];
+                setAppointments(combinedAppointments);
+            }
+        
+        } catch (err) {
+            console.error('Error cancelling appointment:', err);
+            setError('Failed to cancel appointment.');
+        }
+    };
 
     const [error, setError] = useState(null);
 
@@ -142,19 +159,37 @@ export default function AppointmentsPage() {
                                         <TableHead>Date</TableHead>
                                         <TableHead>Time</TableHead>
                                         <TableHead>Status</TableHead>
+                                        <TableHead>Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {appointments && appointments.length > 0 ? (
                                         appointments.map((appointment) => {
-                                            const formattedDate = appointment.date.split("T")[0]; 
+                                            // Format the date and compare it with today
+                                            const formattedDate = appointment.date.split("T")[0];
+                                            const appointmentDate = new Date(appointment.date);
+                                            const today = new Date();
+
+                                            // Check if the appointment is in the past
+                                            const status = appointmentDate < today ? "Completed" : appointment.status;
+
                                             return (
                                                 <TableRow key={appointment.id}>
                                                     <TableCell>{`${appointment.doctor?.name || ''} ${appointment.doctor?.surname || ''}`}</TableCell>
                                                     <TableCell>{appointment.polyclinic?.name}</TableCell>
-                                                    <TableCell>{formattedDate}</TableCell> 
+                                                    <TableCell>{formattedDate}</TableCell>
                                                     <TableCell>{appointment.time}</TableCell>
-                                                    <TableCell>{appointment.status}</TableCell>
+                                                    <TableCell>{status}</TableCell>
+                                                    <TableCell>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => handleDeleteAppointment(appointment._id)}
+                                                        >
+<X className="w-4 h-4 mr-1" />
+Cancel
+                                                        </Button>
+                                                    </TableCell>
                                                 </TableRow>
                                             );
                                         })
@@ -166,6 +201,7 @@ export default function AppointmentsPage() {
                                         </TableRow>
                                     )}
                                 </TableBody>
+
                             </Table>
                         </CardContent>
                     </Card>

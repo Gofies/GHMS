@@ -12,7 +12,7 @@ import { Tooltip } from 'recharts/es6/component/Tooltip';
 import { Legend } from 'recharts/es6/component/Legend';
 import { ResponsiveContainer } from 'recharts/es6/component/ResponsiveContainer';
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
-import Header from "../../components/ui/common/Header.jsx";
+import Header from "../../components/ui/admin/Header.jsx";
 import { Endpoint, putRequest, getRequest, deleteRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify';
 import { useDarkMode } from '../../helpers/DarkModeContext.js';

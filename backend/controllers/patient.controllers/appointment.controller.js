@@ -189,27 +189,85 @@ const getAppointments = async (req, res) => {
 }
 
 
+// const cancelAppointment = async (req, res) => {
+//     try {
+//         const { id } = req.params;
+
+//         if (id === undefined) {
+//             return res.status(400).json({ message: 'Appointment ID is required' });
+//         }
+
+//         const appointment = await Appointment.findById(id);
+
+//         if (!appointment) {
+//             return res.status(404).json({ message: 'Appointment not found' });
+//         }
+
+//         await Appointment.findByIdAndDelete(id);
+
+//         return res.status(200).json({ message: 'Appointment cancelled successfully' });
+//     }
+//     catch (error) {
+//         return res.status(500).json({ message: "patient.cancelAppointment: " + error.message });
+//     }
+// }
+
 const cancelAppointment = async (req, res) => {
     try {
         const { id } = req.params;
 
-        if (id === undefined) {
+        // Check if appointment ID is provided
+        if (!id) {
             return res.status(400).json({ message: 'Appointment ID is required' });
         }
 
-        const appointment = await Appointment.findById(id);
+        // Find the appointment and populate related data
+        const appointment = await Appointment.findById(id).populate('patient').populate('doctor');
 
+        // Check if appointment exists
         if (!appointment) {
             return res.status(404).json({ message: 'Appointment not found' });
         }
 
+        // Check if the appointment belongs to the current patient
+        if (!appointment.patient.equals(req.user._id)) {
+            return res.status(403).json({ message: 'You are not authorized to cancel this appointment' });
+        }
+        
+
+        // Update the time slot to make it free
+        const doctor = await Doctor.findById(appointment.doctor);
+        const scheduleDay = doctor.schedule.find(day =>
+            new Date(day.date).toISOString().slice(0, 10) === new Date(appointment.date).toISOString().slice(0, 10)
+        );
+
+        if (scheduleDay) {
+            const timeSlot = scheduleDay.timeSlots.find(slot => slot.time === appointment.time);
+            if (timeSlot) {
+                timeSlot.isFree = true; // Mark the time slot as free
+            }
+            await doctor.save(); // Save the updated schedule
+        }
+
+        // Remove the appointment from the patient's record
+        await Patient.findByIdAndUpdate(req.user._id, {
+            $pull: { appointments: id },
+        });
+
+        // Optionally, remove the appointment from the doctor's record
+        await Doctor.findByIdAndUpdate(appointment.doctor, {
+            $pull: { appointments: id },
+        });
+
+        // Delete the appointment
         await Appointment.findByIdAndDelete(id);
 
         return res.status(200).json({ message: 'Appointment cancelled successfully' });
-    }
-    catch (error) {
+    } catch (error) {
+        console.error('Error in cancelAppointment:', error);
         return res.status(500).json({ message: "patient.cancelAppointment: " + error.message });
     }
-}
+};
+
 
 export { getHospitalByPolyclinic, newAppointment, getAppointments, cancelAppointment };

@@ -66,28 +66,28 @@ const login = async (req, res) => {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
             generateJwt(patient._id, res);
-            return res.status(200).json({ message: 'Login successful', id: patient._id, role: patient.role });
+            return res.status(200).json({ message: 'Login successful', id: patient._id, role: patient.role, name: patient.name, surname: patient.surname });
         } else if (doctor) {
             const validPassword = await bcryptjs.compare(password, doctor.password);
             if (!validPassword) {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
             generateJwt(doctor._id, res);
-            return res.status(200).json({ message: 'Login successful', id: doctor._id, role: doctor.role });
+            return res.status(200).json({ message: 'Login successful', id: doctor._id, role: doctor.role, name: doctor.name, surname: doctor.surname });
         } else if (admin) {
             const validPassword = await bcryptjs.compare(password, admin.password);
             if (!validPassword) {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
             generateJwt(admin._id, res);
-            return res.status(200).json({ message: 'Login successful', id: admin._id, role: admin.role });
+            return res.status(200).json({ message: 'Login successful', id: admin._id, role: admin.role, name: admin.name, surname: admin.surname });
         } else if (labTechnician) {
             const validPassword = await bcryptjs.compare(password, labTechnician.password);
             if (!validPassword) {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
             generateJwt(labTechnician._id, res);
-            return res.status(200).json({ message: 'Login successful', id: labTechnician._id, role: labTechnician.role });
+            return res.status(200).json({ message: 'Login successful', id: labTechnician._id, role: labTechnician.role, name: labTechnician.name, surname: labTechnician.surname });
         }
 
     } catch (error) {

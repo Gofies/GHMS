@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Switch } from "../../components/ui/patient/settings/Switch.jsx"
 import { CalendarDays, Home, User, FileText, PieChart, Settings, LogOut, Moon, Bell, Lock } from 'lucide-react'
 import Sidebar from "../../components/ui/doctor/common/Sidebar.jsx";
-import Header from "../../components/ui/common/Header.jsx";
+import Header from "../../components/ui/admin/Header.jsx";
 import { useDarkMode } from '../../helpers/DarkModeContext.js';
 import { Endpoint, getRequest, putRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify'

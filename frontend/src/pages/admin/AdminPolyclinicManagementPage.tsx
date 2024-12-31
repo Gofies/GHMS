@@ -246,7 +246,7 @@ export default function AdminPolyclinicManagementPage() {
       <Sidebar />
 
       <main className="flex-1 overflow-y-auto">
-        <Header title="Hospital Management" />
+        <Header title="Polyclinic Management" />
 
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-6">

@@ -30,8 +30,8 @@ function App() {
             <Route element={<ProtectedRoute requiredRole="doctor" />}>
               <Route path="/doctor/:doctorId/*" element={<DoctorView />} />
             </Route>
-            <Route element={<ProtectedRoute requiredRole="lab-staff" />}>
-              <Route path="/lab-staff/*" element={<LabStaffView />} />
+            <Route element={<ProtectedRoute requiredRole="labtechnician" />}>
+              <Route path="/labtechnician/:labTechnicianId/*" element={<LabStaffView />} />
             </Route>
             <Route element={<ProtectedRoute requiredRole="patient" />}>
               <Route path="/patient/:patientId/*" element={<PatientView />} />

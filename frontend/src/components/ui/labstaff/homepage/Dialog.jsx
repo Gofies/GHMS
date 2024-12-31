@@ -14,9 +14,8 @@ export const Dialog = ({ children }) => {
   );
 };
 
-export const DialogTrigger = ({ asChild, toggleDialog, children }) => {
-  const triggerProps = asChild ? {} : { onClick: toggleDialog };
-  return React.cloneElement(children, triggerProps);
+export const DialogTrigger = ({ toggleDialog, children }) => {
+  return React.cloneElement(children, { onClick: toggleDialog });
 };
 
 export const DialogContent = ({ isOpen, toggleDialog, children }) => {
@@ -24,7 +23,7 @@ export const DialogContent = ({ isOpen, toggleDialog, children }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-md shadow-lg w-full max-w-lg p-6">
+      <div className="bg-white rounded-md shadow-lg w-full max-w-lg p-6 relative">
         {children}
         <button
           onClick={toggleDialog}

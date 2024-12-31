@@ -7,7 +7,6 @@ export default function Sidebar() {
     const location = useLocation(); 
     const { darkMode } = useDarkMode();
     const isActive = (path) => location.pathname === path;
-
     const { userId } = useSelector((state) => state.auth);
 
     const links = [

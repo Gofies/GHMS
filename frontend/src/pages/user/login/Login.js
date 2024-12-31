@@ -34,8 +34,8 @@ export default function LoginPage() {
         case "doctor":
           navigate(`/doctor/${userId}/`);
           break;
-        case "lab-staff":
-          navigate("/lab-staff/");
+        case "labtechnician":
+          navigate(`/labtechnician/${userId}`);
           break;
         case "patient":
           navigate(`/patient/${userId}/`);

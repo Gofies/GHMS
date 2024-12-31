@@ -7,7 +7,7 @@ import { Textarea } from "../../components/ui/patient/profile/TextArea.jsx"
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/patient/profile/Avatar.jsx"
 import { Endpoint, getRequest, putRequest } from "../../helpers/Network.js";
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
-import Header from "../../components/ui/common/Header.jsx";
+import Header from "../../components/ui/admin/Header.jsx";
 import { useDarkMode } from '../../helpers/DarkModeContext.js';
 import { toast } from 'react-toastify'
 

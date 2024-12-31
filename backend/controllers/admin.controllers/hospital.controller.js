@@ -2,10 +2,11 @@ import Hospital from '../../models/hospital.model.js';
 import Polyclinic from '../../models/polyclinic.model.js';
 import Doctor from '../../models/doctor.model.js';
 import LabTest from '../../models/lab.test.model.js';
+import LabTechnician from "../../models/lab.technician.model.js";
 
 const getHospitals = async (req, res) => {
     try {
-        const hospitals = await Hospital.find({}, 'name phone email address establishmentdate');
+        const hospitals = await Hospital.find({}, 'name phone email address establishmentdate labTechnicians');
 
         if (hospitals) {
             return res.status(200).json({ hospitals });
@@ -60,7 +61,7 @@ const getHospital = async (req, res) => {
 
 const newHospital = async (req, res) => {
     try {
-        const { name, address, selecteddoctors = [], establishmentdate, phone, email, polyclinics = [] } = req.body;
+        const { name, address, selecteddoctors = [], establishmentdate, phone, email, polyclinics = [], labTechnicians = [] } = req.body;
 
         if (
             name === undefined ||
@@ -111,9 +112,18 @@ const newHospital = async (req, res) => {
 
 const updateHospital = async (req, res) => {
     try {
-        const { name, address, doctors = [], establishmentdate, phone, email, polyclinics = [] } = req.body;
+        const { 
+            name, 
+            address, 
+            doctors = [], 
+            establishmentdate, 
+            phone, 
+            email, 
+            polyclinics = [], 
+            labTechnicians = [] // Güncel LabTechnicians listesi
+        } = req.body;
 
-        const hospital = await Hospital.findById(req.params.id);
+        const hospital = await Hospital.findById(req.params.id).populate('labTechnicians');
         if (!hospital) {
             return res.status(404).json({ message: 'Hospital not found' });
         }
@@ -152,6 +162,45 @@ const updateHospital = async (req, res) => {
             }
         }
 
+        // LabTechnicians güncellemesi
+        if (labTechnicians && labTechnicians.length > 0) {
+            // Mevcut teknisyenlerden unselect edilenleri kaldır ve hospital alanını null yap
+            const removedTechnicians = hospital.labTechnicians.filter((existingTech) =>
+                !labTechnicians.includes(existingTech._id.toString())
+            );
+            for (const tech of removedTechnicians) {
+                const labTechnician = await LabTechnician.findById(tech._id);
+                if (labTechnician) {
+                    labTechnician.hospital = null; // Hospital alanını null yap
+                    await labTechnician.save();
+                }
+            }
+
+            // Yeni eklenen teknisyenleri ekle
+            for (let i = 0; i < labTechnicians.length; i++) {
+                const labTechnician = await LabTechnician.findById(labTechnicians[i]);
+                if (labTechnician) {
+                    // Eğer teknisyen zaten hastaneye atanmışsa ekleme yapmayın
+                    if (!hospital.labTechnicians.includes(labTechnician._id)) {
+                        hospital.labTechnicians.push(labTechnician._id);
+                    }
+                    // Teknisyenin hospital alanını güncelle
+                    labTechnician.hospital = hospital._id;
+                    await labTechnician.save();
+                }
+            }
+        } else {
+            // Eğer labTechnicians boşsa tüm teknisyenleri kaldır ve hospital alanını null yap
+            for (const tech of hospital.labTechnicians) {
+                const labTechnician = await LabTechnician.findById(tech._id);
+                if (labTechnician) {
+                    labTechnician.hospital = null; // Hospital alanını null yap
+                    await labTechnician.save();
+                }
+            }
+            hospital.labTechnicians = [];
+        }
+
         // Güncellemeyi kaydet
         await hospital.save();
 
@@ -161,6 +210,8 @@ const updateHospital = async (req, res) => {
         return res.status(500).json({ message: 'Error in admin.hospital.controller: ' + error.message });
     }
 };
+
+
 
 
 

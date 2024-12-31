@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, User, CalendarDays, FileText, PieChart, Settings, Shield } from "lucide-react"; // Icon importlarını unutmayın
+import { User, Building, Settings } from "lucide-react"; // Icon importlarını unutmayın
 import { useSelector } from "react-redux";
 import { useDarkMode } from "../../../helpers/DarkModeContext.js";
 
@@ -20,7 +20,7 @@ export default function Sidebar() {
     {
       to: `/admin/${userId}/hospital-management`,
       label: "Hospital Management",
-      icon: User,
+      icon: Building,
     },
     {
       to: `/admin/${userId}/system-settings`,

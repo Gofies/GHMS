@@ -3,16 +3,12 @@ import { Calendars } from '../../components/ui/patient/home/Calendar'
 import { Button } from '../../components/ui/patient/home/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/patient/home/Card'
 import { ScrollArea } from '../../components/ui/patient/home/Scroll-area'
-import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/patient/home/Avatar'
-import { Badge } from '../../components/ui/patient/home/Badge'
 import { Plus } from 'lucide-react'
-//import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/patient/home/Dialog'
 import { useDarkMode } from '../../helpers/DarkModeContext.js';
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
-import Header from "../../components/ui/common/Header.jsx";
+import Header from "../../components/ui/admin/Header.jsx";
 import { Endpoint, getRequest } from "../../helpers/Network.js";
 import { useNavigate, useLocation } from 'react-router-dom'
-import { applyMiddleware } from '@reduxjs/toolkit'
 
 export default function PatientHomeScreen() {
 
@@ -42,48 +38,6 @@ export default function PatientHomeScreen() {
   
     return `${year}-${month}-${day}`;
   };
-
-  // useEffect(() => {
-  //   const fetchPatientHome = async () => {
-  //     try {
-  //       const response = await getRequest(Endpoint.GET_HOME_APPOINTMENTS);
-  //       console.log("response", response);
-  //       setRecentAppointments(response.recentAppointments);
-  //       setUpcomingAppointments(response.upcomingAppointments);
-
-  //       const dates = response.recentAppointments
-  //         ? response.recentAppointments.map(appointment => new Date(appointment.date))
-  //         : [];
-  //       setAppointmentDates(dates);
-
-  //     } catch (err) {
-  //       console.error('Error fetching patient profile:', err);
-  //       setError('Failed to load patient profile.');
-  //     }
-  //   };
-  //   fetchPatientHome();
-  // }, []);
-
-  // useEffect(() => {
-  //   const fetchPatientHome = async () => {
-  //     try {
-  //       const response = await getRequest(Endpoint.GET_HOME_APPOINTMENTS);
-  //       console.log("response", response);
-  //       setRecentAppointments(response.recentAppointments);
-  //       setUpcomingAppointments(response.upcomingAppointments);
-
-  //       const dates = response.recentAppointments
-  //         ? response.recentAppointments.map(appointment => new Date(appointment.date))
-  //         : [];
-  //       setAppointmentDates(dates);
-
-  //     } catch (err) {
-  //       console.error('Error fetching patient profile:', err);
-  //       setError('Failed to load patient profile.');
-  //     }
-  //   };
-  //   fetchPatientHome();
-  // }, []);
 
   useEffect(() => {
     const fetchPatientHome = async () => {
@@ -192,7 +146,7 @@ export default function PatientHomeScreen() {
                           <div key={appointment.id} className="flex items-center space-x-4 mb-4">
                             <div>
                               <p className="text-sm font-medium">
-                                {appointment.doctor.name} {appointment.doctor.surname}
+                                {appointment?.doctor?.name} {appointment?.doctor?.surname}
                               </p>
                               <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
                                 {appointment.polyclinic?.name}
@@ -284,7 +238,7 @@ export default function PatientHomeScreen() {
                             </Avatar> */}
                               <div>
                                 <p className="text-sm font-medium">
-                                  {appointment.doctor.name} {appointment.doctor.surname}
+                                  {appointment.doctor?.name} {appointment.doctor?.surname}
                                 </p>
                                 <p className="text-sm text-gray-500">{appointment.polyclinic?.name}</p>
                                 <p className="text-xs text-gray-400">{formattedDate}</p> {/* Formatlanmış tarih */}

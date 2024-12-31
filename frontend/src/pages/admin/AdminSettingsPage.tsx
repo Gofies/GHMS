@@ -16,11 +16,7 @@ import { Input } from "../../components/ui/patient/settings/Input.jsx"
 
 
 export default function AdminSettingsPage() {
-  const [language, setLanguage] = useState('english')
-  const [notifications, setNotifications] = useState(true)
-  const [twoFactor, setTwoFactor] = useState(false)
- 
- const { darkMode, toggleDarkMode } = useDarkMode(); // Context'ten alınan değerler
+  const { darkMode, toggleDarkMode } = useDarkMode(); // Context'ten alınan değerler
 
   const [error, setError] = useState(null);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
@@ -29,20 +25,24 @@ export default function AdminSettingsPage() {
   const [newPassword, setNewPassword] = useState('');
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+
   const handleChangePassword = async (e) => { // api gelince çalışacak
     e.preventDefault();
     try {
-      // PUT isteği gönder
       const response = await putRequest(Endpoint.CHANGE_PASSWORD, {
         currentPassword: currentPassword, // Eski şifre
         newPassword: newPassword, // Yeni şifre
         newPasswordConfirm: newPasswordConfirm
       });
-      toast("Password changed successfully!"); // Toast mesajı
+
+      // Başarılı yanıt alındığında işlem yap
+      console.log("Password changed successfully:", response);
+      toast.success("Password changed successfully!"); // Toast mesajı
     } catch (err) {
-      console.error("Error changing password:", err);
-      toast("Failed to change password. Please try again."); // Toast mesajı
+      toast.error("Failed to change password. Please try again."); // Toast mesajı
       setError("Failed to change password. Please try again."); // Hata durumu
     }
   };
@@ -111,6 +111,7 @@ export default function AdminSettingsPage() {
               id="currentPassword"
               type={showPassword ? "text" : "password"}
               placeholder="Enter your current password"
+              required
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               className={`${darkMode ? "bg-gray-700 text-white border-gray-600" : ""}`}
@@ -134,6 +135,7 @@ export default function AdminSettingsPage() {
               id="newPassword"
               type={showPassword ? "text" : "password"}
               placeholder="Enter your new password"
+              required
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               className={`${darkMode ? "bg-gray-700 text-white border-gray-600" : ""}`}
@@ -146,6 +148,7 @@ export default function AdminSettingsPage() {
               id="newPasswordConfirm"
               type={showPassword ? "text" : "password"}
               placeholder="Confirm your new password"
+              required
               value={newPasswordConfirm}
               onChange={(e) => setNewPasswordConfirm(e.target.value)}
               className={`${darkMode ? "bg-gray-700 text-white border-gray-600" : ""}`}
@@ -153,8 +156,11 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        {error && <div className={`text-sm ${darkMode ? "text-red-400" : "text-red-500"} mt-2`}>{error}</div>}
-
+        {error && (
+            <div className={`text-sm ${darkMode ? "text-red-400" : "text-red-500"} mt-2`}>
+              {error.message || "Email or password is incorrect. Please try again."}
+            </div>
+        )}
         <div className="flex justify-between mt-4">
           <Button
             type="button"

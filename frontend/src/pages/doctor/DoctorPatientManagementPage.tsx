@@ -10,7 +10,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Endpoint, getRequest } from "../../helpers/Network.js";
 
 import Sidebar from "../../components/ui/doctor/common/Sidebar.jsx"
-import Header from "../../components/ui/common/Header.jsx";
+import Header from "../../components/ui/admin/Header.jsx";
 import { useDarkMode } from '../../helpers/DarkModeContext';
 
 function calculateAge(birthdate) {
