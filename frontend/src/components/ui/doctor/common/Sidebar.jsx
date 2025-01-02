@@ -3,12 +3,17 @@ import { Home, User, CalendarDays, FileText, PieChart, Settings, Clipboard } fro
 import { useSelector } from "react-redux";
 import { useDarkMode } from "../../../../helpers/DarkModeContext";
 
+import { useEffect, useState } from "react";
+
 export default function Sidebar() {
     const location = useLocation(); 
     const { darkMode } = useDarkMode();
     const isActive = (path) => location.pathname === path;
     const { userId } = useSelector((state) => state.auth);
 
+    const [currentPath, setCurrentPath] = useState(location.pathname); // Sayfa değişim kontrolü
+
+  
     const links = [
         {
           to: `/doctor/${userId}/`,
@@ -26,6 +31,14 @@ export default function Sidebar() {
           icon: Settings,
         },
       ];
+
+         // Eğer pathname değişirse "soft refresh" yap
+    useEffect(() => {
+      if (location.pathname !== currentPath) {
+          setCurrentPath(location.pathname); // Path güncelleniyor
+          window.location.reload(); // Sayfa yenileniyor
+      }
+  }, [location.pathname]);
 
     return (
         <aside className={`w-64 hidden md:block shadow-md transition-all duration-300 ${darkMode ? "bg-gray-900 border-r border-gray-700 text-white" : "bg-white border-r border-gray-200 text-gray-800"}`}>

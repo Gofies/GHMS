@@ -2,12 +2,15 @@ import { Link, useLocation } from "react-router-dom";
 import { Home, User, CalendarDays, FileText, PieChart, Settings, Clipboard, TestTube } from "lucide-react"; // Icon importlarını unutmayın
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 
 export default function Sidebar() {
     const location = useLocation(); 
 
     const isActive = (path) => location.pathname === path;
     const { userId } = useSelector((state) => state.auth);
+
+    const [currentPath, setCurrentPath] = useState(location.pathname); // Sayfa değişim kontrolü
 
     const links = [
         {
@@ -22,6 +25,14 @@ export default function Sidebar() {
         },
       ];
 
+          // Eğer pathname değişirse "soft refresh" yap
+    useEffect(() => {
+      if (location.pathname !== currentPath) {
+          setCurrentPath(location.pathname); // Path güncelleniyor
+          window.location.reload(); // Sayfa yenileniyor
+      }
+  }, [location.pathname]);
+  
     return (
         <aside className="w-64 bg-white shadow-md hidden md:block">
       <div className="p-4">

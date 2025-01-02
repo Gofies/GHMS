@@ -3,6 +3,7 @@ import { Home, User, CalendarDays, FileText, PieChart, Settings } from "lucide-r
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useDarkMode } from "../../../../helpers/DarkModeContext";
+import { useEffect, useState } from "react";
 
 export default function Sidebar() {
     const location = useLocation();
@@ -11,6 +12,9 @@ export default function Sidebar() {
     const isActive = (path) => location.pathname === path;
 
     const { userId } = useSelector((state) => state.auth);
+
+    const [currentPath, setCurrentPath] = useState(location.pathname); // Sayfa değişim kontrolü
+
 
     const links = [
         {
@@ -44,6 +48,14 @@ export default function Sidebar() {
           icon: Settings,
         },
     ];
+
+       // Eğer pathname değişirse "soft refresh" yap
+       useEffect(() => {
+        if (location.pathname !== currentPath) {
+            setCurrentPath(location.pathname); // Path güncelleniyor
+            window.location.reload(); // Sayfa yenileniyor
+        }
+    }, [location.pathname]);
 
     return (
         <aside

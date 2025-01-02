@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { User, Building, Settings } from "lucide-react"; // Icon importlarını unutmayın
 import { useSelector } from "react-redux";
 import { useDarkMode } from "../../../helpers/DarkModeContext.js";
+import { useEffect, useState } from "react";
 
 export default function Sidebar() {
   const { darkMode } = useDarkMode();
@@ -10,6 +11,9 @@ export default function Sidebar() {
   const isActive = (path) => location.pathname === path;
 
   const { userId } = useSelector((state) => state.auth);
+
+  const [currentPath, setCurrentPath] = useState(location.pathname); // Sayfa değişim kontrolü
+
 
   const links = [
     {
@@ -28,6 +32,14 @@ export default function Sidebar() {
       icon: Settings,
     },
   ];
+
+      // Eğer pathname değişirse "soft refresh" yap
+      useEffect(() => {
+        if (location.pathname !== currentPath) {
+            setCurrentPath(location.pathname); // Path güncelleniyor
+            window.location.reload(); // Sayfa yenileniyor
+        }
+    }, [location.pathname]);
 
   return (
     <aside
