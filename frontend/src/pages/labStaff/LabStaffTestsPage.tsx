@@ -21,7 +21,7 @@ import { toast } from 'react-toastify';
 
 
 export default function LabStaffTests() {
-  const { darkMode } = useDarkMode(); 
+  const { darkMode } = useDarkMode();
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTest, setSelectedTest] = useState(null)
   const [testResult, setTestResult] = useState({ result: '' })
@@ -117,32 +117,32 @@ export default function LabStaffTests() {
     Medium: 2,
     Low: 3,
   };
-  
+
   const filteredPendingTests = Array.isArray(pendingTests)
     ? pendingTests
-        .filter(test => {
-          const searchTermLower = searchTerm.toLowerCase();
-          return (
-            test.patient?.name.toLowerCase().includes(searchTermLower) || // Hasta adı
-            test.patient?.surname.toLowerCase().includes(searchTermLower) || // Hasta soyadı
-            test.testType?.toLowerCase().includes(searchTermLower) || // Test türü
-            test.urgency?.toLowerCase().includes(searchTermLower) // Aciliyet
-          );
-        })
-        .sort((a, b) => {
-          const dateA = new Date(a.createdAt).getTime();
-          const dateB = new Date(b.createdAt).getTime();
-        
-          // Önce urgency seviyesine göre sıralama
-          if (urgencyOrder[a.urgency] !== urgencyOrder[b.urgency]) {
-            return urgencyOrder[a.urgency] - urgencyOrder[b.urgency];
-          }
-        
-          // Aynı urgency seviyesine sahip olanları createdAt'e göre descending sırala
-          return dateB - dateA;
-        })
+      .filter(test => {
+        const searchTermLower = searchTerm.toLowerCase();
+        return (
+          test.patient?.name.toLowerCase().includes(searchTermLower) || // Hasta adı
+          test.patient?.surname.toLowerCase().includes(searchTermLower) || // Hasta soyadı
+          test.testType?.toLowerCase().includes(searchTermLower) || // Test türü
+          test.urgency?.toLowerCase().includes(searchTermLower) // Aciliyet
+        );
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+
+        // Önce urgency seviyesine göre sıralama
+        if (urgencyOrder[a.urgency] !== urgencyOrder[b.urgency]) {
+          return urgencyOrder[a.urgency] - urgencyOrder[b.urgency];
+        }
+
+        // Aynı urgency seviyesine sahip olanları createdAt'e göre descending sırala
+        return dateB - dateA;
+      })
     : [];
-  
+
 
 
   const filteredCompletedTests = Array.isArray(completedTests)
@@ -158,10 +158,10 @@ export default function LabStaffTests() {
     })
     : [];
 
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
-    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100"}text-gray-900`}>
       <Sidebar />
 
       {/* Main Content */}
@@ -226,15 +226,14 @@ export default function LabStaffTests() {
                             {new Date(test.createdAt).toISOString().replace('T', ' ').slice(0, 16)}
                           </TableCell>
                           <TableCell>
-                            <Dialog>
-                              <DialogTrigger asChild>
+                            <Dialog
+                              isOpen={isDialogOpen} // Dialog açık/kapalı durumunu kontrol eder
+                              onClose={() => setIsDialogOpen(false)} // Dialog arka plana tıklandığında kapanır
+                            >                              
+                            <DialogTrigger asChild>
                                 <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    setSelectedTest(test); // Test seçimini yap
-                                    console.log("Selected test set:", test);
-                                  }}
+                                  className="text-blue-500 underline"
+                                  onClick={() => {setIsDialogOpen(true); setSelectedTest(test);}}
                                 >
                                   Complete Test
                                 </Button>
