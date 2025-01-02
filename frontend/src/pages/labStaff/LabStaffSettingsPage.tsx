@@ -4,28 +4,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Label } from "../../components/ui/admin/Label.jsx"
 import { Switch } from "../../components/ui/patient/settings/Switch.jsx"
 import { Lock } from 'lucide-react'
-
+import { useDarkMode } from '../../helpers/DarkModeContext.js';
 import Sidebar from "../../components/ui/lab-staff/common/Sidebar.jsx"
 import Header from "../../components/ui/admin/Header.jsx";
 
 import { Endpoint, putRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify'
 import { Dialog, DialogContent } from "../../components/ui/lab-staff/Dialog.jsx"
-import { Input } from '../../components/ui/login/Input.jsx';
+import { Input } from '../../components/ui/patient/settings/Input.jsx';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
 export default function LabStaffSettingsPage() {
   const [error, setError] = useState(null);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-
+  const { darkMode, toggleDarkMode } = useDarkMode(); 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-
-  const [darkMode, setDarkMode] = useState(false);
-
-  const handleDarkModeToggle = (checked) => { };
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -43,7 +39,7 @@ export default function LabStaffSettingsPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
@@ -67,7 +63,7 @@ export default function LabStaffSettingsPage() {
                 <Switch
                   id="dark-mode"
                   checked={darkMode}
-                  onCheckedChange={handleDarkModeToggle}
+                  onCheckedChange={toggleDarkMode}
                 />
               </div>
             </CardContent>
