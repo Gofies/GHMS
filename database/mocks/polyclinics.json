@@ -1,137 +1,11 @@
 [
     {
         "_id": {
-            "$oid": "676db907dc2d5a014902683e"
-        },
-        "name": "Neurology",
-        "hospital": {
-            "$oid": "676db800dc2d5a0149026424"
-        },
-        "doctors": [
-            {
-                "$oid": "676db552dc2d5a0149025e22"
-            }
-        ],
-        "createdAt": {
-            "$date": "2024-12-26T20:13:59.567Z"
-        },
-        "updatedAt": {
-            "$date": "2024-12-26T20:13:59.567Z"
-        },
-        "__v": 0
-    },
-    {
-        "_id": {
-            "$oid": "676db8dadc2d5a01490266eb"
-        },
-        "name": "Pediatrics",
-        "hospital": {
-            "$oid": "676db7afdc2d5a014902640f"
-        },
-        "doctors": [
-            {
-                "$oid": "676db640dc2d5a0149026225"
-            }
-        ],
-        "createdAt": {
-            "$date": "2024-12-26T20:13:14.61Z"
-        },
-        "updatedAt": {
-            "$date": "2024-12-26T20:13:14.61Z"
-        },
-        "__v": 0
-    },
-    {
-        "_id": {
-            "$oid": "676db936dc2d5a01490269a0"
-        },
-        "name": "Psychiatry",
-        "hospital": {
-            "$oid": "676db7e2dc2d5a014902641d"
-        },
-        "doctors": [
-            {
-                "$oid": "676db6a7dc2d5a014902634d"
-            }
-        ],
-        "createdAt": {
-            "$date": "2024-12-26T20:14:46.294Z"
-        },
-        "updatedAt": {
-            "$date": "2024-12-26T20:14:46.294Z"
-        },
-        "__v": 0
-    },
-    {
-        "_id": {
-            "$oid": "676db98ddc2d5a0149026baf"
-        },
-        "name": "Urology",
-        "hospital": {
-            "$oid": "676db85ddc2d5a0149026435"
-        },
-        "doctors": [
-            {
-                "$oid": "676db97edc2d5a0149026b13"
-            }
-        ],
-        "createdAt": {
-            "$date": "2024-12-26T20:16:13.219Z"
-        },
-        "updatedAt": {
-            "$date": "2024-12-26T20:16:13.219Z"
-        },
-        "__v": 0
-    },
-    {
-        "_id": {
-            "$oid": "676db89fdc2d5a01490264f1"
-        },
-        "name": "Ophthalmology",
-        "hospital": {
-            "$oid": "676db7c8dc2d5a0149026416"
-        },
-        "doctors": [
-            {
-                "$oid": "676db615dc2d5a014902618d"
-            }
-        ],
-        "createdAt": {
-            "$date": "2024-12-26T20:12:15.691Z"
-        },
-        "updatedAt": {
-            "$date": "2024-12-26T20:12:42.343Z"
-        },
-        "__v": 1
-    },
-    {
-        "_id": {
-            "$oid": "676db8e2dc2d5a0149026786"
-        },
-        "name": "Otolaryngology",
-        "hospital": {
-            "$oid": "676db7afdc2d5a014902640f"
-        },
-        "doctors": [
-            {
-                "$oid": "676db66fdc2d5a01490262b9"
-            }
-        ],
-        "createdAt": {
-            "$date": "2024-12-26T20:13:22.681Z"
-        },
-        "updatedAt": {
-            "$date": "2024-12-26T20:13:22.681Z"
-        },
-        "__v": 0
-    },
-    {
-        "_id": {
-            "$oid": "676db891dc2d5a0149026456"
+            "$oid": "6776f523e319b7fdab1acfee"
         },
         "name": "Cardiology",
         "hospital": {
-            "$oid": "676db7c8dc2d5a0149026416"
+            "$oid": "676db7afdc2d5a014902640f"
         },
         "doctors": [
             {
@@ -139,16 +13,58 @@
             }
         ],
         "createdAt": {
-            "$date": "2024-12-26T20:12:01.394Z"
+            "$date": "2025-01-02T20:20:51.652Z"
         },
         "updatedAt": {
-            "$date": "2024-12-26T20:12:01.394Z"
+            "$date": "2025-01-02T20:20:51.652Z"
         },
         "__v": 0
     },
     {
         "_id": {
-            "$oid": "676db93edc2d5a0149026a42"
+            "$oid": "6776f535e319b7fdab1ad0bc"
+        },
+        "name": "Neurology",
+        "hospital": {
+            "$oid": "676db85ddc2d5a0149026435"
+        },
+        "doctors": [
+            {
+                "$oid": "676db552dc2d5a0149025e22"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:21:09.693Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:21:09.693Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f56be319b7fdab1ad3be"
+        },
+        "name": "Orthopedics",
+        "hospital": {
+            "$oid": "676db85ddc2d5a0149026435"
+        },
+        "doctors": [
+            {
+                "$oid": "676db582dc2d5a0149025eb6"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:22:03.863Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:22:03.863Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f515e319b7fdab1acf37"
         },
         "name": "Dermatology",
         "hospital": {
@@ -160,31 +76,115 @@
             }
         ],
         "createdAt": {
-            "$date": "2024-12-26T20:14:54.122Z"
+            "$date": "2025-01-02T20:20:37.124Z"
         },
         "updatedAt": {
-            "$date": "2024-12-26T20:14:54.122Z"
+            "$date": "2025-01-02T20:20:37.124Z"
         },
         "__v": 0
     },
     {
         "_id": {
-            "$oid": "676db910dc2d5a01490268d9"
+            "$oid": "6776f53fe319b7fdab1ad173"
         },
-        "name": "Orthopedics",
+        "name": "Ophthalmology",
         "hospital": {
-            "$oid": "676db800dc2d5a0149026424"
+            "$oid": "676db7c8dc2d5a0149026416"
         },
         "doctors": [
             {
-                "$oid": "676db582dc2d5a0149025eb6"
+                "$oid": "676db615dc2d5a014902618d"
             }
         ],
         "createdAt": {
-            "$date": "2024-12-26T20:14:08.426Z"
+            "$date": "2025-01-02T20:21:19.628Z"
         },
         "updatedAt": {
-            "$date": "2024-12-26T20:14:08.426Z"
+            "$date": "2025-01-02T20:21:19.628Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f552e319b7fdab1ad24a"
+        },
+        "name": "Otolaryngology",
+        "hospital": {
+            "$oid": "676db7c8dc2d5a0149026416"
+        },
+        "doctors": [
+            {
+                "$oid": "676db66fdc2d5a01490262b9"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:21:38.439Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:21:38.439Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f55ee319b7fdab1ad2fc"
+        },
+        "name": "Psychiatry",
+        "hospital": {
+            "$oid": "676db820dc2d5a014902642b"
+        },
+        "doctors": [
+            {
+                "$oid": "676db6a7dc2d5a014902634d"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:21:50.809Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:21:50.809Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f57be319b7fdab1ad485"
+        },
+        "name": "Pediatrics",
+        "hospital": {
+            "$oid": "676db7e2dc2d5a014902641d"
+        },
+        "doctors": [
+            {
+                "$oid": "676db640dc2d5a0149026225"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:22:19.658Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:22:19.658Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f595e319b7fdab1ad5c7"
+        },
+        "name": "Urology",
+        "hospital": {
+            "$oid": "676db7afdc2d5a014902640f"
+        },
+        "doctors": [
+            {
+                "$oid": "676db97edc2d5a0149026b13"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:22:45.859Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:22:45.859Z"
         },
         "__v": 0
     }
