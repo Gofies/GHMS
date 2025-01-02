@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/lab-staff/tests/Tabs.jsx"
 import { Home, LogOut, FlaskRoundIcon as Flask, Clipboard, Search, AlertTriangle } from 'lucide-react'
 import Link from "../../components/ui/lab-staff/tests/Link.jsx"
-
+import { useDarkMode } from '../../helpers/DarkModeContext.js';
 import Sidebar from "../../components/ui/lab-staff/common/Sidebar.jsx"
 import Header from "../../components/ui/admin/Header.jsx";
 
@@ -21,7 +21,7 @@ import { toast } from 'react-toastify';
 
 
 export default function LabStaffTests() {
-
+  const { darkMode } = useDarkMode(); 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTest, setSelectedTest] = useState(null)
   const [testResult, setTestResult] = useState({ result: '' })
@@ -161,7 +161,7 @@ export default function LabStaffTests() {
 
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
 
       {/* Main Content */}
