@@ -15,19 +15,24 @@
         },
         "nationality": "Turkish",
         "address": "ITU",
-        "labtests": [],
-        "appointments": [
+        "labtests": [
             {
-                "$oid": "676dc17a44828d8b42abab84"
-            },
-            {
-                "$oid": "676dc4c944828d8b42abae58"
-            },
-            {
-                "$oid": "676dc55544828d8b42abb564"
+                "$oid": "6776f6bfe319b7fdab1b02d4"
             }
         ],
-        "prescriptions": [],
+        "appointments": [
+            {
+                "$oid": "6776f5ffe319b7fdab1adcdb"
+            },
+            {
+                "$oid": "6776f62ce319b7fdab1aeafb"
+            }
+        ],
+        "prescriptions": [
+            {
+                "$oid": "6776f6f0e319b7fdab1b051b"
+            }
+        ],
         "diagnoses": [],
         "family": [],
         "allergies": [
@@ -39,14 +44,63 @@
             "$date": "2024-12-26T20:17:42.399Z"
         },
         "updatedAt": {
-            "$date": "2024-12-26T21:06:29.803Z"
+            "$date": "2025-01-02T20:28:32.19Z"
         },
-        "__v": 0,
+        "__v": 2,
         "weight": 80,
         "height": 179,
         "bloodpressure": "160 80",
         "heartrate": 120,
         "bloodsugar": 120,
         "bloodtype": "A+"
+    },
+    {
+        "_id": {
+            "$oid": "6776f652e319b7fdab1aeb93"
+        },
+        "name": "Vedat",
+        "surname": "Akgoz",
+        "gender": "Male",
+        "email": "vedat.akgoz@gofies.com",
+        "password": "$2a$10$8Vz7htmaA3wtPJ.qKcH.6elr9a.7WMyDQUepVPR11mLfOlhN8MtjS",
+        "phone": "🇹🇷 +90 533533533",
+        "emergencycontact": "🇹🇷 +90 533533533",
+        "birthdate": {
+            "$date": "1997-04-04T00:00:00Z"
+        },
+        "nationality": "Turkish",
+        "address": "ITU",
+        "labtests": [
+            {
+                "$oid": "6776f75be319b7fdab1b1e51"
+            }
+        ],
+        "appointments": [
+            {
+                "$oid": "6776f66ce319b7fdab1af028"
+            },
+            {
+                "$oid": "6776f678e319b7fdab1af1e8"
+            },
+            {
+                "$oid": "6776f683e319b7fdab1af3a8"
+            }
+        ],
+        "prescriptions": [
+            {
+                "$oid": "6776f722e319b7fdab1b0914"
+            }
+        ],
+        "diagnoses": [],
+        "family": [],
+        "allergies": [],
+        "role": "patient",
+        "createdAt": {
+            "$date": "2025-01-02T20:25:54.817Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:30:19.094Z"
+        },
+        "__v": 2
     }
 ]

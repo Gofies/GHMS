@@ -1,6 +1,83 @@
 [
     {
         "_id": {
+            "$oid": "676db7c8dc2d5a0149026416"
+        },
+        "name": "Central Park Hospital",
+        "address": "2300 N Lake Shore Drive, Chicago, IL 60614, USA",
+        "establishmentdate": {
+            "$date": "1988-01-01T00:00:00Z"
+        },
+        "phone": "1 312 444 5678",
+        "email": "contact@centralpark-hospital.com",
+        "polyclinics": [
+            {
+                "$oid": "676db891dc2d5a0149026456"
+            },
+            {
+                "$oid": "676db89fdc2d5a01490264f1"
+            },
+            {
+                "$oid": "6776f53fe319b7fdab1ad173"
+            },
+            {
+                "$oid": "6776f552e319b7fdab1ad24a"
+            }
+        ],
+        "doctors": [],
+        "labTechnicians": [
+            {
+                "$oid": "6776f37de319b7fdab1acc61"
+            },
+            {
+                "$oid": "6776f37de319b7fdab1acc61"
+            }
+        ],
+        "itTechnicians": [],
+        "appointments": [],
+        "labTests": [],
+        "createdAt": {
+            "$date": "2024-12-26T20:08:40.976Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:21:38.494Z"
+        },
+        "__v": 2
+    },
+    {
+        "_id": {
+            "$oid": "676db7e2dc2d5a014902641d"
+        },
+        "name": "Sunrise Healthcare Complex",
+        "address": "8700 Beverly Boulevard, Los Angeles, CA 90048, USA",
+        "establishmentdate": {
+            "$date": "1999-01-01T00:00:00Z"
+        },
+        "phone": "1 310 333 9012",
+        "email": "info@sunrisehealthcare.com",
+        "polyclinics": [
+            {
+                "$oid": "676db936dc2d5a01490269a0"
+            },
+            {
+                "$oid": "6776f57be319b7fdab1ad485"
+            }
+        ],
+        "doctors": [],
+        "labTechnicians": [],
+        "itTechnicians": [],
+        "appointments": [],
+        "labTests": [],
+        "createdAt": {
+            "$date": "2024-12-26T20:09:06.115Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:22:19.705Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
             "$oid": "676db7afdc2d5a014902640f"
         },
         "name": "Metropolitan Medical Center",
@@ -16,20 +93,40 @@
             },
             {
                 "$oid": "676db8e2dc2d5a0149026786"
+            },
+            {
+                "$oid": "6776f523e319b7fdab1acfee"
+            },
+            {
+                "$oid": "6776f595e319b7fdab1ad5c7"
             }
         ],
         "doctors": [],
-        "labTechnicians": [],
+        "labTechnicians": [
+            {
+                "$oid": "6776f464e319b7fdab1acca5"
+            },
+            {
+                "$oid": "6776f464e319b7fdab1acca5"
+            }
+        ],
         "itTechnicians": [],
         "appointments": [],
-        "labTests": [],
+        "labTests": [
+            {
+                "$oid": "6776f6bfe319b7fdab1b02d4"
+            },
+            {
+                "$oid": "6776f75be319b7fdab1b1e51"
+            }
+        ],
         "createdAt": {
             "$date": "2024-12-26T20:08:15.469Z"
         },
         "updatedAt": {
-            "$date": "2024-12-26T20:13:22.727Z"
+            "$date": "2025-01-02T20:30:19.085Z"
         },
-        "__v": 0
+        "__v": 4
     },
     {
         "_id": {
@@ -45,10 +142,20 @@
         "polyclinics": [
             {
                 "$oid": "676db98ddc2d5a0149026baf"
+            },
+            {
+                "$oid": "6776f535e319b7fdab1ad0bc"
+            },
+            {
+                "$oid": "6776f56be319b7fdab1ad3be"
             }
         ],
         "doctors": [],
-        "labTechnicians": [],
+        "labTechnicians": [
+            {
+                "$oid": "6776f443e319b7fdab1acc9c"
+            }
+        ],
         "itTechnicians": [],
         "appointments": [],
         "labTests": [],
@@ -56,9 +163,9 @@
             "$date": "2024-12-26T20:11:09.108Z"
         },
         "updatedAt": {
-            "$date": "2024-12-26T20:16:13.267Z"
+            "$date": "2025-01-02T20:22:03.89Z"
         },
-        "__v": 0
+        "__v": 1
     },
     {
         "_id": {
@@ -80,7 +187,17 @@
             }
         ],
         "doctors": [],
-        "labTechnicians": [],
+        "labTechnicians": [
+            {
+                "$oid": "6776f40fe319b7fdab1acc8e"
+            },
+            {
+                "$oid": "6776f40fe319b7fdab1acc8e"
+            },
+            {
+                "$oid": "6776f40fe319b7fdab1acc8e"
+            }
+        ],
         "itTechnicians": [],
         "appointments": [],
         "labTests": [],
@@ -88,9 +205,9 @@
             "$date": "2024-12-26T20:09:36.772Z"
         },
         "updatedAt": {
-            "$date": "2024-12-26T20:14:08.449Z"
+            "$date": "2025-01-02T20:19:19.46Z"
         },
-        "__v": 0
+        "__v": 3
     },
     {
         "_id": {
@@ -106,10 +223,23 @@
         "polyclinics": [
             {
                 "$oid": "676db93edc2d5a0149026a42"
+            },
+            {
+                "$oid": "6776f515e319b7fdab1acf37"
+            },
+            {
+                "$oid": "6776f55ee319b7fdab1ad2fc"
             }
         ],
         "doctors": [],
-        "labTechnicians": [],
+        "labTechnicians": [
+            {
+                "$oid": "6776f49de319b7fdab1accae"
+            },
+            {
+                "$oid": "6776f49de319b7fdab1accae"
+            }
+        ],
         "itTechnicians": [],
         "appointments": [],
         "labTests": [],
@@ -117,69 +247,8 @@
             "$date": "2024-12-26T20:10:08.479Z"
         },
         "updatedAt": {
-            "$date": "2024-12-26T20:14:54.167Z"
+            "$date": "2025-01-02T20:21:50.86Z"
         },
-        "__v": 0
-    },
-    {
-        "_id": {
-            "$oid": "676db7e2dc2d5a014902641d"
-        },
-        "name": "Sunrise Healthcare Complex",
-        "address": "8700 Beverly Boulevard, Los Angeles, CA 90048, USA",
-        "establishmentdate": {
-            "$date": "1999-01-01T00:00:00Z"
-        },
-        "phone": "1 310 333 9012",
-        "email": "info@sunrisehealthcare.com",
-        "polyclinics": [
-            {
-                "$oid": "676db936dc2d5a01490269a0"
-            }
-        ],
-        "doctors": [],
-        "labTechnicians": [],
-        "itTechnicians": [],
-        "appointments": [],
-        "labTests": [],
-        "createdAt": {
-            "$date": "2024-12-26T20:09:06.115Z"
-        },
-        "updatedAt": {
-            "$date": "2024-12-26T20:14:46.34Z"
-        },
-        "__v": 0
-    },
-    {
-        "_id": {
-            "$oid": "676db7c8dc2d5a0149026416"
-        },
-        "name": "Central Park Hospital",
-        "address": "2300 N Lake Shore Drive, Chicago, IL 60614, USA",
-        "establishmentdate": {
-            "$date": "1988-01-01T00:00:00Z"
-        },
-        "phone": "1 312 444 5678",
-        "email": "contact@centralpark-hospital.com",
-        "polyclinics": [
-            {
-                "$oid": "676db891dc2d5a0149026456"
-            },
-            {
-                "$oid": "676db89fdc2d5a01490264f1"
-            }
-        ],
-        "doctors": [],
-        "labTechnicians": [],
-        "itTechnicians": [],
-        "appointments": [],
-        "labTests": [],
-        "createdAt": {
-            "$date": "2024-12-26T20:08:40.976Z"
-        },
-        "updatedAt": {
-            "$date": "2024-12-26T20:12:15.719Z"
-        },
-        "__v": 0
+        "__v": 2
     }
 ]

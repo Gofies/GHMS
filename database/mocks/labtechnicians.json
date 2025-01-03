@@ -1,0 +1,162 @@
+[
+    {
+        "_id": {
+            "$oid": "6776f443e319b7fdab1acc9c"
+        },
+        "name": "Camille",
+        "surname": "Dubois",
+        "title": "Lab. Tech.",
+        "email": "camille.dubois@gofies.com",
+        "password": "$2a$10$SePtchFa5QXLLpq2TLZZ8uHJ4slRnZ5QL8VLkFlsF4GRoRu11KrKW",
+        "birthdate": {
+            "$date": "1988-06-05T00:00:00Z"
+        },
+        "phone": "12412442",
+        "jobstartdate": {
+            "$date": "2021-05-06T00:00:00Z"
+        },
+        "specialization": "Biochemistry",
+        "certificates": [
+            "Biochemistry"
+        ],
+        "role": "labtechnician",
+        "createdAt": {
+            "$date": "2025-01-02T20:17:07.808Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:18:55.556Z"
+        },
+        "__v": 0,
+        "hospital": {
+            "$oid": "676db85ddc2d5a0149026435"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6776f37de319b7fdab1acc61"
+        },
+        "name": "Eloise",
+        "surname": "Moreau",
+        "title": "Lab. Tech.",
+        "email": "eloise.moreau@gofies.com",
+        "password": "$2a$10$dzC3XUHB/3wAaNozbxeuV.y8bEL3HD7vrVxUtQyV.hKMrLhhQo0JO",
+        "birthdate": {
+            "$date": "1973-01-04T00:00:00Z"
+        },
+        "phone": "421412",
+        "jobstartdate": {
+            "$date": "2024-04-02T00:00:00Z"
+        },
+        "specialization": "Hematology",
+        "certificates": [
+            "Hematology"
+        ],
+        "role": "labtechnician",
+        "createdAt": {
+            "$date": "2025-01-02T20:13:49.014Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:18:51.986Z"
+        },
+        "__v": 0,
+        "hospital": {
+            "$oid": "676db7c8dc2d5a0149026416"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6776f40fe319b7fdab1acc8e"
+        },
+        "name": "Mathieu",
+        "surname": "Lefevre",
+        "title": "Lab. Tech.",
+        "email": "mathieu.lefevre@gofies.com",
+        "password": "$2a$10$QcrweTiB9c1vSvtTNsVZxOYw7vFcXqlODaWNxFAmwt70V8meqOq46",
+        "birthdate": {
+            "$date": "1990-01-05T00:00:00Z"
+        },
+        "phone": "421412",
+        "jobstartdate": {
+            "$date": "2022-01-01T00:00:00Z"
+        },
+        "specialization": "Clinical Pathology",
+        "certificates": [
+            "ClinicalPathology"
+        ],
+        "role": "labtechnician",
+        "createdAt": {
+            "$date": "2025-01-02T20:16:15.692Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:18:58.606Z"
+        },
+        "__v": 0,
+        "hospital": {
+            "$oid": "676db800dc2d5a0149026424"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6776f464e319b7fdab1acca5"
+        },
+        "name": "Adrien",
+        "surname": "Rousseau",
+        "title": "Lab. Tech.",
+        "email": "adrien.rousseau@gofies.com",
+        "password": "$2a$10$s6VOOh.zGuwth2XtT54kBeYCpktIeX7CVROV4ryDO0OZOu3ueIf/u",
+        "birthdate": {
+            "$date": "1992-01-04T00:00:00Z"
+        },
+        "phone": "421412",
+        "jobstartdate": {
+            "$date": "2025-01-01T00:00:00Z"
+        },
+        "specialization": "Radiology",
+        "certificates": [
+            "Radiology"
+        ],
+        "role": "labtechnician",
+        "createdAt": {
+            "$date": "2025-01-02T20:17:40.782Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:19:09.83Z"
+        },
+        "__v": 0,
+        "hospital": {
+            "$oid": "676db7afdc2d5a014902640f"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6776f49de319b7fdab1accae"
+        },
+        "name": "Chloe",
+        "surname": "Boucher",
+        "title": "Lab. Tech.",
+        "email": "chloe.boucher@gofies.com",
+        "password": "$2a$10$3HPfcM4NOSMq78JwOTLCNezJjzCDRuQg.nJuSNZfhZJdrCDmQBgai",
+        "birthdate": {
+            "$date": "1974-05-06T00:00:00Z"
+        },
+        "phone": "421412",
+        "jobstartdate": {
+            "$date": "2025-01-01T00:00:00Z"
+        },
+        "specialization": "Neurology",
+        "certificates": [
+            "Neurology"
+        ],
+        "role": "labtechnician",
+        "createdAt": {
+            "$date": "2025-01-02T20:18:37.003Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:19:05.054Z"
+        },
+        "__v": 0,
+        "hospital": {
+            "$oid": "676db820dc2d5a014902642b"
+        }
+    }
+]
