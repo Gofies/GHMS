@@ -320,7 +320,6 @@ const newLabTestRequest = async (req, res) => {
 };
 
 export {
-    getPatientDetails,
     getPatients,
     getPatient,
     createPrescription,

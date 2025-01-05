@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import {
-    getPatientDetails,
     getPatients,
     getPatient,
     createPrescription,
@@ -175,32 +174,6 @@ describe('Patient Controller Tests', () => {
 
     afterAll(async () => {
         await mongoose.connection.close();
-    });
-
-    describe('getPatientDetails', () => {
-        it('should get patient details successfully', async () => {
-            mockRequest.params = { patientId: testPatient._id };
-            mockRequest.user = { _id: testDoctor._id };
-
-            await getPatientDetails(mockRequest, mockResponse);
-
-            const responseData = mockResponse._getJSONData();
-            expect(mockResponse._getStatusCode()).toBe(200);
-            expect(responseData.patient.name).toBe('Test');
-            expect(responseData.patient.surname).toBe('Patient');
-            expect(responseData.patient.gender).toBe('Male');
-            expect(responseData.message).toBe('Patient details retrieved successfully');
-        });
-
-        it('should return 404 if patient not found', async () => {
-            mockRequest.params = { patientId: new mongoose.Types.ObjectId() };
-            mockRequest.user = { _id: testDoctor._id };
-
-            await getPatientDetails(mockRequest, mockResponse);
-
-            expect(mockResponse._getStatusCode()).toBe(404);
-            expect(mockResponse._getJSONData().message).toBe('Patient not found for this doctor');
-        });
     });
 
     describe('getPatients', () => {
