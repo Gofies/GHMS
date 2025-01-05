@@ -4,7 +4,9 @@ import os
 
 class LLMService:
     def __init__(self):
-        local_model_dir = 'distilgpt2'
+        local_model_dir = '/app/models/Llama-2-7b-hf'
+	if not os.path.exists(local_model_dir):
+            raise ValueError(f"Model not found at {local_model_dir}")
 
         # Load tokenizer with specific settings
         self.tokenizer = AutoTokenizer.from_pretrained(

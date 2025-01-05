@@ -48,7 +48,7 @@ const processQueue = (error, token = null) => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: 'https://localhost/api/v1/',
+  baseURL: 'https://www.gofies.software/api/v1/',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
