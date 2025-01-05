@@ -1,46 +1,70 @@
 import React, { useState } from 'react';
+import { useDarkMode } from "../../../../helpers/DarkModeContext";
 
-export const Dialog = ({ children }) => {
+export function Dialog({ children }) {
   const [isOpen, setIsOpen] = useState(false);
+  const { darkMode } = useDarkMode();
 
-  const toggleDialog = () => setIsOpen(!isOpen);
-
-  return (
-    <>
-      {React.Children.map(children, (child) =>
-        React.cloneElement(child, { isOpen, toggleDialog })
-      )}
-    </>
-  );
-};
-
-export const DialogTrigger = ({ asChild, toggleDialog, children }) => {
-  const triggerProps = asChild ? {} : { onClick: toggleDialog };
-  return React.cloneElement(children, triggerProps);
-};
-
-export const DialogContent = ({ isOpen, toggleDialog, children }) => {
-  if (!isOpen) return null;
+  const openDialog = () => setIsOpen(true);
+  const closeDialog = () => setIsOpen(false);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-md shadow-lg w-full max-w-lg p-6">
-        {children}
-        <button
-          onClick={toggleDialog}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+    <div>
+      {/* Trigger */}
+      <div onClick={openDialog}>{children[0]}</div>
+
+      {/* Dialog Content */}
+      {isOpen && (
+        <div
+          className={`fixed inset-0 flex justify-center items-center z-50 transition-all duration-300 ${
+            darkMode ? "bg-black bg-opacity-70" : "bg-black bg-opacity-50"
+          }`}
+          onClick={closeDialog}
         >
-          &times;
-        </button>
-      </div>
+          <div
+            className={`rounded-lg shadow-lg w-1/3 max-w-lg p-6 transition-all duration-300 ${
+              darkMode ? "bg-gray-800 text-white" : "bg-white"
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className={`absolute top-2 right-2 transition-all duration-300 ${
+                darkMode ? "text-gray-400 hover:text-gray-300" : "text-gray-400 hover:text-gray-600"
+              }`}
+              onClick={closeDialog}
+            >
+              &#x2715;
+            </button>
+            {children[1]}
+          </div>
+        </div>
+      )}
     </div>
   );
-};
+}
 
-export const DialogHeader = ({ children }) => (
-  <div className="mb-4 border-b pb-2">{children}</div>
-);
+export function DialogTrigger({ asChild, children }) {
+  return children;
+}
 
-export const DialogTitle = ({ children }) => (
-  <h2 className="text-lg font-bold text-gray-800">{children}</h2>
-);
+export function DialogContent({ children }) {
+  return <div className="space-y-4">{children}</div>;
+}
+
+export function DialogHeader({ children }) {
+  const { darkMode } = useDarkMode();
+  return (
+    <div className={`text-lg font-semibold ${darkMode ? "text-white" : "text-black"}`}>
+      {children}
+    </div>
+  );
+}
+
+export function DialogTitle({ children }) {
+  const { darkMode } = useDarkMode();
+  return (
+    <h2 className={`text-2xl font-bold ${darkMode ? "text-white" : "text-black"}`}>
+      {children}
+    </h2>
+  );
+}

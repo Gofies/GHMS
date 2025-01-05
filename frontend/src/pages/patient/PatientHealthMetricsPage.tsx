@@ -1,24 +1,18 @@
 import { useState, useEffect } from 'react'
 import { Button } from "../../components/ui/patient/health-metrics/Button.jsx"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/patient/health-metrics/Card.jsx"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/patient/health-metrics/Tabs.jsx"
-import { CalendarDays, Home, User, FileText, PieChart, Settings, LogOut, Activity, Heart, Weight, Ruler } from 'lucide-react'
-import { LineChart } from 'recharts/es6/chart/LineChart';
-import { Line } from 'recharts/es6/cartesian/Line';
-import { XAxis } from 'recharts/es6/cartesian/XAxis';
-import { YAxis } from 'recharts/es6/cartesian/YAxis';
-import { CartesianGrid } from 'recharts/es6/cartesian/CartesianGrid';
-import { Tooltip } from 'recharts/es6/component/Tooltip';
-import { Legend } from 'recharts/es6/component/Legend';
-import { ResponsiveContainer } from 'recharts/es6/component/ResponsiveContainer';
+import { Input } from "../../components/ui/patient/health-metrics/Input.jsx"
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
-import Header from "../../components/ui/common/Header.jsx";
+import Header from "../../components/ui/admin/Header.jsx";
 import { Endpoint, putRequest, getRequest, deleteRequest } from "../../helpers/Network.js";
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
+import { useDarkMode } from '../../helpers/DarkModeContext.js';
 
 export default function HealthMetricsPage() {
+
   const [activeTab, setActiveTab] = useState('overview');
   const [editing, setEditing] = useState(null);
+
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
   const [heartRate, setHeartRate] = useState("");
@@ -30,26 +24,26 @@ export default function HealthMetricsPage() {
   const [error, setError] = useState("")
   const [allergies, setAllergies] = useState(null);
 
+  const { darkMode, toggleDarkMode } = useDarkMode();
+
   const handleDelete = async (allergyToDelete) => {
     try {
-      console.log(allergyToDelete);
       const response = await deleteRequest("/patient/metrics/allergies", {
-        allergyName: allergyToDelete, // Backend'in beklediği format
+        allergyName: allergyToDelete,
       });
       console.log(response.status);
       if (response) {
         setAllergies((prevAllergies) =>
           prevAllergies.filter((allergy) => allergy !== allergyToDelete)
         );
-        toast("Allergy deleted successfully!");
+        toast.success("Allergy deleted successfully!");
       } else {
-        toast("Error deleting allergy!");
+        toast.error("Error deleting allergy!");
       }
     } catch (error) {
-      toast(`Error deleting allergy: ${error.message}`);
+      toast.error(`Error deleting allergy: ${error.message}`);
     }
   };
-  
 
   const getBmiComment = (bmi) => {
     if (bmi && !isNaN(bmi)) {
@@ -65,21 +59,20 @@ export default function HealthMetricsPage() {
     }
   };
 
-  // BMI'ye Göre Renk Fonksiyonu
-const getBmiColor = (bmi) => {
-  if (bmi && !isNaN(bmi)) {
-    if (bmi < 18.5) {
-      return "text-yellow-500"; // Zayıf
-    } else if (bmi >= 18.5 && bmi < 24.9) {
-      return "text-green-500"; // Normal
-    } else if (bmi >= 25 && bmi < 29.9) {
-      return "text-red-500"; // Fazla Kilolu
-    } else {
-      return "text-red-800"; // Obezite
+  const getBmiColor = (bmi) => {
+    if (bmi && !isNaN(bmi)) {
+      if (bmi < 18.5) {
+        return "text-yellow-500"; // Underweight
+      } else if (bmi >= 18.5 && bmi < 24.9) {
+        return "text-green-500"; // Normal weight
+      } else if (bmi >= 25 && bmi < 29.9) {
+        return "text-red-500"; // Overweight
+      } else {
+        return "text-red-800"; // Obesity
+      }
     }
-  }
-  return "text-muted-foreground"; // Varsayılan
-};
+    return "text-muted-foreground"; // Default
+  };
 
   const parseBloodPressure = (bloodPressure) => {
     if (!bloodPressure) return { systolic: "-", diastolic: "-" };
@@ -87,12 +80,10 @@ const getBmiColor = (bmi) => {
     return { systolic, diastolic };
   };
 
-
   useEffect(() => {
     const fetchHealthMetrics = async () => {
       try {
         const response = await getRequest(Endpoint.GET_HEALTH_METRICS);
-        console.log("response", response);
         setWeight(response.metrics.weight);
         setHeartRate(response.metrics.heartrate);
         setHeight(response.metrics.height);
@@ -117,94 +108,95 @@ const getBmiColor = (bmi) => {
     return value.replace("/", " ");
   };
 
-
   const handleSave = async (type, value) => {
     try {
-      // Validasyonlar
+      let isValid = true;
+
       if (type === "weight") {
-        if (value < 0 || value > 300) {
-          toast("Weight must be between 30 and 300 kg.");
-          return;
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue) || numericValue < 30 || numericValue > 300) {
+          toast.error("Weight must be a valid number between 30 and 300 kg.");
+          isValid = false;
         }
       } else if (type === "height") {
-        if (value < 0 || value > 250) {
-          toast("Height must be between 50 and 250 cm.");
-          return;
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue) || numericValue < 50 || numericValue > 250) {
+          toast.error("Height must be a valid number between 50 and 250 cm.");
+          isValid = false;
         }
       } else if (type === "blood-pressure") {
-        const normalizedValue = value.replace(/\s+/g, "/");
-        console.log("Normalized Value:", normalizedValue);
-      
-        const [systolic, diastolic] = normalizedValue.split("/").map(Number);
-        if (
-          !systolic ||
-          !diastolic ||
-          systolic < 70 ||
-          systolic > 250 ||
-          diastolic < 40 ||
-          diastolic > 150
-        ) {
-          toast("Blood pressure must be in the format systolic/diastolic and within valid ranges.");
-          return;
+        const normalizedValue = value.trim().replace(/\s+/g, "/");
+        if (!/^(\d{1,3})\/(\d{1,3})$/.test(normalizedValue)) {
+          toast.error("Blood pressure must be in the format systolic/diastolic (e.g., 120/80).");
+          isValid = false;
+        } else {
+          const [systolic, diastolic] = normalizedValue.split("/").map(Number);
+          if (
+            systolic < 70 || systolic > 250 ||
+            diastolic < 40 || diastolic > 150
+          ) {
+            toast.error("Blood pressure values must be in valid ranges (Systolic: 70-250, Diastolic: 40-150).");
+            isValid = false;
+          }
         }
-      }
-      else if (type === "heart-rate") {
-        if (value < 0 || value > 200) {
-          toast("Heart rate must be between 40 and 200 bpm.");
-          return;
+      } else if (type === "heart-rate") {
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue) || numericValue < 40 || numericValue > 200) {
+          toast.error("Heart rate must be a valid number between 40 and 200 bpm.");
+          isValid = false;
         }
       } else if (type === "blood-sugar") {
-        if (value < 50 || value > 500) {
-          toast("Blood sugar must be between 50 and 500.");
-          return;
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue) || numericValue < 50 || numericValue > 500) {
+          toast.error("Blood sugar must be a valid number between 50 and 500 mg/dL.");
+          isValid = false;
         }
       } else if (type === "blood-type") {
         const validBloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "0+", "0-"];
-        if (!validBloodTypes.includes(value)) {
-          toast("Invalid blood type. Valid types are A+, A-, B+, B-, AB+, AB-, 0+, 0-.");
-          return;
+        if (!validBloodTypes.includes(value.trim().toUpperCase())) {
+          toast.error("Invalid blood type. Valid types are A+, A-, B+, B-, AB+, AB-, 0+, 0-.");
+          isValid = false;
         }
       } else if (type === "allergies") {
-        if (value.length > 50) {
-          toast("Allergy descriptions must be less than 50 characters.");
-          return;
+        if (!value || typeof value !== "string" || value.length > 50 || /[^a-zA-Z0-9\s,]/.test(value)) {
+          toast.error("Allergy descriptions must be a string with less than 50 characters and only contain letters, numbers, spaces, or commas.");
+          isValid = false;
         }
+      } else {
+        toast.error("Invalid metric type.");
+        isValid = false;
+      }
+
+      if (!isValid) {
+        if (type === "weight") setWeight(null);
+        else if (type === "height") setHeight(null);
+        else if (type === "blood-pressure") setBloodPressure(null);
+        else if (type === "heart-rate") setHeartRate(null);
+        else if (type === "blood-sugar") setBloodSugar(null);
+        else if (type === "blood-type") setBloodType(null);
+        else if (type === "allergies") setAllergies([]);
+        return;
       }
 
       const response = await putRequest(`${Endpoint.PUT_HEALTH_METRICS}/${type}`, { [type]: value });
-
       if (response) {
-        toast(`${type} updated successfully!`);
+        toast.success(`${type} updated successfully!`);
       } else {
-        toast(`Failed to update ${type}.`);
+        toast.error(`Failed to update ${type}.`);
       }
 
-      // Durum güncellemesi
-      if (type === "weight") {
-        setWeight(response.patient.weight);
-      } else if (type === "heart-rate") {
-        setHeartRate(response.patient.heartrate);
-      } else if (type === "height") {
-        setHeight(response.patient.height);
-      } else if (type === "blood-sugar") {
-        setBloodSugar(response.patient.bloodsugar);
-      } else if (type === "blood-type") {
-        setBloodType(response.patient.bloodtype);
-      } else if (type === "allergies") {
-        setAllergies(response.patient.allergies);
-      } else if (type === "blood-pressure") {
-        setBloodPressure(response.patient.bloodpressure);
-      }
+      if (type === "weight") setWeight(response.patient.weight);
+      else if (type === "height") setHeight(response.patient.height);
+      else if (type === "blood-pressure") setBloodPressure(response.patient.bloodpressure);
+      else if (type === "heart-rate") setHeartRate(response.patient.heartrate);
+      else if (type === "blood-sugar") setBloodSugar(response.patient.bloodsugar);
+      else if (type === "blood-type") setBloodType(response.patient.bloodtype);
+      else if (type === "allergies") setAllergies(response.patient.allergies);
 
     } catch (error) {
-      toast(`Error updating ${type}: ${error.message}`);
+      toast.error(`Error updating ${type}: ${error.message}`);
     }
     setEditing(null);
-  };
-
-
-  const handleTabChange = (value) => {
-    setActiveTab(value); // Update the active tab
   };
 
   const handleEditClick = (type) => {
@@ -243,20 +235,11 @@ const getBmiColor = (bmi) => {
 
   const handleInputChange = (e) => {
     const newValue = e.target.value;
-
-    // if (editing === "blood-pressure") {
-    //   // Sadece "sayı/sayı" formatına izin ver
-    //   if (!/^\d*\/?\d*$/.test(newValue)) {
-    //     return; // Geçersiz formatta ise değişikliğe izin verme
-    //   }
-    // }
-
     setValue(newValue);
   };
 
-
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100"}text-gray-900`}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <Header title="Health Metrics" />
@@ -270,7 +253,7 @@ const getBmiColor = (bmi) => {
               <CardContent>
                 {editing === "weight" ? (
                   <div>
-                    <input
+                    <Input
                       type="number"
                       value={value}
                       onChange={handleInputChange}
@@ -294,7 +277,6 @@ const getBmiColor = (bmi) => {
                 )}
               </div>
             </Card>
-
             {/* Height card */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -303,7 +285,7 @@ const getBmiColor = (bmi) => {
               <CardContent>
                 {editing === "height" ? (
                   <div>
-                    <input
+                    <Input
                       type="number"
                       value={value}
                       onChange={handleInputChange}
@@ -336,7 +318,7 @@ const getBmiColor = (bmi) => {
               <CardContent>
                 {editing === "blood-pressure" ? (
                   <div>
-                    <input
+                    <Input
                       type="text"
                       value={value}
                       onChange={handleInputChange}
@@ -373,7 +355,7 @@ const getBmiColor = (bmi) => {
               <CardContent>
                 {editing === "heart-rate" ? (
                   <div>
-                    <input
+                    <Input
                       type="number"
                       value={value}
                       onChange={handleInputChange}
@@ -397,9 +379,6 @@ const getBmiColor = (bmi) => {
                 )}
               </div>
             </Card>
-
-
-
             {/* Blood Sugar Card */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -408,7 +387,7 @@ const getBmiColor = (bmi) => {
               <CardContent>
                 {editing === "blood-sugar" ? (
                   <div>
-                    <input
+                    <Input
                       type="number"
                       value={value}
                       onChange={handleInputChange}
@@ -442,7 +421,7 @@ const getBmiColor = (bmi) => {
               <CardContent>
                 {editing === "blood-type" ? (
                   <div>
-                    <input
+                    <Input
                       type="text"
                       value={value}
                       onChange={handleInputChange}
@@ -470,20 +449,18 @@ const getBmiColor = (bmi) => {
                 )}
               </div>
             </Card>
-
             {/* BMI Card */}
-<Card>
-  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-    <CardTitle className="text-sm font-medium">BMI</CardTitle>
-  </CardHeader>
-  <CardContent>
-    <div className="text-2xl font-bold">{bmi ? bmi : "-"}</div>
-    <p className={`text-sm ${getBmiColor(bmi)}`}>
-      {getBmiComment(bmi)}
-    </p>
-  </CardContent>
-</Card>
-
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">BMI</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{bmi ? bmi : "-"}</div>
+                <p className={`text-sm ${getBmiColor(bmi)}`}>
+                  {getBmiComment(bmi)}
+                </p>
+              </CardContent>
+            </Card>
           </div>
           {/* Allergies Card */}
           <div className='mt-3'>
@@ -495,10 +472,15 @@ const getBmiColor = (bmi) => {
                 <ul>
                   {Array.isArray(allergies) && allergies.length > 0 ? (
                     allergies.map((allergy, index) => (
-                      <li key={index} className="flex items-center justify-between text-sm text-gray-700">
+                      <li
+                        key={index}
+                        className={`flex items-center justify-between text-sm transition-all duration-300 ${darkMode ? "bg-gray-700 text-gray-300" : "text-gray-700"
+                          }`}
+                      >
                         <span>{index + 1}. {allergy}</span>
                         <Button
-                          className="text-red-500 text-xs"
+                          className={`text-xs transition-all duration-300 ${darkMode ? "text-red-400 hover:text-red-300" : "text-red-500 hover:text-red-400"
+                            }`}
                           onClick={() => handleDelete(allergy)}
                         >
                           Delete
@@ -506,14 +488,18 @@ const getBmiColor = (bmi) => {
                       </li>
                     ))
                   ) : (
-                    <li className="text-sm text-gray-500">No allergies</li>
+                    <li
+                      className={`text-sm transition-all duration-300 ${darkMode ? "text-gray-500" : "text-gray-400"
+                        }`}
+                    >
+                      No allergies
+                    </li>
                   )}
                 </ul>
-
-                {/* Yeni alerji ekleme alanı */}
+                {/* New Allergy Adding Card */}
                 {editing === "allergies" && (
                   <div className="mt-4">
-                    <input
+                    <Input
                       type="text"
                       value={value}
                       onChange={handleInputChange}
@@ -526,7 +512,6 @@ const getBmiColor = (bmi) => {
                     </div>
                   </div>
                 )}
-
               </CardContent>
               <div>
                 {editing !== "allergies" && (
@@ -535,8 +520,6 @@ const getBmiColor = (bmi) => {
               </div>
             </Card>
           </div>
-
-
         </div>
       </main>
     </div>

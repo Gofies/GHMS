@@ -1,23 +1,81 @@
-export const Table = ({ children }) => (
-  <table className="min-w-full border-collapse border border-gray-300">{children}</table>
-);
+import React from 'react';
+import { useDarkMode } from "../../../../helpers/DarkModeContext";
 
-export const TableHeader = ({ children }) => (
-  <thead className="bg-gray-200">{children}</thead>
-);
+export const Table = ({ children }) => {
+  const { darkMode } = useDarkMode();
+  return (
+    <table
+      className={`min-w-full divide-y transition-all duration-300 ${
+        darkMode ? 'divide-gray-700' : 'divide-gray-200'
+      }`}
+    >
+      {children}
+    </table>
+  );
+};
 
-export const TableRow = ({ children }) => (
-  <tr className="hover:bg-gray-100">{children}</tr>
-);
+export const TableHeader = ({ children }) => {
+  const { darkMode } = useDarkMode();
+  return (
+    <thead
+      className={`transition-all duration-300 ${
+        darkMode ? 'bg-gray-800 text-white' : 'bg-gray-50'
+      }`}
+    >
+      {children}
+    </thead>
+  );
+};
 
-export const TableHead = ({ children }) => (
-  <th className="px-4 py-2 text-left border border-gray-300 text-gray-700 font-semibold">
-    {children}
-  </th>
-);
+export const TableBody = ({ children }) => {
+  const { darkMode } = useDarkMode();
+  return (
+    <tbody
+      className={`divide-y transition-all duration-300 ${
+        darkMode ? 'bg-gray-900 divide-gray-700 text-white' : 'bg-white divide-gray-200'
+      }`}
+    >
+      {children}
+    </tbody>
+  );
+};
 
-export const TableBody = ({ children }) => <tbody>{children}</tbody>;
+export const TableRow = ({ children }) => {
+  const { darkMode } = useDarkMode();
+  return (
+    <tr
+      className={`transition-all duration-300 ${
+        darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'
+      }`}
+    >
+      {children}
+    </tr>
+  );
+};
 
-export const TableCell = ({ children }) => (
-  <td className="px-4 py-2 border border-gray-300 text-gray-600">{children}</td>
-);
+export const TableHead = ({ children }) => {
+  const { darkMode } = useDarkMode();
+  return (
+    <th
+      scope="col"
+      className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-all duration-300 ${
+        darkMode ? 'text-gray-300' : 'text-gray-500'
+      }`}
+    >
+      {children}
+    </th>
+  );
+};
+
+export const TableCell = ({ children }) => {
+  const { darkMode } = useDarkMode();
+  return (
+    <td
+      className={`px-6 py-4 whitespace-nowrap text-sm transition-all duration-300 ${
+        darkMode ? 'text-gray-400' : 'text-gray-700'
+      }`}
+    >
+      {children}
+    </td>
+  );
+};

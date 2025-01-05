@@ -7,5 +7,4 @@ const router = express.Router();
 
 router.put('/', protect('labtechnician'), changePassword);
 
-
 export default router;

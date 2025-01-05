@@ -13,11 +13,11 @@ import ProtectedRoute from "./components/ProtectedRoute.js";
 import { store, persistor } from "./redux/store";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-//import { DarkModeProvider } from '../src/helpers/DarkModeContext.js';
+import { DarkModeProvider } from '../src/helpers/DarkModeContext.js';
 
 function App() {
   return (
-   // <DarkModeProvider>
+   <DarkModeProvider>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
@@ -30,8 +30,8 @@ function App() {
             <Route element={<ProtectedRoute requiredRole="doctor" />}>
               <Route path="/doctor/:doctorId/*" element={<DoctorView />} />
             </Route>
-            <Route element={<ProtectedRoute requiredRole="lab-staff" />}>
-              <Route path="/lab-staff/*" element={<LabStaffView />} />
+            <Route element={<ProtectedRoute requiredRole="labtechnician" />}>
+              <Route path="/labtechnician/:labTechnicianId/*" element={<LabStaffView />} />
             </Route>
             <Route element={<ProtectedRoute requiredRole="patient" />}>
               <Route path="/patient/:patientId/*" element={<PatientView />} />
@@ -41,7 +41,7 @@ function App() {
         </BrowserRouter>
       </PersistGate>
     </Provider>
-   // </DarkModeProvider>
+   </DarkModeProvider>
   );
 }
 

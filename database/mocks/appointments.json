@@ -1,67 +1,39 @@
 [
     {
         "_id": {
-            "$oid": "676dc55544828d8b42abb564"
+            "$oid": "6776f678e319b7fdab1af1e8"
         },
         "patient": {
-            "$oid": "676db9e6dc2d5a0149026eca"
+            "$oid": "6776f652e319b7fdab1aeb93"
         },
         "doctor": {
-            "$oid": "676db6a7dc2d5a014902634d"
+            "$oid": "676db66fdc2d5a01490262b9"
         },
-        "hospital": null,
+        "hospital": {
+            "$oid": "676db7c8dc2d5a0149026416"
+        },
         "polyclinic": {
-            "$oid": "676db936dc2d5a01490269a0"
+            "$oid": "6776f552e319b7fdab1ad24a"
         },
         "treatment": [],
         "type": "doctor",
         "date": {
-            "$date": "2025-01-07T20:03:51.769Z"
+            "$date": "2025-01-05T20:02:55.271Z"
         },
-        "time": "10:00",
+        "time": "12:00",
         "status": "Scheduled",
         "tests": [],
         "createdAt": {
-            "$date": "2024-12-26T21:06:29.794Z"
+            "$date": "2025-01-02T20:26:32.451Z"
         },
         "updatedAt": {
-            "$date": "2024-12-26T21:06:29.794Z"
+            "$date": "2025-01-02T20:26:32.451Z"
         },
         "__v": 0
     },
     {
         "_id": {
-            "$oid": "676dc17a44828d8b42abab84"
-        },
-        "patient": {
-            "$oid": "676db9e6dc2d5a0149026eca"
-        },
-        "doctor": {
-            "$oid": "676db640dc2d5a0149026225"
-        },
-        "hospital": null,
-        "polyclinic": {
-            "$oid": "676db8dadc2d5a01490266eb"
-        },
-        "treatment": [],
-        "type": "doctor",
-        "date": {
-            "$date": "2024-12-26T20:02:08.559Z"
-        },
-        "time": "10:00",
-        "status": "Scheduled",
-        "tests": [],
-        "createdAt": {
-            "$date": "2024-12-26T20:50:02.695Z"
-        },
-        "updatedAt": {
-            "$date": "2024-12-26T20:50:02.695Z"
-        },
-        "__v": 0
-    },
-    {
-        "_id": {
-            "$oid": "676dc4c944828d8b42abae58"
+            "$oid": "6776f62ce319b7fdab1aeafb"
         },
         "patient": {
             "$oid": "676db9e6dc2d5a0149026eca"
@@ -69,23 +41,121 @@
         "doctor": {
             "$oid": "676db552dc2d5a0149025e22"
         },
-        "hospital": null,
+        "hospital": {
+            "$oid": "676db85ddc2d5a0149026435"
+        },
         "polyclinic": {
-            "$oid": "676db907dc2d5a014902683e"
+            "$oid": "6776f535e319b7fdab1ad0bc"
         },
         "treatment": [],
         "type": "doctor",
         "date": {
-            "$date": "2024-12-28T19:58:10.463Z"
+            "$date": "2025-01-07T19:58:10.463Z"
         },
         "time": "11:00",
         "status": "Scheduled",
         "tests": [],
         "createdAt": {
-            "$date": "2024-12-26T21:04:09.826Z"
+            "$date": "2025-01-02T20:25:16.542Z"
         },
         "updatedAt": {
-            "$date": "2024-12-26T21:04:09.826Z"
+            "$date": "2025-01-02T20:25:16.542Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f5ffe319b7fdab1adcdb"
+        },
+        "patient": {
+            "$oid": "676db9e6dc2d5a0149026eca"
+        },
+        "doctor": {
+            "$oid": "676db97edc2d5a0149026b13"
+        },
+        "hospital": {
+            "$oid": "676db7afdc2d5a014902640f"
+        },
+        "polyclinic": {
+            "$oid": "6776f595e319b7fdab1ad5c7"
+        },
+        "treatment": [],
+        "type": "doctor",
+        "date": {
+            "$date": "2025-01-09T20:15:58.377Z"
+        },
+        "time": "11:00",
+        "status": "Scheduled",
+        "tests": [],
+        "createdAt": {
+            "$date": "2025-01-02T20:24:31.249Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:24:31.249Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f66ce319b7fdab1af028"
+        },
+        "patient": {
+            "$oid": "6776f652e319b7fdab1aeb93"
+        },
+        "doctor": {
+            "$oid": "676db97edc2d5a0149026b13"
+        },
+        "hospital": {
+            "$oid": "676db7afdc2d5a014902640f"
+        },
+        "polyclinic": {
+            "$oid": "6776f595e319b7fdab1ad5c7"
+        },
+        "treatment": [],
+        "type": "doctor",
+        "date": {
+            "$date": "2025-01-07T20:15:58.377Z"
+        },
+        "time": "11:00",
+        "status": "Scheduled",
+        "tests": [],
+        "createdAt": {
+            "$date": "2025-01-02T20:26:20.23Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:26:20.23Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f683e319b7fdab1af3a8"
+        },
+        "patient": {
+            "$oid": "6776f652e319b7fdab1aeb93"
+        },
+        "doctor": {
+            "$oid": "676db552dc2d5a0149025e22"
+        },
+        "hospital": {
+            "$oid": "676db85ddc2d5a0149026435"
+        },
+        "polyclinic": {
+            "$oid": "6776f535e319b7fdab1ad0bc"
+        },
+        "treatment": [],
+        "type": "doctor",
+        "date": {
+            "$date": "2025-01-04T19:58:10.463Z"
+        },
+        "time": "11:00",
+        "status": "Scheduled",
+        "tests": [],
+        "createdAt": {
+            "$date": "2025-01-02T20:26:43.383Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:26:43.383Z"
         },
         "__v": 0
     }

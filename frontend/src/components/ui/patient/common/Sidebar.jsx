@@ -1,15 +1,20 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, User, CalendarDays, FileText, PieChart, Settings } from "lucide-react"; // Icon importlarını unutmayın
+import { Home, User, CalendarDays, FileText, PieChart, Settings } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useDarkMode } from "../../../../helpers/DarkModeContext";
+import { useEffect, useState } from "react";
 
 export default function Sidebar() {
-    const location = useLocation(); 
+    const location = useLocation();
+    const { darkMode } = useDarkMode();
 
     const isActive = (path) => location.pathname === path;
 
-    const { patientId } = useParams();
     const { userId } = useSelector((state) => state.auth);
+
+    const [currentPath, setCurrentPath] = useState(location.pathname);
+
 
     const links = [
         {
@@ -29,7 +34,7 @@ export default function Sidebar() {
         },
         {
           to: `/patient/${userId}/medical-records`,
-          label: "Medical Records",
+          label: "Lab Tests",
           icon: FileText,
         },
         {
@@ -42,32 +47,49 @@ export default function Sidebar() {
           label: "Settings",
           icon: Settings,
         },
-      ];
+    ];
+
+    useEffect(() => {
+      if (location.pathname !== currentPath) {
+          setCurrentPath(location.pathname);
+          window.location.reload(); 
+      }
+    }, [location.pathname]);
 
     return (
-        <aside className="w-64 bg-white shadow-md hidden md:block">
-      <div className="p-4">
-        <h2 className="text-2xl font-bold text-gray-800">Hospital System</h2>
-      </div>
-      <nav className="mt-6">
-        {links.map((link, index) => {
-          const Icon = link.icon; 
-          return (
-            <Link
-              key={index}
-              to={link.to}
-              className={`flex items-center px-4 py-2 mt-2 ${
-                isActive(link.to)
-                  ? "text-gray-800 bg-gray-200 font-bold"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              <Icon className="w-5 h-5 mr-2" />
-              {link.label}
-            </Link>
-          );
-        })}
-      </nav>
-    </aside>
+        <aside
+          className={`w-64 hidden md:block shadow-md transition-all duration-300 ${
+            darkMode ? "bg-gray-900 text-white border-r border-gray-700" : "bg-white text-gray-800 border-r border-gray-200"
+          }`}
+        >
+          <div className="p-4">
+            <h2 className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-800"}`}>
+              Hospital System
+            </h2>
+          </div>
+          <nav className="mt-6">
+            {links.map((link, index) => {
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={index}
+                  to={link.to}
+                  className={`flex items-center px-4 py-2 mt-2 rounded-md transition-all duration-300 ${
+                    isActive(link.to)
+                      ? darkMode
+                        ? "bg-gray-800 text-white font-bold"
+                        : "bg-gray-200 text-gray-800 font-bold"
+                      : darkMode
+                      ? "text-gray-400 hover:bg-gray-800 hover:text-white"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Icon className="w-5 h-5 mr-2" />
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </aside>
     );
 }

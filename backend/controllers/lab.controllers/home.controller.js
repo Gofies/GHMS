@@ -7,31 +7,30 @@ const getHomePage = async (req, res) => {
         const id = req.user._id;
 
         const labTestQueue = await LabTechnician.findById(id)
-            .select('hospital') // Select the hospital field from LabTechnician
+            .select('hospital')
             .populate({
                 path: 'hospital',
                 model: 'Hospital',
-                select: 'labTests', // Select the labTests field from Hospital
+                select: 'labTests',
                 populate: {
                     path: 'labTests',
                     model: 'LabTest',
-                    match: { status: 'pending' }, // Only include pending lab tests
-                    select: 'patient testtype urgency doctor', // Select specific fields
+                    match: { status: 'pending' },
+                    select: 'patient testtype urgency doctor',
                     populate: [
                         {
                             path: 'patient',
                             model: 'Patient',
-                            select: 'name surname', // Select patient name and surname
+                            select: 'name surname',
                         },
                         {
                             path: 'doctor',
                             model: 'Doctor',
-                            select: 'name surname', // Select doctor name and surname
+                            select: 'name surname',
                         },
                     ],
                 },
             });
-
 
         if (!labTestQueue) {
             return res.status(404).json({ message: 'Lab test queue not found' });
@@ -46,17 +45,32 @@ const getHomePage = async (req, res) => {
 
 const completeTest = async (req, res) => {
     try {
-        const { testId } = req.body;
+        const { testId, result } = req.body;
 
-        await LabTest.findByIdAndUpdate(testId, { status: 'completed' });
+        const labTest = await LabTest.findById(testId);
+        if (!labTest) {
+            return res.status(404).json({ message: 'Lab test not found' });
+        }
 
-        return res.status(200).json({ message: 'Lab test completed successfully' });
+        labTest.status = 'completed';
+        labTest.result = result || labTest.result;
+        labTest.resultdate = new Date();
+
+        await labTest.save();
+
+        const updatedLabTest = await LabTest.findById(testId)
+            .populate('patient', 'name surname')
+            .populate('doctor', 'name surname');
+
+        return res.status(200).json({
+            message: 'Lab test completed successfully',
+            completedTest: updatedLabTest
+        });
+    } catch (error) {
+        console.error('Error in completeTest controller:', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch (error) {
-        console.error(error, 'Error in completeTest controller');
-        res.status(500).send('Server Error');
-    }
-}
+};
 
 export { getHomePage, completeTest };
 

@@ -1,90 +1,95 @@
-import Doctor from "../../models/doctor.model.js";
 import LabTechnician from "../../models/lab.technician.model.js";
-import Hospital from "../../models/hospital.model.js";
 import LabTest from "../../models/lab.test.model.js";
-import Patient from "../../models/patient.model.js";
-
-const getResults = async (req, res) => {
-    try {
-        const results = await LabTechnician.findById(req.user._id)
-            .select('hospital')
-            .populate({
-                path: 'hospital',
-                model: 'Hospital',
-                select: 'labTests',
-                populate: {
-                    path: 'labTests',
-                    model: 'LabTest',
-                    populate: [
-                        {
-                            path: 'patient',
-                            model: 'Patient',
-                            select: 'name surname'
-                        },
-                        {
-                            path: 'doctor',
-                            model: 'Doctor',
-                            select: 'name surname'
-                        }
-                    ]
-
-                }
-
-            });
-
-        if (!results) {
-            return res.status(404).json({ message: 'Results not found' });
-        }
-
-        res.json(results);
-
-    } catch (error) {
-        console.error(error, 'Error in getResults controller');
-        res.status(500).send('Server Error');
-    }
-}
 
 const getLabTests = async (req, res) => {
     try {
-        const labTests = await LabTechnician.findById(req.user._id)
+        const labTechnicianId = req.user._id;
+
+        const labTechnician = await LabTechnician.findById(labTechnicianId)
             .select('hospital')
             .populate({
                 path: 'hospital',
-                model: 'Hospital',
                 select: 'labTests',
                 populate: {
                     path: 'labTests',
                     model: 'LabTest',
+                    match: { labTechnician: labTechnicianId },
                     populate: [
                         {
                             path: 'patient',
                             model: 'Patient',
-                            select: 'name surname'
+                            select: 'name surname',
                         },
                         {
                             path: 'doctor',
                             model: 'Doctor',
-                            select: 'name surname'
-                        }
-                    ]
-                }
+                            select: 'name surname',
+                        },
+                    ],
+                },
             });
 
-
-        if (!labTests) {
+        if (!labTechnician || !labTechnician.hospital || !labTechnician.hospital.labTests) {
             return res.status(404).json({ message: 'Lab tests not found' });
         }
 
+        const pendingTests = labTechnician.hospital.labTests
+            .filter(test => test.status === 'pending')
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .map(test => ({
+                _id: test._id,
+                patient: test.patient,
+                doctor: test.doctor,
+                hospital: labTechnician.hospital._id,
+                polyclinic: test.polyclinic,
+                status: test.status,
+                testType: test.testType,
+                urgency: test.urgency,
+                createdAt: test.createdAt,
+                updatedAt: test.updatedAt,
+            }));
 
-        const pendingTests = labTests.hospital.labTests.filter(test => test.status === 'pending');
-        const completedTests = labTests.hospital.labTests.filter(test => test.status === 'completed');
+        const completedTests = labTechnician.hospital.labTests
+            .filter(test => test.status === 'completed')
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .map(test => ({
+                _id: test._id,
+                patient: test.patient,
+                doctor: test.doctor,
+                hospital: labTechnician.hospital._id,
+                polyclinic: test.polyclinic,
+                status: test.status,
+                testType: test.testType,
+                urgency: test.urgency,
+                result: test.result,
+                resultDate: test.resultdate,
+                createdAt: test.createdAt,
+                updatedAt: test.updatedAt,
+            }));
 
         res.json({ pendingTests, completedTests });
-
     } catch (error) {
-        console.error(error, 'Error in getLabTests controller');
-        res.status(500).send('Server Error');
+        console.error('Error in getLabTests controller:', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-}
+};
 
-export { getResults, getLabTests };
+const deleteLabTest = async (req, res) => {
+    try {
+        const { labTestId } = req.params;
+
+        const labTest = await LabTest.findById(labTestId);
+        if (!labTest) {
+            return res.status(404).json({ message: 'Lab test not found' });
+        }
+
+        await labTest.deleteOne();
+
+        res.status(200).json({ message: 'Lab test deleted successfully' });
+    } catch (error) {
+        console.error('Error in deleteLabTest controller:', error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+export { getLabTests, deleteLabTest };

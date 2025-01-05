@@ -7,28 +7,27 @@ import { Label } from "../../components/ui/admin/Label.jsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/admin/Table.jsx";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/admin/Dialog.jsx";
 import { Badge } from "../../components/ui/admin/Badge.jsx";
-import { Search, Plus, Edit, Trash2, Eye, EyeOff, CloudCog } from 'lucide-react';
-import { useNavigate } from "react-router-dom";
+import { Search, Plus, Edit, Trash2 } from 'lucide-react';
 import Sidebar from "../../components/ui/admin/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
 import { Endpoint, postRequest, getRequest, putRequest, deleteRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify';
+import { useDarkMode } from '../../helpers/DarkModeContext';
 
 export default function AdminPolyclinicManagementPage() {
+
   const [doctors, setDoctors] = useState([]);
   const [inactiveDoctors, setInactiveDoctors] = useState([]);
-
+  const { darkMode } = useDarkMode();
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [polyclinics, setPolyclinics] = useState([]);
   const [filteredPolyclinics, setFilteredPolyclinics] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [name, setName] = useState('');
-  const [hospitalId, setHospitalId] = useState('');
-  const [doctorIds, setDoctorIds] = useState([]);
 
   const handleLocationChange = () => {
     const pathParts = window.location.pathname.split("/");
-    const hospitalId = pathParts[4]; // "/admin/{adminId}/hospital-management"
+    const hospitalId = pathParts[4];
     return hospitalId;
   };
 
@@ -52,7 +51,7 @@ export default function AdminPolyclinicManagementPage() {
       const response = await getRequest(Endpoint.GET_ADMIN_DOCTOR);
       if (response) {
         const inactiveDoctors = response.doctors.filter(doctor => !doctor.polyclinic);
-        setInactiveDoctors(inactiveDoctors); // Sadece `Inactive` doktorları state'e ata
+        setInactiveDoctors(inactiveDoctors);
       } else {
         toast.error('Failed to fetch doctors.');
       }
@@ -62,49 +61,18 @@ export default function AdminPolyclinicManagementPage() {
     }
   };
 
-
-  //   const getDoctorNames = (doctorIds) => {
-  //  //   if (!doctorIds || doctorIds.length === 0) return "No Doctors Assigned";
-  //     const doctorNames = doctorIds
-  //       .map((id) => doctors.find((doctor) => doctor._id === id)?.name)
-  //       .filter((name) => name); // Geçersiz (undefined) isimleri filtrele
-  //       return doctorNames.join(", ");
-  //     //return doctorNames.length > 0 ? doctorNames.join(", ") : "No Doctors Found";
-  //   };
-
-  const getDoctorNames = (doctorIds) => {
-    if (!doctorIds || doctorIds.length === 0) return "No Doctors Assigned";
-
-    const doctorNames = doctorIds
-      .map((id) => doctors.find((doctor) => doctor._id === id)?.name)
-      .filter((name) => name); // Geçersiz (undefined) isimleri filtrele
-
-    return doctorNames.length > 0 ? (
-      <ul className="list-disc list-inside">
-        {doctorNames.map((name, index) => (
-          <li key={index}>{name}</li>
-        ))}
-      </ul>
-    ) : (
-      "No Doctors Found"
-    );
-  };
-
-
   const fetchPolyclinics = async () => {
     try {
       const hospitalId = handleLocationChange();
       const response = await getRequest(`${Endpoint.GET_ADMIN_POLYCLINIC}/${hospitalId}`);
-      console.log("API Response:", response);
       if (response) {
-        const fetchedPolyclinics = response.polyclinics; // Gelen veriyi sakla
-        console.log(fetchedPolyclinics);
-        setPolyclinics(fetchedPolyclinics); // Ana listeyi güncelle
-        setFilteredPolyclinics(fetchedPolyclinics); // Filtrelenmiş listeyi başlangıç olarak ata
+        const fetchedPolyclinics = response.polyclinics;
+        setPolyclinics(fetchedPolyclinics);
+        setFilteredPolyclinics(fetchedPolyclinics);
       } else {
         console.error("Invalid data format:", response);
-        setPolyclinics([]); // Ana listeyi boş yap
-        setFilteredPolyclinics([]); // Filtrelenmiş listeyi boş yap
+        setPolyclinics([]);
+        setFilteredPolyclinics([]);
       }
     } catch (error) {
       console.error("Error fetching polyclinics:", error);
@@ -124,30 +92,25 @@ export default function AdminPolyclinicManagementPage() {
       const filtered = polyclinics.filter((poly) =>
         poly.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      setFilteredPolyclinics(filtered); // Filtrelenmiş listeyi güncelle
+      setFilteredPolyclinics(filtered);
     } else {
-      setFilteredPolyclinics(polyclinics); // Ana listeyi geri yükle
+      setFilteredPolyclinics(polyclinics);
     }
   }, [searchTerm, polyclinics]);
 
-
-  const navigate = useNavigate();
-
   const handleCreatePolyclinic = async (e) => {
-    setEditMode(false); // Edit modunu kapat
-    setName(''); // Name alanını sıfırla
-    setSelectedDoctors([]); // Seçili doktorları sıfırla
-    setEditingPolyclinicId(null); // Editlenen ID'yi sıfırla
+    setEditMode(false);
+    setName('');
+    setSelectedDoctors([]);
+    setEditingPolyclinicId(null);
     e.preventDefault();
     try {
-      //fetchDoctors();
       fetchInactiveDoctors();
     } catch (error) {
       console.error('Error:', error);
       toast.error("An unexpected error occurred.");
     }
   };
-
 
   const handleSavePolyclinic = async (e) => {
     e.preventDefault();
@@ -161,8 +124,8 @@ export default function AdminPolyclinicManagementPage() {
     try {
       const responseData = await postRequest(Endpoint.GET_ADMIN_POLYCLINIC, requestBody);
       if (responseData) {
-        toast.success("POLY created successfully!");
-        fetchPolyclinics(); // Yeni polyclinic oluşturulduktan sonra listeyi yenile
+        toast.success("Polyclinic created successfully!");
+        fetchPolyclinics();
 
       } else {
         toast.error("An error occurred during poly creation.");
@@ -189,12 +152,10 @@ export default function AdminPolyclinicManagementPage() {
     }
   };
 
-
   const [selectedDoctors, setSelectedDoctors] = useState([]);
 
   const handleDoctorSelect = (doctorId) => {
     setSelectedDoctors((prev) => {
-      // Eğer doktor ID zaten varsa kaldır, yoksa ekle
       if (prev.includes(doctorId)) {
         return prev.filter((id) => id !== doctorId);
       } else {
@@ -203,39 +164,28 @@ export default function AdminPolyclinicManagementPage() {
     });
   };
 
-  // Yeni durumlar
   const [editMode, setEditMode] = useState(false);
   const [editingPolyclinicId, setEditingPolyclinicId] = useState(null);
   const [combinedDoctors, setCombinedDoctors] = useState([]);
 
   const handleEditPolyclinic = async (polyclinic) => {
-    // Poliklinik bilgilerini doldur
     setEditingPolyclinicId(polyclinic._id);
     setName(polyclinic.name);
-    setSelectedDoctors(polyclinic.doctors || []); // Seçili doktorları doldur
+    setSelectedDoctors(polyclinic.doctors || []);
 
     try {
-      // Inactive doktorları getir
       const response = await getRequest(Endpoint.GET_ADMIN_DOCTOR);
       if (response) {
-        const inactiveDoctors = response.doctors.filter(doctor => !doctor.polyclinic);
-
-        // Mevcut doktorlar ile inaktif doktorları birleştir
-        const combined = [
-          ...inactiveDoctors,
-          ...response.doctors.filter(doctor => polyclinic.doctors.includes(doctor._id)),
-        ];
-
-        // combinedDoctors state'ini güncelle
-        setCombinedDoctors(combined);
-        console.log(combinedDoctors);
-
+        const filteredDoctors = inactiveDoctors.filter(
+          (doctor) => doctor.specialization === polyclinic.name
+        );
+        setCombinedDoctors(filteredDoctors);
       } else {
-        toast.error('Failed to fetch doctors.');
+        toast.error("Failed to fetch doctors.");
       }
     } catch (error) {
-      console.error('Error fetching inactive doctors:', error);
-      toast.error('An error occurred while fetching doctor data.');
+      console.error("Error fetching doctors:", error);
+      toast.error("An error occurred while fetching doctor data.");
     }
   };
 
@@ -252,11 +202,7 @@ export default function AdminPolyclinicManagementPage() {
       const responseData = await putRequest(`${Endpoint.GET_ADMIN_POLYCLINIC}/${editingPolyclinicId}`, requestBody);
       if (responseData) {
         toast.success("Polyclinic updated successfully!");
-
-        // Güncellemeden sonra poliklinik listesini yeniden fetch et
         await fetchPolyclinics();
-
-        // Edit modundan çık
         setEditingPolyclinicId(null);
         setCombinedDoctors([]);
       } else {
@@ -269,12 +215,10 @@ export default function AdminPolyclinicManagementPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-900 " : "bg-gray-100"}text-gray-900`}>
       <Sidebar />
-
       <main className="flex-1 overflow-y-auto">
-        <Header title="Hospital Management" />
-
+        <Header title="Polyclinic Management" />
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center">
@@ -287,7 +231,6 @@ export default function AdminPolyclinicManagementPage() {
                 className="max-w-sm"
               />
             </div>
-
             <Dialog>
               <DialogTrigger asChild>
                 <Button onClick={handleCreatePolyclinic}>
@@ -307,17 +250,15 @@ export default function AdminPolyclinicManagementPage() {
                         id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="John"
+                        placeholder="Cardiology"
                         required
                         className="w-full"
                       />
                     </div>
-
-
                     <div>
                       <Label>Doctors</Label>
                       <div className="border p-2 rounded">
-                        {inactiveDoctors.map((doctor) => (
+                        {combinedDoctors.map((doctor) => (
                           <div key={doctor._id} className="flex items-center mb-2">
                             <input
                               type="checkbox"
@@ -334,7 +275,6 @@ export default function AdminPolyclinicManagementPage() {
                       </div>
                       <p className="text-sm text-gray-500">Select doctors for this polyclinic</p>
                     </div>
-
                   </div>
                   <div className="flex justify-end">
                     <Button type="submit">Save Polyclinic</Button>
@@ -354,6 +294,7 @@ export default function AdminPolyclinicManagementPage() {
                     <TableHead>Name</TableHead>
                     <TableHead>Doctors</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -367,7 +308,7 @@ export default function AdminPolyclinicManagementPage() {
                             overflowY: "auto",
                             overflowX: "hidden",
                             padding: "0.5rem",
-                            backgroundColor: "#f9f9f9",
+                            backgroundColor: darkMode ? "#2d3748" : "#f9f9f9",
                             borderRadius: "4px",
                           }}
                         >
@@ -378,10 +319,12 @@ export default function AdminPolyclinicManagementPage() {
                                 key={index}
                                 style={{
                                   padding: "0.5rem",
-                                  backgroundColor: "#fff",
-                                  border: "1px solid #ddd",
+                                  backgroundColor: darkMode ? "#1a202c" : "#fff",
+                                  border: `1px solid ${darkMode ? "#4a5568" : "#ddd"}`,
                                   borderRadius: "4px",
-                                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                                  boxShadow: darkMode
+                                    ? "0 2px 4px rgba(0, 0, 0, 0.4)"
+                                    : "0 2px 4px rgba(0, 0, 0, 0.1)",
                                   fontSize: "0.875rem",
                                   display: "flex",
                                   alignItems: "center",
@@ -408,6 +351,7 @@ export default function AdminPolyclinicManagementPage() {
                                 size="sm"
                                 onClick={() => handleEditPolyclinic(poly)}
                               >
+                                <Edit className="w-4 h-4 mr-2" />
                                 Edit
                               </Button>
                             </DialogTrigger>
@@ -423,7 +367,7 @@ export default function AdminPolyclinicManagementPage() {
                                       id="name"
                                       value={name}
                                       onChange={(e) => setName(e.target.value)}
-                                      placeholder="John"
+                                      placeholder="Cardiology"
                                       required
                                       className="w-full"
                                     />

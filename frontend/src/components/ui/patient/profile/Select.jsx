@@ -1,43 +1,68 @@
-import React from "react";
+import React, { useState } from 'react';
+import { useDarkMode } from "../../../../helpers/DarkModeContext";
 
-export function Select({ children, disabled }) {
-  return (
-    <div className={`relative ${disabled ? "opacity-50 pointer-events-none" : ""}`}>
-      {children}
-    </div>
-  );
-}
+export const Select = ({ children }) => {
+  return <div className="relative">{children}</div>;
+};
 
-export function SelectTrigger({ children, id }) {
+export const SelectTrigger = ({ value, onClick }) => {
+  const { darkMode } = useDarkMode();
   return (
     <button
-      id={id}
-      className="w-full p-2 border border-gray-300 rounded bg-white focus:ring focus:ring-blue-300"
+      onClick={onClick}
+      className={`border rounded px-4 py-2 w-full text-left transition-all duration-300 ${
+        darkMode
+          ? 'bg-gray-800 border-gray-600 text-white hover:bg-gray-700'
+          : 'bg-white border-gray-300 text-black hover:bg-gray-100'
+      }`}
     >
-      {children}
+      <SelectValue value={value} />
     </button>
   );
-}
+};
 
-export function SelectValue({ placeholder }) {
-  return <span>{placeholder}</span>;
-}
-
-export function SelectContent({ children }) {
+export const SelectValue = ({ value }) => {
+  const { darkMode } = useDarkMode();
   return (
-    <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded shadow-lg">
-      {children}
-    </div>
+    <span className={`${darkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+      {value || 'Select an option'}
+    </span>
   );
-}
+};
 
-export function SelectItem({ value, children }) {
+export const SelectContent = ({ children, isOpen }) => {
+  const { darkMode } = useDarkMode();
+  return (
+    isOpen && (
+      <div
+        className={`absolute z-10 w-full border rounded shadow-md mt-2 transition-all duration-300 ${
+          darkMode
+            ? 'bg-gray-800 border-gray-600 text-white'
+            : 'bg-white border-gray-300 text-black'
+        }`}
+      >
+        {children}
+      </div>
+    )
+  );
+};
+
+export const SelectItem = ({ value, onSelect, disabled }) => {
+  const { darkMode } = useDarkMode();
   return (
     <div
-      className="p-2 hover:bg-gray-100 cursor-pointer"
-      onClick={() => console.log(`Selected: ${value}`)}
+      onClick={() => !disabled && onSelect(value)}
+      className={`px-4 py-2 cursor-pointer transition-all duration-300 ${
+        disabled
+          ? darkMode
+            ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+            : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+          : darkMode
+            ? 'hover:bg-gray-700 text-white'
+            : 'hover:bg-gray-100 text-black'
+      }`}
     >
-      {children}
+      {value}
     </div>
   );
-}
+};

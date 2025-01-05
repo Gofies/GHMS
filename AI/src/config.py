@@ -3,12 +3,6 @@ import os
 
 class Config:
     UPLOAD_FOLDER = 'uploads'
-    ALLOWED_EXTENSIONS = {
-        'png': 'image',
-        'jpg': 'image',
-        'jpeg': 'image',
-        'pdf': 'pdf'
-    }
     PORT = int(os.getenv('PORT', 3131))
     
     @staticmethod

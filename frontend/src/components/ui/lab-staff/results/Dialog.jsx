@@ -5,7 +5,6 @@ export const Dialog = ({ children }) => {
 
   const toggleDialog = () => setIsOpen(!isOpen);
 
-  // Pass `isOpen` and `toggleDialog` as props to all child components
   return React.Children.map(children, (child) =>
     React.cloneElement(child, { isOpen, toggleDialog })
   );

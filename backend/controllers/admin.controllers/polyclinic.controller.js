@@ -4,12 +4,11 @@ import Doctor from "../../models/doctor.model.js";
 
 const getPolyclinics = async (req, res) => {
     try {
-        const hospitalId = req.params.id; // İlgili hastanenin ID'si
+        const hospitalId = req.params.id;
 
-        // Hastane verilerini bul ve polikliniklerini getir
         const hospital = await Hospital.findById(hospitalId).populate({
             path: 'polyclinics',
-            match: { hospital: hospitalId } // Sadece ilgili hastaneye ait poliklinikler
+            match: { hospital: hospitalId }
         });
 
         if (!hospital) {
@@ -25,23 +24,22 @@ const getPolyclinics = async (req, res) => {
 
 const newPolyclinic = async (req, res) => {
     try {
-        // get hospital endpointine request attıktan sonra hastanedeki doktorları da seçip id array olarak gönderecek
-        const { name, hospitalId, doctorIds } = req.body;
+        const { name, hospitalId, doctorIds = [] } = req.body;
 
-        if (
-            name === undefined,
-            hospitalId === undefined
-        ) {
-            return res.status(400).json({ message: 'All fields are required' });
+        if (!name || !hospitalId) {
+            return res.status(400).json({ message: 'All required fields must be provided' });
         }
 
         const hospital = await Hospital.findById(hospitalId).select('polyclinics').populate('polyclinics');
 
-        // check if hospital id we got from the req body has this polyclinic name in its array of polyclinics
+        if (!hospital) {
+            return res.status(404).json({ message: 'Hospital not found' });
+        }
+
         const polyclinicExists = hospital.polyclinics.find(polyclinic => polyclinic.name === name);
 
         if (polyclinicExists) {
-            return res.status(400).json({ message: 'Polyclinic already exists' });
+            return res.status(400).json({ message: 'Polyclinic already exists in this hospital' });
         }
 
         let polyclinic = await Polyclinic.create({
@@ -51,25 +49,29 @@ const newPolyclinic = async (req, res) => {
         });
 
         for (let i = 0; i < doctorIds.length; i++) {
-            let doctor = await Doctor.findById(doctorIds[i]);
-            doctor.polyclinic = polyclinic._id;
-            await doctor.save();
+            const doctor = await Doctor.findById(doctorIds[i]);
+            if (doctor) {
+                doctor.polyclinic = polyclinic._id;
+                doctor.hospital = hospital._id;
+                await doctor.save();
+            }
         }
-        hospital.polyclinics.push(polyclinic);
+
+        hospital.polyclinics.push(polyclinic._id);
         await hospital.save();
-        await polyclinic.save();
 
         return res.status(201).json({ message: 'Polyclinic created successfully', polyclinic });
 
     } catch (error) {
-        return res.status(500).json({ message: 'error in admin.newpolyclinic.controller ' + error.message });
+        return res.status(500).json({ message: 'Error in admin.newpolyclinic.controller: ' + error.message });
     }
-}
+};
 
 const updatePolyclinic = async (req, res) => {
     try {
-        const { name, doctors } = req.body;
-        const polyclinic = await Polyclinic.findById(req.params.id);
+        const { name, doctors = [] } = req.body;
+
+        const polyclinic = await Polyclinic.findById(req.params.id).populate('hospital');
 
         if (!polyclinic) {
             return res.status(404).json({ message: 'Polyclinic not found' });
@@ -78,37 +80,29 @@ const updatePolyclinic = async (req, res) => {
         // Polyclinic adını güncelle
         polyclinic.name = name || polyclinic.name;
 
-        // Polyclinic'ten çıkarılacak doktorları bul
         const doctorsToRemove = polyclinic.doctors.filter(
             (doctor) => !doctors.includes(doctor.toString())
         );
 
-        // Polyclinic'e yeni doktorları ekle
-        doctors.forEach((doctor) => {
-            if (!polyclinic.doctors.includes(doctor)) {
-                polyclinic.doctors.push(doctor);
+        for (const doctorId of doctors) {
+            const doctor = await Doctor.findById(doctorId);
+            if (doctor && !polyclinic.doctors.includes(doctorId)) {
+                polyclinic.doctors.push(doctorId);
+                doctor.polyclinic = polyclinic._id;
+                doctor.hospital = polyclinic.hospital._id;
+                await doctor.save();
             }
-        });
+        }
 
-        // Çıkarılacak doktorların `polyclinic` alanını null yap
         for (const doctorId of doctorsToRemove) {
             const doctor = await Doctor.findById(doctorId);
             if (doctor) {
                 doctor.polyclinic = null;
+                doctor.hospital = null;
                 await doctor.save();
             }
         }
 
-        // Polyclinic'e eklenen doktorların `polyclinic` alanını güncelle
-        for (const doctorId of doctors) {
-            const doctor = await Doctor.findById(doctorId);
-            if (doctor) {
-                doctor.polyclinic = polyclinic._id;
-                await doctor.save();
-            }
-        }
-
-        // Polyclinic'in doktor listesini güncelle
         polyclinic.doctors = doctors;
 
         // Polyclinic'i kaydet
@@ -119,7 +113,6 @@ const updatePolyclinic = async (req, res) => {
         return res.status(500).json({ message: 'Error in admin.updatepolyclinic.controller: ' + error.message });
     }
 };
-
 
 const deletePolyclinic = async (req, res) => {
     try {

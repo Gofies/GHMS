@@ -69,3 +69,7 @@ mongo-up:
 
 attach-mongo:
 	docker-compose exec router01 mongosh HospitalDatabase --port 27117 -u ${MONGO_USERNAME} -p ${MONGO_PASSWORD} --authenticationDatabase admin
+
+mocks-export:
+	chmod 777 ./database/export_database.sh
+	./database/export_database.sh

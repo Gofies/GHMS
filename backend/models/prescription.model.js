@@ -16,14 +16,24 @@ const prescription = new mongoose.Schema({
                 required: true,
             },
             form: {
-                type: String, // Optional if `form` is not always required
+                type: String,
             }
         }
     ],
     status: {
         type: String,
         required: true
-    }
+    },
+    hospital: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Hospital',
+        required: true
+    },
+    doctor: { 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Doctor',
+        required: true
+    },
 }, { timestamps: true });
 
 const Prescription = mongoose.model('Prescription', prescription);

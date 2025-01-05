@@ -8,6 +8,4 @@ const router = express.Router();
 router.post('/signup', signup);
 router.put('/change-password', protect('patient'), changePassword);
 
-
-
 export default router;

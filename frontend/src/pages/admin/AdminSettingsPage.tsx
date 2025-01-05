@@ -2,163 +2,94 @@ import { useState } from 'react'
 import { Button } from "../../components/ui/admin/Button.jsx"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/admin/Card.jsx"
 import { Label } from "../../components/ui/admin/Label.jsx"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/admin/Select.jsx"
 import { Switch } from "../../components/ui/admin/Switch.jsx"
-import { CalendarDays, Home, User, FileText, PieChart, Settings, LogOut, Moon, Bell, Lock } from 'lucide-react'
+import { Lock } from 'lucide-react'
 import Sidebar from "../../components/ui/admin/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
 import { useDarkMode } from '../../helpers/DarkModeContext';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
-import { Endpoint, getRequest, putRequest } from "../../helpers/Network.js";
+import { Endpoint, putRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/patient/appointment/Dialog.jsx"
-import { Input } from '../../components/ui/login/Input';
+import { Dialog, DialogContent } from "../../components/ui/patient/appointment/Dialog.jsx"
+import { Input } from "../../components/ui/patient/settings/Input.jsx"
 
 export default function AdminSettingsPage() {
-  const [language, setLanguage] = useState('english')
-  const [notifications, setNotifications] = useState(true)
-  const [twoFactor, setTwoFactor] = useState(false)
- 
-  // const [darkMode, setDarkMode] = useState(
-  //   localStorage.getItem("darkMode") === "true" // Dark mode durumu yerel depolamadan alınır
-  // );
-  const [darkMode, setDarkMode] = useState(false);
-  
-  const handleDarkModeToggle = (checked) => {
-    // setDarkMode(checked);
-    // if (checked) {
-    //   document.documentElement.classList.add("dark"); // `dark` sınıfını ekler
-    //   localStorage.setItem("darkMode", "true"); // Yerel depolamada dark mode'u aktif olarak kaydeder
-    // } else {
-    //   document.documentElement.classList.remove("dark"); // `dark` sınıfını kaldırır
-    //   localStorage.setItem("darkMode", "false"); // Yerel depolamada dark mode'u devre dışı bırakır
-    // }
-  };
-  
-  const handleLanguageChange = (value: string) => {
-    setLanguage(value)
-    // Here you would typically update the language in your app
-  }
 
+  const { darkMode, toggleDarkMode } = useDarkMode();
   const [error, setError] = useState(null);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showPassword1, setShowPassword1] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
+  const [showPassword3, setShowPassword3] = useState(false);
 
-  const handleChangePassword = async (e) => { // api gelince çalışacak
-    //setIsChangePasswordOpen(true);
+  const handleChangePassword = async (e) => {
     e.preventDefault();
-    console.log("aaa");
     try {
-      // PUT isteği gönder
-      const response = await putRequest(Endpoint.CHANGE_PASSWORD, {
-        currentPassword: currentPassword, // Eski şifre
-        newPassword: newPassword, // Yeni şifre
+      const response = await putRequest(Endpoint.ADMIN_CHANGE_PASSWORD, {
+        currentPassword: currentPassword,
+        newPassword: newPassword,
         newPasswordConfirm: newPasswordConfirm
       });
-
-      // Başarılı yanıt alındığında işlem yap
-      console.log("Password changed successfully:", response);
-      toast("Password changed successfully!"); // Toast mesajı
+      toast.success("Password changed successfully!");
+      setIsChangePasswordOpen(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setNewPasswordConfirm("");
     } catch (err) {
-      console.error("Error changing password:", err);
-      toast("Failed to change password. Please try again."); // Toast mesajı
-      setError("Failed to change password. Please try again."); // Hata durumu
+      toast.error("Failed to change password. Please try again.");
+      setError("Failed to change password. Please try again.");
     }
   };
-  
+
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-900 " : "bg-gray-100"}text-gray-900`}>
       <Sidebar />
-      {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
-        {/* Header */}
         <Header title="Settings" />
-        {/* Settings Content */}
         <div className="max-w-2xl mx-auto py-6 sm:px-6 lg:px-8">
-          <Card>
+          {/* Appearance Card */}
+          <Card className={"shadow-lg rounded-lg"}>
             <CardHeader>
-              <CardTitle>Appearance</CardTitle>
-              <CardDescription>Customize how the application looks and feels.</CardDescription>
+              <CardTitle className="text-lg font-semibold">Appearance</CardTitle>
+              <CardDescription>
+                Customize how the application looks and feels.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="dark-mode">Dark Mode</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Turn on dark mode for a comfortable viewing experience in low light.
-                  </p>
+                  <Label htmlFor="dark-mode" className="font-medium">
+                    Dark Mode
+                  </Label>
                 </div>
                 <Switch
                   id="dark-mode"
                   checked={darkMode}
-                  onCheckedChange={handleDarkModeToggle}
+                  onCheckedChange={toggleDarkMode}
                 />
               </div>
-              {/* <div className="space-y-2">
-                <Label htmlFor="language">Language</Label>
-                <Select value={language} onValueChange={handleLanguageChange}>
-                  <SelectTrigger id="language">
-                    <SelectValue placeholder="Select Language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="english">English</SelectItem>
-                    <SelectItem value="spanish">Español</SelectItem>
-                    <SelectItem value="french">Français</SelectItem>
-                    <SelectItem value="german">Deutsch</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div> */}
             </CardContent>
           </Card>
-
-          {/* <Card className="mt-6">
+          {/* Security Card */}
+          <Card className={`mt-6 shadow-lg rounded-lg`}>
             <CardHeader>
-              <CardTitle>Notifications</CardTitle>
-              <CardDescription>Manage your notification preferences.</CardDescription>
+              <CardTitle className="text-lg font-semibold">Security</CardTitle>
+              <CardDescription>
+                Manage your account security settings.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="notifications">Enable Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive notifications about appointments, test results, and more.
-                  </p>
-                </div>
-                <Switch
-                  id="notifications"
-                  checked={notifications}
-                  onCheckedChange={setNotifications}
-                />
-              </div>
-            </CardContent>
-          </Card> */}
-
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Security</CardTitle>
-              <CardDescription>Manage your account security settings.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="two-factor">Two-Factor Authentication</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Add an extra layer of security to your account.
-                  </p>
-                </div>
-                <Switch
-                  id="two-factor"
-                  checked={twoFactor}
-                  onCheckedChange={setTwoFactor}
-                />
-              </div> */}
-              <Button variant="outline" className="w-full" onClick={() => setIsChangePasswordOpen(true)}>
+              <Button
+                variant="outline"
+                className={"w-full border-gray-300 text-gray-900 hover:bg-gray-100"}
+                onClick={() => { setIsChangePasswordOpen(true); setIsDialogOpen(true) }}
+              >
                 <Lock className="w-4 h-4 mr-2" />
-                  Change Password
+                Change Password
               </Button>
             </CardContent>
           </Card>
@@ -173,90 +104,77 @@ export default function AdminSettingsPage() {
                 <div className="relative">
                   <Input
                     id="currentPassword"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword1 ? "text" : "password"}
                     placeholder="********"
                     required
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
+                  <div
                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowPassword1(!showPassword1)}
                   >
-                    {showPassword ? (
+                    {showPassword1 ? (
                       <EyeOffIcon className="h-4 w-4 text-gray-500" />
                     ) : (
                       <EyeIcon className="h-4 w-4 text-gray-500" />
                     )}
                     <span className="sr-only">
-                      {showPassword ? "Hide password" : "Show password"}
+                      {showPassword1 ? "Hide password" : "Show password"}
                     </span>
-                  </Button>
+                  </div>
                 </div>
                 <Label htmlFor="newPassword">New Password</Label>
                 <div className="relative">
                   <Input
                     id="newPassword"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword2 ? "text" : "password"}
                     placeholder="********"
                     required
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
+                  <div
+
                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowPassword2(!showPassword2)}
                   >
-                    {showPassword ? (
+                    {showPassword2 ? (
                       <EyeOffIcon className="h-4 w-4 text-gray-500" />
                     ) : (
                       <EyeIcon className="h-4 w-4 text-gray-500" />
                     )}
                     <span className="sr-only">
-                      {showPassword ? "Hide password" : "Show password"}
+                      {showPassword2 ? "Hide password" : "Show password"}
                     </span>
-                  </Button>
+                  </div>
                 </div>
                 <Label htmlFor="newPasswordConfirm">New Password Confirm</Label>
                 <div className="relative">
                   <Input
                     id="newPasswordConfirm"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword3 ? "text" : "password"}
                     placeholder="********"
                     required
                     value={newPasswordConfirm}
                     onChange={(e) => setNewPasswordConfirm(e.target.value)}
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
+                  <div
+
                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowPassword3(!showPassword3)}
                   >
-                    {showPassword ? (
+                    {showPassword3 ? (
                       <EyeOffIcon className="h-4 w-4 text-gray-500" />
                     ) : (
                       <EyeIcon className="h-4 w-4 text-gray-500" />
                     )}
                     <span className="sr-only">
-                      {showPassword ? "Hide password" : "Show password"}
+                      {showPassword3 ? "Hide password" : "Show password"}
                     </span>
-                  </Button>
+                  </div>
                 </div>
               </div>
-              {/* Display loading state */}
-              {/* {loading && (
-                  <div className="mt-2 text-sm text-blue-600">Logging in...</div>
-                )} */}
-
-              {/* Display error message */}
               {error && (
                 <div className="mt-2 text-sm text-red-600">
                   {error.message || "Email or password is incorrect. Please try again."}
@@ -266,15 +184,15 @@ export default function AdminSettingsPage() {
                 <Button
                   type="button"
                   onClick={() => {
-                    setIsChangePasswordOpen(false); // Dialog'u kapat
-                    setCurrentPassword(""); // Inputları sıfırla
+                    setIsChangePasswordOpen(false);
+                    setCurrentPassword("");
                     setNewPassword("");
                     setNewPasswordConfirm("");
                   }}
                 >
                   Close
                 </Button>
-                <Button className="ml-auto" type="submit"> {/* Sağ tarafa yasla */}
+                <Button className="ml-auto" type="submit">
                   Change Password
                 </Button>
               </div>
@@ -283,5 +201,5 @@ export default function AdminSettingsPage() {
         </Dialog>
       )}
     </div>
-  )
+  );
 }

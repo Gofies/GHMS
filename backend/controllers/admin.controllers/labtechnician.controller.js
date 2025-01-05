@@ -42,7 +42,7 @@ const newLabTechnician = async (req, res) => {
 
         await labTechnician.save();
 
-        res.status(201).json({ message: "Lab Technician created successfully" }, labTechnician);
+        res.status(201).json({ message: "Lab Technician created successfully", labTechnician });
 
     } catch (error) {
         console.log(error, "Error in newLabTechnician");
@@ -88,6 +88,5 @@ const deleteLabTechnician = async (req, res) => {
         return res.status(500).json({ message: "admin.deleteLabTechnician :" + error.message });
     }
 }
-
 
 export { newLabTechnician, getLabTechnician, getAllLabTechnicians, updateLabTechnician, deleteLabTechnician };

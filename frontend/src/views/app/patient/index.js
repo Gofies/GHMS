@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route } from "react-router-dom";
-import PatientHomePage from "../../../pages/patient/PatientHomePage.js";
+import PatientHomePage from "../../../pages/patient/PatientHomePage.tsx";
 import PatientHealthMetricsPage from "../../../pages/patient/PatientHealthMetricsPage.tsx";
 import PatientAppointmentsPage from "../../../pages/patient/PatientAppointmentsPage.tsx";
 import PatientNewAppointmentsPage from "../../../pages/patient/PatientNewAppointmentsPage.tsx";
@@ -18,8 +18,6 @@ const PatientView = () => {
       <Route path="/profile" element={<PatientProfilePage />} />
       <Route path="/medical-records" element={<PatientMedicalRecordsPage />} />
       <Route path="/settings" element={<PatientSettingsPage />} />
-      {/* Add additional routes here for PatientView */}
-      {/* Example: <Route path="/settings" element={<PatientSettings />} /> */}
    </Routes>
   );
 }

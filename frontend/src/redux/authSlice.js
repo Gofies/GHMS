@@ -1,23 +1,18 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-
 import { postRequest, Endpoint } from '../helpers/Network';
-
-// const isAuthenticated = () => {
-//   const cookies = document.cookie.split('; ');
-//   const hasAccessToken = cookies.some((cookie) => cookie.startsWith('accessToken='));
-//   return hasAccessToken; // accessToken varsa kullanıcı authenticated
-// };
 
 export const login = createAsyncThunk(
   'auth/login',
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const response = await postRequest(Endpoint.LOGIN, { email, password });
-      const role = response.role || 'patient';
+      const name = response.name || "Guest"; 
+      const surname = response.surname || "Guest"; 
+      const role = response.role;
       const userId = response.id || null; 
-      return { role, userId, isAuthenticated: true };
+      return { name, surname, role, userId, isAuthenticated: true };
     } catch (error) {
       return rejectWithValue(error.response?.data || 'An error occurred');
     }
@@ -39,6 +34,8 @@ const authSlice = createSlice({
     isAuthenticated: false,
     role: null,
     userId: null,
+    name: null,
+    surname: null,
     loading: false,
     error: null,
   },
@@ -46,6 +43,8 @@ const authSlice = createSlice({
     logout: (state) => {
       state.isAuthenticated = false;
       state.role = null;
+      state.name = null; 
+      state.surname = null;
       state.error = null;
       state.userId = null;
     },
@@ -63,6 +62,8 @@ const authSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = true;
         state.role = action.payload.role;
+        state.name = action.payload.name; 
+        state.surname = action.payload.surname; 
         state.userId = action.payload.userId;
         state.error = null;
       })
