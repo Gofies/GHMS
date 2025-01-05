@@ -3,6 +3,10 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
+AI/src/models/Llama-2-7b-hf/
+AI/src/models/huggingface_env/
+
+
 # Logs
 logs/
 *.log

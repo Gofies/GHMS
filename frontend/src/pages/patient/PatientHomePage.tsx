@@ -100,7 +100,7 @@ export default function PatientHomeScreen() {
       ]);
 
       try {
-        const response = await fetch("https://localhost/llm/process", {
+        const response = await fetch("https://www.gofies.software/llm/process", {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
