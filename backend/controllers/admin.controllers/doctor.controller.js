@@ -6,7 +6,7 @@ const getDoctors = async (req, res) => {
         const doctors = await Doctor.find({}, 'name surname title email specialization polyclinic hospital')
             .populate('hospital', 'name')
             .populate('polyclinic', 'name');
-        
+
         return res.status(200).json({
             message: 'Doctors retrieved successfully',
             doctors

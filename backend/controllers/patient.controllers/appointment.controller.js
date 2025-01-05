@@ -92,7 +92,7 @@ const newAppointment = async (req, res) => {
                         appointments: appointment._id
                     }
                 },
-                { new: true } 
+                { new: true }
             );
         }
 
@@ -157,7 +157,7 @@ const getAppointments = async (req, res) => {
             for (const appointment of appointments) {
                 if (new Date(appointment.date) < currentDate && appointment.status === 'Scheduled') {
                     appointment.status = 'Completed';
-                    await appointment.save(); 
+                    await appointment.save();
                 }
             }
 
@@ -172,6 +172,7 @@ const getAppointments = async (req, res) => {
         return res.status(500).json({ message: "patient.getAppointments: " + error.message });
     }
 }
+
 
 const cancelAppointment = async (req, res) => {
     try {
@@ -190,7 +191,7 @@ const cancelAppointment = async (req, res) => {
         if (!appointment.patient.equals(req.user._id)) {
             return res.status(403).json({ message: 'You are not authorized to cancel this appointment' });
         }
-        
+
         const doctor = await Doctor.findById(appointment.doctor);
         const scheduleDay = doctor.schedule.find(day =>
             new Date(day.date).toISOString().slice(0, 10) === new Date(appointment.date).toISOString().slice(0, 10)
@@ -199,7 +200,7 @@ const cancelAppointment = async (req, res) => {
         if (scheduleDay) {
             const timeSlot = scheduleDay.timeSlots.find(slot => slot.time === appointment.time);
             if (timeSlot) {
-                timeSlot.isFree = true; 
+                timeSlot.isFree = true;
             }
             await doctor.save();
         }

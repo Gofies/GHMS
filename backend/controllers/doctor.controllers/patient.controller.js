@@ -19,16 +19,16 @@ const getPatients = async (req, res) => {
                     path: 'patient',
                     select: 'name surname gender birthdate',
                 },
-                options: { sort: { date: -1 } }, 
+                options: { sort: { date: -1 } },
             });
 
         const patientsSet = new Set();
         const uniquePatients = doctor.appointments
-            .map(appointment => appointment.patient)  
+            .map(appointment => appointment.patient)
             .filter(patient => {
                 if (!patientsSet.has(patient._id.toString())) {
-                    patientsSet.add(patient._id.toString());  
-                    return true;  
+                    patientsSet.add(patient._id.toString());
+                    return true;
                 }
                 return false;
             });
@@ -79,7 +79,7 @@ const getPatient = async (req, res) => {
                 populate: [
                     {
                         path: 'doctor',
-                        match: { hospital: doctorHospitalId }, 
+                        match: { hospital: doctorHospitalId },
                         select: 'name surname hospital',
                         populate: {
                             path: 'hospital',
@@ -117,8 +117,8 @@ const getPatient = async (req, res) => {
 
 const createPrescription = async (req, res) => {
     try {
-        const doctorId = req.user._id; 
-        const patientId = req.params.patientId; 
+        const doctorId = req.user._id;
+        const patientId = req.params.patientId;
 
         if (!patientId) {
             return res.status(400).json({ message: 'Patient ID is required' });
@@ -129,7 +129,7 @@ const createPrescription = async (req, res) => {
         const doctor = await Doctor.findById(doctorId)
             .populate({
                 path: 'appointments',
-                match: { patient: patientId }, 
+                match: { patient: patientId },
                 select: 'patient hospital',
                 populate: {
                     path: 'hospital',
@@ -213,7 +213,7 @@ const deletePrescription = async (req, res) => {
 
 const getLabTechniciansBySpecialization = async (req, res) => {
     try {
-        const { specialization } = req.query; 
+        const { specialization } = req.query;
         const doctorId = req.user._id;
 
         const doctor = await Doctor.findById(doctorId).populate('hospital', '_id');
@@ -244,7 +244,7 @@ const getLabTechniciansBySpecialization = async (req, res) => {
 
 const newLabTestRequest = async (req, res) => {
     try {
-        console.log("a",req.body);
+        console.log("a", req.body);
         const { patientId, labTechnicianId, testType, urgency, specialization } = req.body;
         const doctorId = req.user._id;
 
@@ -295,19 +295,19 @@ const newLabTestRequest = async (req, res) => {
             return res.status(404).json({ message: 'Hospital not found' });
         }
 
-        hospital.labTests.push(labTest._id); 
-        await hospital.save(); 
+        hospital.labTests.push(labTest._id);
+        await hospital.save();
 
         const patient = await Patient.findById(patientId);
         if (!patient) {
             return res.status(404).json({ message: 'Patient not found' });
         }
 
-        patient.labtests.push(labTest._id); 
-        await patient.save(); 
+        patient.labtests.push(labTest._id);
+        await patient.save();
 
-        doctor.labtests.push(labTest._id); 
-        await doctor.save(); 
+        doctor.labtests.push(labTest._id);
+        await doctor.save();
 
         res.status(201).json({
             message: 'Lab test created successfully',
@@ -320,6 +320,7 @@ const newLabTestRequest = async (req, res) => {
 };
 
 export {
+    getPatientDetails,
     getPatients,
     getPatient,
     createPrescription,

@@ -23,7 +23,7 @@ function calculateAge(birthdate) {
 }
 
 export default function PatientManagement() {
-  
+
   const { darkMode, toggleDarkMode } = useDarkMode();
   const [searchTerm, setSearchTerm] = useState('')
   const [error, setError] = useState(null);

@@ -131,7 +131,7 @@ export default function AdminHospitalManagementPage() {
   const handleLocationChange = (hospitalId) => {
     const pathParts = window.location.pathname.split("/");
     const adminId = pathParts[2];
-    
+
     navigate(`/admin/${adminId}/polyclinic-management/${hospitalId}`);
   };
 
@@ -230,7 +230,7 @@ export default function AdminHospitalManagementPage() {
     });
   };
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false); 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
     <div className={`flex h-screen ${darkMode ? "bg-gray-900 " : "bg-gray-100"}text-gray-900`}>
@@ -251,12 +251,12 @@ export default function AdminHospitalManagementPage() {
             </div>
             <Dialog>
               <DialogTrigger asChild>
-                <Button onClick={() => setIsDialogOpen(true)}> 
+                <Button onClick={() => setIsDialogOpen(true)}>
                   <Plus className="w-4 h-4 mr-2" />
                   Create Hospital
                 </Button>
               </DialogTrigger>
-              {isDialogOpen && ( 
+              {isDialogOpen && (
                 <DialogContent className="dialog-large">
                   <DialogHeader>
                     <DialogTitle>Create New Hospital</DialogTitle>
@@ -450,13 +450,13 @@ export default function AdminHospitalManagementPage() {
                                           <Label htmlFor="establishmentdate">Establishment Date</Label>
                                           <Input
                                             id="establishmentdate"
-                                            type="number" 
+                                            type="number"
                                             value={selectedHospital.establishmentdate?.split('-')[0] || ""}
                                             onChange={(e) => {
                                               const year = e.target.value;
                                               setSelectedHospital((prev) => ({
                                                 ...prev,
-                                                establishmentdate: `${year}-01-01T00:00:00.000Z`, 
+                                                establishmentdate: `${year}-01-01T00:00:00.000Z`,
                                               }));
                                             }}
                                             placeholder="YYYY"

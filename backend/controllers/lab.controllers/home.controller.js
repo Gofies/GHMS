@@ -7,26 +7,26 @@ const getHomePage = async (req, res) => {
         const id = req.user._id;
 
         const labTestQueue = await LabTechnician.findById(id)
-            .select('hospital') 
+            .select('hospital')
             .populate({
                 path: 'hospital',
                 model: 'Hospital',
-                select: 'labTests', 
+                select: 'labTests',
                 populate: {
                     path: 'labTests',
                     model: 'LabTest',
-                    match: { status: 'pending' }, 
+                    match: { status: 'pending' },
                     select: 'patient testtype urgency doctor',
                     populate: [
                         {
                             path: 'patient',
                             model: 'Patient',
-                            select: 'name surname', 
+                            select: 'name surname',
                         },
                         {
                             path: 'doctor',
                             model: 'Doctor',
-                            select: 'name surname', 
+                            select: 'name surname',
                         },
                     ],
                 },
@@ -45,7 +45,7 @@ const getHomePage = async (req, res) => {
 
 const completeTest = async (req, res) => {
     try {
-        const { testId, result } = req.body; 
+        const { testId, result } = req.body;
 
         const labTest = await LabTest.findById(testId);
         if (!labTest) {
@@ -53,18 +53,18 @@ const completeTest = async (req, res) => {
         }
 
         labTest.status = 'completed';
-        labTest.result = result || labTest.result; 
-        labTest.resultdate = new Date(); 
+        labTest.result = result || labTest.result;
+        labTest.resultdate = new Date();
 
-        await labTest.save(); 
+        await labTest.save();
 
         const updatedLabTest = await LabTest.findById(testId)
-            .populate('patient', 'name surname') 
+            .populate('patient', 'name surname')
             .populate('doctor', 'name surname');
 
-        return res.status(200).json({ 
-            message: 'Lab test completed successfully', 
-            completedTest: updatedLabTest 
+        return res.status(200).json({
+            message: 'Lab test completed successfully',
+            completedTest: updatedLabTest
         });
     } catch (error) {
         console.error('Error in completeTest controller:', error);

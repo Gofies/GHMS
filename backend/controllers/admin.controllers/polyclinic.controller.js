@@ -4,7 +4,7 @@ import Doctor from "../../models/doctor.model.js";
 
 const getPolyclinics = async (req, res) => {
     try {
-        const hospitalId = req.params.id; 
+        const hospitalId = req.params.id;
 
         const hospital = await Hospital.findById(hospitalId).populate({
             path: 'polyclinics',
@@ -77,6 +77,7 @@ const updatePolyclinic = async (req, res) => {
             return res.status(404).json({ message: 'Polyclinic not found' });
         }
 
+        // Polyclinic adını güncelle
         polyclinic.name = name || polyclinic.name;
 
         const doctorsToRemove = polyclinic.doctors.filter(
@@ -88,7 +89,7 @@ const updatePolyclinic = async (req, res) => {
             if (doctor && !polyclinic.doctors.includes(doctorId)) {
                 polyclinic.doctors.push(doctorId);
                 doctor.polyclinic = polyclinic._id;
-                doctor.hospital = polyclinic.hospital._id; 
+                doctor.hospital = polyclinic.hospital._id;
                 await doctor.save();
             }
         }
@@ -104,6 +105,7 @@ const updatePolyclinic = async (req, res) => {
 
         polyclinic.doctors = doctors;
 
+        // Polyclinic'i kaydet
         await polyclinic.save();
 
         return res.status(200).json({ message: 'Polyclinic updated successfully', polyclinic });

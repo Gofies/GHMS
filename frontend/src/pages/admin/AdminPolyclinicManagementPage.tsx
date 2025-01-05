@@ -27,7 +27,7 @@ export default function AdminPolyclinicManagementPage() {
 
   const handleLocationChange = () => {
     const pathParts = window.location.pathname.split("/");
-    const hospitalId = pathParts[4]; 
+    const hospitalId = pathParts[4];
     return hospitalId;
   };
 
@@ -51,7 +51,7 @@ export default function AdminPolyclinicManagementPage() {
       const response = await getRequest(Endpoint.GET_ADMIN_DOCTOR);
       if (response) {
         const inactiveDoctors = response.doctors.filter(doctor => !doctor.polyclinic);
-        setInactiveDoctors(inactiveDoctors); 
+        setInactiveDoctors(inactiveDoctors);
       } else {
         toast.error('Failed to fetch doctors.');
       }
@@ -66,12 +66,12 @@ export default function AdminPolyclinicManagementPage() {
       const hospitalId = handleLocationChange();
       const response = await getRequest(`${Endpoint.GET_ADMIN_POLYCLINIC}/${hospitalId}`);
       if (response) {
-        const fetchedPolyclinics = response.polyclinics; 
-        setPolyclinics(fetchedPolyclinics); 
-        setFilteredPolyclinics(fetchedPolyclinics); 
+        const fetchedPolyclinics = response.polyclinics;
+        setPolyclinics(fetchedPolyclinics);
+        setFilteredPolyclinics(fetchedPolyclinics);
       } else {
         console.error("Invalid data format:", response);
-        setPolyclinics([]); 
+        setPolyclinics([]);
         setFilteredPolyclinics([]);
       }
     } catch (error) {
@@ -92,7 +92,7 @@ export default function AdminPolyclinicManagementPage() {
       const filtered = polyclinics.filter((poly) =>
         poly.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      setFilteredPolyclinics(filtered); 
+      setFilteredPolyclinics(filtered);
     } else {
       setFilteredPolyclinics(polyclinics);
     }
@@ -100,8 +100,8 @@ export default function AdminPolyclinicManagementPage() {
 
   const handleCreatePolyclinic = async (e) => {
     setEditMode(false);
-    setName(''); 
-    setSelectedDoctors([]); 
+    setName('');
+    setSelectedDoctors([]);
     setEditingPolyclinicId(null);
     e.preventDefault();
     try {
@@ -125,7 +125,7 @@ export default function AdminPolyclinicManagementPage() {
       const responseData = await postRequest(Endpoint.GET_ADMIN_POLYCLINIC, requestBody);
       if (responseData) {
         toast.success("Polyclinic created successfully!");
-        fetchPolyclinics(); 
+        fetchPolyclinics();
 
       } else {
         toast.error("An error occurred during poly creation.");
@@ -171,14 +171,14 @@ export default function AdminPolyclinicManagementPage() {
   const handleEditPolyclinic = async (polyclinic) => {
     setEditingPolyclinicId(polyclinic._id);
     setName(polyclinic.name);
-    setSelectedDoctors(polyclinic.doctors || []); 
+    setSelectedDoctors(polyclinic.doctors || []);
 
     try {
       const response = await getRequest(Endpoint.GET_ADMIN_DOCTOR);
       if (response) {
         const filteredDoctors = inactiveDoctors.filter(
           (doctor) => doctor.specialization === polyclinic.name
-        ); 
+        );
         setCombinedDoctors(filteredDoctors);
       } else {
         toast.error("Failed to fetch doctors.");
@@ -215,7 +215,7 @@ export default function AdminPolyclinicManagementPage() {
   };
 
   return (
-    <div className={`flex h-screen ${darkMode ? "bg-gray-900 " : "bg-gray-100" }text-gray-900`}>
+    <div className={`flex h-screen ${darkMode ? "bg-gray-900 " : "bg-gray-100"}text-gray-900`}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <Header title="Polyclinic Management" />
@@ -308,7 +308,7 @@ export default function AdminPolyclinicManagementPage() {
                             overflowY: "auto",
                             overflowX: "hidden",
                             padding: "0.5rem",
-                            backgroundColor: darkMode ? "#2d3748" : "#f9f9f9",  
+                            backgroundColor: darkMode ? "#2d3748" : "#f9f9f9",
                             borderRadius: "4px",
                           }}
                         >
@@ -319,11 +319,11 @@ export default function AdminPolyclinicManagementPage() {
                                 key={index}
                                 style={{
                                   padding: "0.5rem",
-                                  backgroundColor: darkMode ? "#1a202c" : "#fff",  
-                                  border: `1px solid ${darkMode ? "#4a5568" : "#ddd"}`,  
+                                  backgroundColor: darkMode ? "#1a202c" : "#fff",
+                                  border: `1px solid ${darkMode ? "#4a5568" : "#ddd"}`,
                                   borderRadius: "4px",
                                   boxShadow: darkMode
-                                    ? "0 2px 4px rgba(0, 0, 0, 0.4)" 
+                                    ? "0 2px 4px rgba(0, 0, 0, 0.4)"
                                     : "0 2px 4px rgba(0, 0, 0, 0.1)",
                                   fontSize: "0.875rem",
                                   display: "flex",

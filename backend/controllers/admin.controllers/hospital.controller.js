@@ -68,8 +68,8 @@ const newHospital = async (req, res) => {
             address === undefined ||
             establishmentdate === undefined ||
             phone === undefined ||
-            email === undefined 
-                ) {
+            email === undefined
+        ) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
@@ -112,14 +112,14 @@ const newHospital = async (req, res) => {
 
 const updateHospital = async (req, res) => {
     try {
-        const { 
-            name, 
-            address, 
-            doctors = [], 
-            establishmentdate, 
-            phone, 
-            email, 
-            polyclinics = [], 
+        const {
+            name,
+            address,
+            doctors = [],
+            establishmentdate,
+            phone,
+            email,
+            polyclinics = [],
             labTechnicians = []
         } = req.body;
 
@@ -136,10 +136,10 @@ const updateHospital = async (req, res) => {
 
         if (polyclinics && polyclinics.length > 0) {
             for (let i = 0; i < polyclinics.length; i++) {
-                const polyclinic = await Polyclinic.create({ 
-                    name: polyclinics[i].name, 
-                    address: hospital.address, 
-                    hospital: hospital._id 
+                const polyclinic = await Polyclinic.create({
+                    name: polyclinics[i].name,
+                    address: hospital.address,
+                    hospital: hospital._id
                 });
                 hospital.polyclinics.push(polyclinic._id);
             }
@@ -166,7 +166,7 @@ const updateHospital = async (req, res) => {
             for (const tech of removedTechnicians) {
                 const labTechnician = await LabTechnician.findById(tech._id);
                 if (labTechnician) {
-                    labTechnician.hospital = null; 
+                    labTechnician.hospital = null;
                     await labTechnician.save();
                 }
             }
@@ -185,7 +185,7 @@ const updateHospital = async (req, res) => {
             for (const tech of hospital.labTechnicians) {
                 const labTechnician = await LabTechnician.findById(tech._id);
                 if (labTechnician) {
-                    labTechnician.hospital = null; 
+                    labTechnician.hospital = null;
                     await labTechnician.save();
                 }
             }

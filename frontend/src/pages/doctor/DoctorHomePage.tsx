@@ -12,12 +12,13 @@ export default function DoctorHomepage() {
   const [error, setError] = useState(null);
   const [homeAppointments, setHomeAppointments] = useState(null);
   const [labResults, setLabResults] = useState(null);
-  const { darkMode, toggleDarkMode } = useDarkMode(); 
+  const { darkMode, toggleDarkMode } = useDarkMode();
 
   useEffect(() => {
     const fetchDoctorHome = async () => {
+      console.log("fdh");
       try {
-        const response = await getRequest(Endpoint.GET_DOCTOR_HOME); 
+        const response = await getRequest(Endpoint.GET_DOCTOR_HOME);
         setHomeAppointments(response.allAppointments);
         setLabResults(response.labtests);
       } catch (err) {
@@ -29,12 +30,12 @@ export default function DoctorHomepage() {
   }, []);
 
   return (
-    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100"}text-gray-900`}>
       <Sidebar />
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {/* Header */}
-       <Header title="Home"/>
+        <Header title="Home" />
         {/* Dashboard Content */}
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="grid gap-6 md:grid-cols-2">
@@ -119,8 +120,8 @@ export default function DoctorHomepage() {
               </CardContent>
             </Card>
           </div>
-        </div>
-      </main>
-    </div>
+        </div >
+      </main >
+    </div >
   )
 }

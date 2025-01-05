@@ -86,10 +86,10 @@ export default function SettingsPage() {
                 <Lock className="w-4 h-4 mr-2" />
                 Change Password
               </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+            </CardContent >
+          </Card >
+        </div >
+      </main >
       {isChangePasswordOpen && (
         <Dialog open={isChangePasswordOpen}>
           <DialogContent>
@@ -130,7 +130,7 @@ export default function SettingsPage() {
                     onChange={(e) => setNewPassword(e.target.value)}
                   />
                   <div
-               
+
                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                     onClick={() => setShowPassword2(!showPassword2)}
                   >
@@ -155,7 +155,7 @@ export default function SettingsPage() {
                     onChange={(e) => setNewPasswordConfirm(e.target.value)}
                   />
                   <div
-              
+
                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                     onClick={() => setShowPassword3(!showPassword3)}
                   >
@@ -194,8 +194,9 @@ export default function SettingsPage() {
             </form>
           </DialogContent>
         </Dialog>
-      )}
-    </div>
+      )
+      }
+    </div >
   )
 }
 

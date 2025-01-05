@@ -24,8 +24,8 @@ export default function AdminUserManagementPage() {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [userType, setUserType] = useState('doctor'); 
-  const [certificates, setCertificates] = useState(''); 
+  const [userType, setUserType] = useState('doctor');
+  const [certificates, setCertificates] = useState('');
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
   const [title, setTitle] = useState('');
@@ -41,12 +41,12 @@ export default function AdminUserManagementPage() {
   const [editingUser, setEditingUser] = useState(null);
   const [updatedPatientUser, setUpdatedPatientUser] = useState(null);
 
-  const days = Array.from({ length: 31 }, (_, i) => i + 1); 
+  const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
-  const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i); 
+  const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
 
   const [selectedJobStartDay, setSelectedJobStartDay] = useState(1);
   const [selectedJobStartMonth, setSelectedJobStartMonth] = useState(months[0]);
@@ -358,8 +358,8 @@ export default function AdminUserManagementPage() {
                           onChange={(e) => setUserType(e.target.value)}
                           required
                           className={`w-full px-3 py-2 rounded-md shadow-sm transition-all duration-300 ${darkMode
-                              ? "bg-gray-800 text-white border border-gray-600 focus:ring-blue-500"
-                              : "bg-white text-gray-900 border border-gray-300 focus:ring-blue-600"
+                            ? "bg-gray-800 text-white border border-gray-600 focus:ring-blue-500"
+                            : "bg-white text-gray-900 border border-gray-300 focus:ring-blue-600"
                             }`}
                         >
                           <option value="doctor">Doctor</option>
@@ -478,7 +478,7 @@ export default function AdminUserManagementPage() {
                               className={`w-full px-3 py-2 rounded-md shadow-sm transition-all duration-300 ${darkMode
                                 ? "bg-gray-800 text-white border border-gray-600 focus:ring-blue-500"
                                 : "bg-white text-gray-900 border border-gray-300 focus:ring-blue-600"
-                              }`}
+                                }`}
                             >
                               <option value="" disabled>Select a specialization</option>
                               <option value="Hematology">Hematology</option>
@@ -858,7 +858,7 @@ export default function AdminUserManagementPage() {
                                         className={`w-full px-3 py-2 rounded-md shadow-sm transition-all duration-300 ${darkMode
                                           ? "bg-gray-800 text-white border border-gray-600 focus:ring-blue-500"
                                           : "bg-white text-gray-900 border border-gray-300 focus:ring-blue-600"
-                                        }`}
+                                          }`}
                                       >
                                         <option value="" disabled>Select a specialization</option>
                                         <option value="Hematology">Hematology</option>

@@ -43,15 +43,15 @@ const getLabTests = async (req, res) => {
                 hospital: labTechnician.hospital._id,
                 polyclinic: test.polyclinic,
                 status: test.status,
-                testType: test.testType, 
-                urgency: test.urgency, 
+                testType: test.testType,
+                urgency: test.urgency,
                 createdAt: test.createdAt,
                 updatedAt: test.updatedAt,
             }));
 
         const completedTests = labTechnician.hospital.labTests
             .filter(test => test.status === 'completed')
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) 
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .map(test => ({
                 _id: test._id,
                 patient: test.patient,
@@ -59,10 +59,10 @@ const getLabTests = async (req, res) => {
                 hospital: labTechnician.hospital._id,
                 polyclinic: test.polyclinic,
                 status: test.status,
-                testType: test.testType, 
-                urgency: test.urgency, 
-                result: test.result, 
-                resultDate: test.resultdate, 
+                testType: test.testType,
+                urgency: test.urgency,
+                result: test.result,
+                resultDate: test.resultdate,
                 createdAt: test.createdAt,
                 updatedAt: test.updatedAt,
             }));

@@ -6,9 +6,8 @@ export function Label({ htmlFor, children, className = "" }) {
   return (
     <label
       htmlFor={htmlFor}
-      className={`block text-sm font-medium transition-all duration-300 ${
-        darkMode ? "text-gray-300" : "text-gray-700"
-      } ${className}`}
+      className={`block text-sm font-medium transition-all duration-300 ${darkMode ? "text-gray-300" : "text-gray-700"
+        } ${className}`}
     >
       {children}
     </label>

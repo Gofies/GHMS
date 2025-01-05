@@ -5,16 +5,16 @@ const getDoctorHome = async (req, res) => {
         console.log(req.user.id);
 
         const doctor = await Doctor.findById(req.user.id)
-            .select('appointments labtests') 
+            .select('appointments labtests')
             .populate({
-                path: 'appointments', 
+                path: 'appointments',
                 populate: [
                     {
                         path: 'tests',
                         model: 'LabTest'
                     },
                     {
-                        path: 'hospital', 
+                        path: 'hospital',
                         select: 'name'
                     },
                     {
@@ -24,15 +24,15 @@ const getDoctorHome = async (req, res) => {
                 ]
             })
             .populate({
-                path: 'labtests', 
+                path: 'labtests',
                 model: 'LabTest',
                 populate: [
                     {
-                        path: 'patient', 
+                        path: 'patient',
                         select: 'name surname'
                     },
                     {
-                        path: 'labTechnician', 
+                        path: 'labTechnician',
                         select: 'name surname'
                     }
                 ]

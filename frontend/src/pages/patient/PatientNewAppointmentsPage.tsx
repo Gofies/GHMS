@@ -407,6 +407,7 @@ export default function NewAppointmentsPage() {
                             value={selectedDate ? new Date(selectedDate).toISOString().split("T")[0] : "Select a Date"}
                           />
                         </SelectTrigger>
+
                         {isDateDropdownOpen && selectedDoctorDates.length > 0 && (
                           <SelectContent isOpen={isDateDropdownOpen} className="absolute z-10 w-full max-w-md bg-white border rounded-md shadow-lg">
                             <div className="max-h-60 overflow-y-auto">
@@ -419,6 +420,8 @@ export default function NewAppointmentsPage() {
                                   {new Date(date).toISOString().split("T")[0]}
                                 </SelectItem>
                               ))}
+
+
                             </div>
                           </SelectContent>
                         )}

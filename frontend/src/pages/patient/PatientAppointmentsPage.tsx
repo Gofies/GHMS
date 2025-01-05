@@ -102,7 +102,6 @@ export default function AppointmentsPage() {
                                         <TableHead>Date</TableHead>
                                         <TableHead>Time</TableHead>
                                         <TableHead>Status</TableHead>
-                                        <TableHead>Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -146,6 +145,6 @@ export default function AppointmentsPage() {
                     </Card>
                 </div>
             </main>
-        </div>
+        </div >
     );
 }

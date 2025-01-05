@@ -13,7 +13,7 @@ const AdminView = () => {
       <Route path="/polyclinic-management/*" element={<AdminPolyclinicManagement />} />
       <Route path="/hospital-management/*" element={<AdminHospitalManagement />} />
       <Route path="/system-settings/*" element={<AdminSettingsPage />} />
-   </Routes>
+    </Routes>
   );
 }
 

@@ -200,14 +200,14 @@ export default function PatientProfile() {
               </div>
               <div>
                 <Label htmlFor="address">Address</Label>
-                <Textarea 
-                  id="address" 
-                  value={patientInfo.address} 
-                  readOnly={!isEditing} 
-                  onChange={handleInputChange} 
+                <Textarea
+                  id="address"
+                  value={patientInfo.address}
+                  readOnly={!isEditing}
+                  onChange={handleInputChange}
                 />
               </div>
-            </CardContent>
+            </CardContent >
             <CardFooter className="flex justify-end space-x-4">
               {isEditing && (
                 <Button
@@ -224,9 +224,9 @@ export default function PatientProfile() {
                 {isEditing ? "Cancel" : "Edit Profile"}
               </Button>
             </CardFooter>
-          </Card>
-        </div>
-      </main>
-    </div>
+          </Card >
+        </div >
+      </main >
+    </div >
   );
 }

@@ -412,7 +412,7 @@ export default function PatientDetails() {
                   </CardHeader>
                   <CardContent>
                     {loading ? (
-                      <p>Loading...</p> 
+                      <p>Loading...</p>
                     ) : (
                       <Table>
                         <TableHeader>
