@@ -4,20 +4,17 @@ import storage from "redux-persist/lib/storage";
 
 import { postRequest, Endpoint } from '../helpers/Network';
 
-// const isAuthenticated = () => {
-//   const cookies = document.cookie.split('; ');
-//   const hasAccessToken = cookies.some((cookie) => cookie.startsWith('accessToken='));
-//   return hasAccessToken; // accessToken varsa kullanıcı authenticated
-// };
-
 export const login = createAsyncThunk(
   'auth/login',
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const response = await postRequest(Endpoint.LOGIN, { email, password });
+      const name = response.name || "Guest"; // Kullanıcı adını al
+      const surname = response.surname || "Guest"; // Kullanıcı adını al
       const role = response.role || 'patient';
       const userId = response.id || null; 
-      return { role, userId, isAuthenticated: true };
+      console.log("a", response);
+      return { name, surname, role, userId, isAuthenticated: true };
     } catch (error) {
       return rejectWithValue(error.response?.data || 'An error occurred');
     }
@@ -39,6 +36,8 @@ const authSlice = createSlice({
     isAuthenticated: false,
     role: null,
     userId: null,
+    name: null, // Kullanıcı adı alanı
+    surname: null,
     loading: false,
     error: null,
   },
@@ -46,6 +45,8 @@ const authSlice = createSlice({
     logout: (state) => {
       state.isAuthenticated = false;
       state.role = null;
+      state.name = null; // Kullanıcı adını temizle
+      state.surname = null; // Kullanıcı adını temizle
       state.error = null;
       state.userId = null;
     },
@@ -63,6 +64,8 @@ const authSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = true;
         state.role = action.payload.role;
+        state.name = action.payload.name; // Kullanıcı adını sakla
+        state.surname = action.payload.surname; // Kullanıcı adını sakla
         state.userId = action.payload.userId;
         state.error = null;
       })

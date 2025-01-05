@@ -1,6 +1,8 @@
 Flask==2.1.2
+transformers==4.35.0
+torch==2.0.1
+prometheus_client==0.16.0
 werkzeug==2.1.2
-Pillow==9.0.1       # For handling images
-pytesseract==0.3.10 # For OCR (image text extraction)
-PyPDF2==3.0.0       # For PDF text extraction
-prometheus_client==0.16.0  # For exposing Prometheus metrics
+numpy<2  # Add this line to avoid compatibility issues
+pybind11>=2.12  # Optional: to ensure compatibility with NumPy 2.x if needed in future
+accelerate==0.22.0

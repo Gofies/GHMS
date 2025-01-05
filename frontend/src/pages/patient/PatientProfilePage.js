@@ -7,8 +7,8 @@ import { Textarea } from "../../components/ui/patient/profile/TextArea.jsx"
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/patient/profile/Avatar.jsx"
 import { Endpoint, getRequest, putRequest } from "../../helpers/Network.js";
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
-import Header from "../../components/ui/common/Header.jsx";
-//import { useDarkMode } from '../../helpers/DarkModeContext.js';
+import Header from "../../components/ui/admin/Header.jsx";
+import { useDarkMode } from '../../helpers/DarkModeContext.js';
 import { toast } from 'react-toastify'
 
 export default function PatientProfile() {
@@ -26,7 +26,7 @@ export default function PatientProfile() {
   });
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
-
+  const { darkMode, toggleDarkMode } = useDarkMode(); 
   const formatBirthdate = (birthdate) => {
     const date = new Date(birthdate);
     const day = String(date.getDate()).padStart(2, '0');
@@ -132,7 +132,7 @@ export default function PatientProfile() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <Header title="Profile" />

@@ -7,16 +7,20 @@ import { Label } from "../../components/ui/admin/Label.jsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/admin/Table.jsx";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/admin/Dialog.jsx";
 import { Badge } from "../../components/ui/admin/Badge.jsx";
-import { Search, Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Eye, EyeOff, CloudCog } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/ui/admin/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
 import { Endpoint, postRequest, getRequest, putRequest, deleteRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/admin/Select.jsx";
+import { useDarkMode } from '../../helpers/DarkModeContext';
 
 export default function AdminUserManagementPage() {
   const [doctors, setDoctors] = useState([]);
+  const [patients, setPatients] = useState([]);
   const [labTechnicians, setLabTechnicians] = useState([]);
+  const { darkMode } = useDarkMode();
 
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -48,12 +52,27 @@ export default function AdminUserManagementPage() {
   ];
   const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i); // Last 100 years
 
+
+  const [selectedJobStartDay, setSelectedJobStartDay] = useState(1);
+  const [selectedJobStartMonth, setSelectedJobStartMonth] = useState(months[0]);
+  const [selectedJobStartYear, setSelectedJobStartYear] = useState(new Date().getFullYear());
+
+  const [isJobStartDayDropdownOpen, setIsJobStartDayDropdownOpen] = useState(false);
+  const [isJobStartMonthDropdownOpen, setIsJobStartMonthDropdownOpen] = useState(false);
+  const [isJobStartYearDropdownOpen, setIsJobStartYearDropdownOpen] = useState(false);
+
+
   const fetchDoctors = async () => {
     try {
       const response = await getRequest(Endpoint.GET_ADMIN_DOCTOR);
       if (response) {
-        setDoctors(response.doctors);
-        setFilteredUsers(response.doctors);
+        const doctorsWithRole = response.doctors.map((doctor) => ({
+          ...doctor,
+          role: "Doctor",
+        }));
+
+        setDoctors(doctorsWithRole);
+        setFilteredUsers(doctorsWithRole);
       } else {
         toast.error('Failed to fetch doctors.');
       }
@@ -63,12 +82,33 @@ export default function AdminUserManagementPage() {
     }
   };
 
+  // const fetchPatients = async () => {
+  //   try {
+  //     const response = await getRequest(Endpoint.GET_ADMIN_PATIENT);
+  //     if (response) {
+
+  //       setPatients(response.patients);
+  //       //setFilteredUsers(doctorsWithRole);
+  //     } else {
+  //       toast.error('Failed to fetch patients.');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching patients:', error);
+  //     toast.error('An error occurred while fetching patients data.');
+  //   }
+  // };
+
   const fetchLabTechnicians = async () => {
     try {
-      const response = await getRequest(Endpoint.GET_ADMIN_LAB_TECHNICIANS);
+      const response = await getRequest(Endpoint.GET_ADMIN_LAB_TECHNICIAN);
+      console.log("a", response);
       if (response) {
-        setLabTechnicians(response.labtechnicians);
-        setFilteredUsers(response.labtechnicians);
+        const labTechniciansWithRole = response.labTechnicians?.map((tech) => ({
+          ...tech,
+          role: "Lab Tech",
+        }));
+        setLabTechnicians(labTechniciansWithRole);
+        setFilteredUsers(labTechniciansWithRole);
       } else {
         toast.error('Failed to fetch lab technicians.');
       }
@@ -78,31 +118,55 @@ export default function AdminUserManagementPage() {
     }
   };
 
+  const navigate = useNavigate();
 
-  const getFormattedDate = () => {
-    if (!selectedDay || !selectedMonth || !selectedYear) return null;
 
-    const monthIndex = months.indexOf(selectedMonth) + 1; // Get month index
-    return `${selectedYear}-${String(monthIndex).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
+  const formatBirthdate = (day, month, year) => {
+    // Ayı sırasına göre indeks bul ve 1 artır
+    const monthIndex = months.indexOf(month) + 1;
+
+    // Gün ve ay tek haneli ise başına '0' ekle
+    const formattedDay = String(day).padStart(2, "0");
+    const formattedMonth = String(monthIndex).padStart(2, "0");
+
+    // Format: DD.MM.YYYY
+    return `${formattedDay}.${formattedMonth}.${year}`;
   };
 
-  const navigate = useNavigate();
+  // Kullanım
+
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
-    const birthdate = getFormattedDate();
-    if (!birthdate) {
-      alert("Please select a valid date of birth.");
+    // Validasyon: Zorunlu alanları kontrol et
+    if (!name || !surname || !email || !password || !phone || !title || !specialization) {
+      toast.error("Please fill in all required fields.");
       return;
     }
+
+    // Validasyon: E-posta formatını kontrol et
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    // Validasyon: Şifre uzunluğunu kontrol et
+    if (password.length < 3) {
+      toast.error("Password must be at least 3 characters long.");
+      return;
+    }
+
+    const birthdate = formatBirthdate(selectedDay, selectedMonth, selectedYear);
+    const jobstartdate = formatBirthdate(selectedJobStartDay, selectedJobStartMonth, selectedJobStartYear);
+
 
     if (userType === 'doctor' && !degree) {
-      alert("Please enter the degree for the doctor.");
+      toast.error("Please enter the degree for the doctor.");
       return;
     }
-
     if (userType === 'labtechnician' && !certificates) {
-      alert("Please enter the certificates for the lab technician.");
+      toast.error("Please enter the certificates for the lab technician.");
       return;
     }
 
@@ -112,27 +176,47 @@ export default function AdminUserManagementPage() {
       title,
       email,
       password,
-      birthdate,
+      birthdate: birthdate,
       phone,
-      jobstartdate,
+      jobstartdate: jobstartdate,
       specialization,
       ...(userType === 'doctor' && { degree }),
-      ...(userType === 'labtechnician' && { certificates }),
+      ...(userType === 'labtechnician' && { certificates: certificates.split(',').map(item => item.trim()) }),
     };
 
     try {
       let responseData;
+      console.log("t", requestBody);
       if (userType === 'doctor') {
         responseData = await postRequest(Endpoint.GET_ADMIN_DOCTOR, requestBody);
       } else if (userType === 'labtechnician') {
-        responseData = await postRequest(Endpoint.GET_ADMIN_LAB_TECHNICIANS, requestBody); // bu yok şu an
+        responseData = await postRequest(Endpoint.GET_ADMIN_LAB_TECHNICIAN, requestBody);
       }
-
+      console.log("q", responseData);
       if (responseData) {
-        toast.success("Account created successfully!");
+        toast.success("User created successfully!");
         if (toast.success) {
           fetchDoctors();
+          fetchLabTechnicians();
+          //fetchPatients();
         }
+
+        // Input alanlarını sıfırla
+        setName('');
+        setSurname('');
+        setTitle('');
+        setEmail('');
+        setPassword('');
+        setPhone('');
+        setDegree('');
+        setCertificates('');
+        setSpecialization('');
+        setSelectedDay(1);
+        setSelectedMonth(months[0]);
+        setSelectedYear(new Date().getFullYear());
+        setSelectedJobStartDay(1);
+        setSelectedJobStartMonth(months[0]);
+        setSelectedJobStartYear(new Date().getFullYear());
       } else {
         toast.error("An error occurred during user creation.");
       }
@@ -142,93 +226,155 @@ export default function AdminUserManagementPage() {
     }
   };
 
-  const handleEditUser = async (e, id) => {
+  const handleEditUser = async (e, id, role) => {
     e.preventDefault();
-    // if (!editingUser) return;
+
     try {
-      const responseData = await getRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`); 
-      console.log(responseData);
+      const endpoint =
+        role === "Doctor"
+          ? `${Endpoint.GET_ADMIN_DOCTOR}/${id}`
+          : `${Endpoint.GET_ADMIN_LAB_TECHNICIAN}/${id}`;
+
+      // API isteğini gönder ve yanıtı al
+      const responseData = await getRequest(endpoint);
+
       if (responseData) {
-        setEditingUser(responseData.doctor);
+        // Kullanıcı bilgilerini role'e göre düzenle
+        const userData = role === "Doctor" ? responseData.doctor : responseData.labTechnician;
+
+        // Düzenlenecek kullanıcıyı state'e set et
+        setEditingUser({ ...userData, role });
       } else {
-        toast.error("An error occurred during user update.");
+        toast.error("An error occurred while fetching user data.");
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error fetching user data:", error);
       toast.error("An unexpected error occurred.");
     }
   };
+
 
   const handleSaveUpdatedUser = async (e, id) => {
     e.preventDefault();
-    if (!editingUser) return;
 
-    const birthdate = getFormattedDate();
-    if (!birthdate) {
-      alert("Please select a valid date of birth.");
+    // Validasyon: Zorunlu alanları kontrol et
+    if (!editingUser?.name || !editingUser?.surname || !editingUser?.email || !editingUser?.phone) {
+      toast.error("Please fill in all required fields.");
       return;
     }
 
+    // Validasyon: E-posta formatını kontrol et
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(editingUser.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    // Gönderilecek veriyi oluştur
     const requestBody = {
-      name: editingUser.name || name, // Eğer editingUser'dan gelen boşsa, mevcut state kullan
-      surname: editingUser.surname || surname,
-      title: editingUser.title || title,
-      email: editingUser.email || email,
-      phone: editingUser.phone || phone,
-      jobstartdate: editingUser.jobstartdate || jobstartdate,
-      degree: editingUser.degree || degree,
-      specialization: editingUser.specialization || specialization,
+      name: editingUser.name,
+      surname: editingUser.surname,
+      title: editingUser.title,
+      email: editingUser.email,
+      phone: editingUser.phone,
+      jobstartdate: editingUser.jobstartdate,
+      specialization: editingUser.specialization,
+      ...(editingUser.role === "Doctor" && { degree: editingUser.degree }), // Doktor için degree ekle
+      ...(editingUser.role === "Lab Technician" && { certificates: editingUser.certificates }), // Teknisyen için certificates ekle
     };
-  console.log(requestBody);
+
+    console.log("Request Body:", requestBody);
 
     try {
-      const responseData = await putRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`, requestBody); //  /admin/doctor
-      console.log("r", responseData);
+      // Role'e göre doğru endpoint'i belirle
+      const endpoint =
+        editingUser.role === "Doctor"
+          ? `${Endpoint.GET_ADMIN_DOCTOR}/${id}`
+          : `${Endpoint.GET_ADMIN_LAB_TECHNICIAN}/${id}`;
+
+      // API isteğini gönder
+      const responseData = await putRequest(endpoint, requestBody);
+
       if (responseData) {
         toast.success("User updated successfully!");
-        fetchDoctors(); // Listeyi güncelle
+
+        // Kullanıcı listelerini güncelle
+        fetchDoctors();
+        fetchLabTechnicians();
+
+        // Düzenleme modundan çık
+        setEditingUser(null);
       } else {
         toast.error("An error occurred during user update.");
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error updating user:", error);
       toast.error("An unexpected error occurred.");
     }
   };
 
+
+  const [isDayDropdownOpen, setIsDayDropdownOpen] = useState(false);
+  const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState(false);
+  const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
+
+
   useEffect(() => {
-    //   if (searchTerm) {
-    //     const filtered = users.filter((user) =>
-    //       `${user.name} ${user.surname}`.toLowerCase().includes(searchTerm.toLowerCase())
-    //     );
-    //     setFilteredUsers(filtered);
-    //   } else {
     fetchDoctors();
-    //   }
+    fetchLabTechnicians();
+    //fetchPatients();
   }, []);
-  // }, [searchTerm, users]);
-
-  // useEffect(() => {
-  //   fetchDoctors();
-  // }, []);
 
   useEffect(() => {
+    // Tüm kullanıcıları birleştir
+    const allUsers = [
+      ...doctors.map((user) => ({ ...user, role: "Doctor" })),
+      // ...patients.map((user) => ({ ...user, role: "Patient" })),
+      ...labTechnicians.map((user) => ({ ...user, role: "Lab Technician" })),
+    ];
+  
+    // Kullanıcıları önce ada, sonra soyada göre sırala
+    allUsers.sort((a, b) => {
+      const nameComparison = a.name.localeCompare(b.name);
+      if (nameComparison !== 0) {
+        return nameComparison; // İsimler farklıysa ada göre sırala
+      }
+      return a.surname.localeCompare(b.surname); // İsimler aynıysa soyada göre sırala
+    });
+  
     // Arama terimine göre filtreleme yap
-    const filtered = doctors.filter((user) =>
-      `${user.name} ${user.email} ${user.title} ${user.specialization}`
+    const filtered = allUsers.filter((user) =>
+      `${user.name} ${user.email} ${user.title} ${user.specialization} ${user.role}`
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
     );
-    setFilteredUsers(filtered); // Filtrelenmiş kullanıcı listesini güncelle
-  }, [searchTerm, doctors]);
+  
+    setFilteredUsers(filtered); // Filtrelenmiş ve sıralanmış kullanıcı listesini güncelle
+  }, [searchTerm, doctors, labTechnicians]); // patients
+  
 
-
-  const deleteUser = async (id) => {
+  const deleteUser = async (id, role) => {
     try {
-      const response = await deleteRequest(`${Endpoint.GET_ADMIN_DOCTOR}/${id}`);
+      // Role'e göre endpoint belirle
+      const endpoint =
+        role === "Doctor"
+          ? `${Endpoint.GET_ADMIN_DOCTOR}/${id}`
+          : `${Endpoint.GET_ADMIN_LAB_TECHNICIAN}/${id}`;
+
+      // API isteğini gönder
+      const response = await deleteRequest(endpoint);
+
       if (response) {
         toast.success('User deleted successfully!');
-        setDoctors(doctors.filter(user => user._id !== id));
+
+        // Role'e göre doğru listeyi güncelle
+        if (role === "Doctor") {
+          setDoctors(doctors.filter(user => user._id !== id));
+        } else if (role === "Lab Technician") {
+          setLabTechnicians(labTechnicians.filter(user => user._id !== id));
+        }
+
+        // Filtrelenmiş kullanıcı listesini güncelle
         setFilteredUsers(filteredUsers.filter(user => user._id !== id));
       } else {
         toast.error('Failed to delete user.');
@@ -239,15 +385,15 @@ export default function AdminUserManagementPage() {
     }
   };
 
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-
   return (
-    <div className="flex h-screen bg-gray-100">
+   <div className={`flex h-screen ${darkMode ? "bg-gray-900 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
 
       <main className="flex-1 overflow-y-auto">
-        <Header title="User Management" />
+        <Header title="Staff Management" />
 
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-6">
@@ -274,158 +420,334 @@ export default function AdminUserManagementPage() {
                   <DialogHeader>
                     <DialogTitle>Create New User</DialogTitle>
                   </DialogHeader>
-                  <form onSubmit={handleCreateUser}>
-                    <div className="grid grid-cols-2 gap-6 py-4">
-                      <div>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault(); // Varsayılan form gönderimini engelle
+                      handleCreateUser(e);
+                    }}
+                  >
+                    <div className="grid grid-cols-1 gap-6 py-4">
+                      <div className="col-span-1">
                         <Label htmlFor="userType">User Type</Label>
                         <select
                           id="userType"
                           value={userType}
                           onChange={(e) => setUserType(e.target.value)}
                           required
-                          className="w-full"
+                          className={`w-full px-3 py-2 rounded-md shadow-sm transition-all duration-300 ${
+                            darkMode
+                              ? "bg-gray-800 text-white border border-gray-600 focus:ring-blue-500"
+                              : "bg-white text-gray-900 border border-gray-300 focus:ring-blue-600"
+                          }`}
                         >
                           <option value="doctor">Doctor</option>
                           <option value="labtechnician">Lab Technician</option>
                         </select>
                       </div>
-                      <div>
-                        <Label htmlFor="name">Name</Label>
-                        <Input
-                          id="name"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          placeholder="John"
-                          required
-                          className="w-full"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="surname">Surname</Label>
-                        <Input
-                          id="surname"
-                          value={surname}
-                          onChange={(e) => setSurname(e.target.value)}
-                          placeholder="Doe"
-                          required
-                          className="w-full"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="email">E-Mail</Label>
-                        <Input
-                          id="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="example@domain.com"
-                          required
-                          className="w-full"
-                        />
-                      </div>
-                      <div className="relative">
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                          id="password"
-                          type={showPassword ? 'text' : 'password'}
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Enter your password"
-                          required
-                          className="w-full"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
-                        >
-                          {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                        </button>
-                      </div>
-                      <div>
-                        <Label htmlFor="phone">Phone</Label>
-                        <Input
-                          id="phone"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder="+90 123 456 7890"
-                          required
-                          className="w-full"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="title">Title</Label>
-                        <Input
-                          id="title"
-                          value={title}
-                          onChange={(e) => setTitle(e.target.value)}
-                          placeholder="Prof. Dr."
-                          required
-                          className="w-full"
-                        />
-                      </div>
-                      {userType === 'doctor' && (
+                      <div className="grid grid-cols-2 gap-6">
                         <div>
-                          <Label htmlFor="degree">Degree</Label>
+                          <Label htmlFor="name">Name</Label>
                           <Input
-                            id="degree"
-                            value={degree}
-                            onChange={(e) => setDegree(e.target.value)}
-                            placeholder="PhD"
+                            id="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="John"
                             required
                             className="w-full"
                           />
                         </div>
-                      )}
-                      {userType === 'labtechnician' && (
                         <div>
-                          <Label htmlFor="certificates">Certificates</Label>
+                          <Label htmlFor="surname">Surname</Label>
                           <Input
-                            id="certificates"
-                            value={certificates}
-                            onChange={(e) => setCertificates(e.target.value)}
-                            placeholder="Certification details"
+                            id="surname"
+                            value={surname}
+                            onChange={(e) => setSurname(e.target.value)}
+                            placeholder="Doe"
                             required
                             className="w-full"
                           />
                         </div>
-                      )}
-                      <div>
-                        <Label htmlFor="specialization">Specialization</Label>
-                        <Input
-                          id="specialization"
-                          value={specialization}
-                          onChange={(e) => setSpecialization(e.target.value)}
-                          placeholder="Cardiology"
-                          required
-                          className="w-full"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="birthdate">Birthdate</Label>
-                        <Input
-                          id="birthdate"
-                          type="date"
-                          value={getFormattedDate()}
-                          onChange={(e) => {
-                            const [year, month, day] = e.target.value.split('-');
-                            setSelectedYear(parseInt(year, 10));
-                            setSelectedMonth(months[parseInt(month, 10) - 1]);
-                            setSelectedDay(parseInt(day, 10));
-                          }}
-                          required
-                          className="w-full"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="jobstartdate">Job Start Date</Label>
-                        <Input
-                          id="jobstartdate"
-                          type="date"
-                          value={jobstartdate}
-                          onChange={(e) => setJobStartDate(e.target.value)}
-                          required
-                          className="w-full"
-                        />
+                        <div>
+                          <Label htmlFor="email">E-Mail</Label>
+                          <Input
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="example@domain.com"
+                            required
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="relative">
+                          <Label htmlFor="password">Password</Label>
+                          <Input
+                            id="password"
+                            type={showPassword ? 'text' : 'password'}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter your password"
+                            required
+                            className="w-full"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+                          >
+                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                          </button>
+                        </div>
+                        <div>
+                          <Label htmlFor="phone">Phone</Label>
+                          <Input
+                            id="phone"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="+90 123 456 7890"
+                            required
+                            className="w-full"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="title">Title</Label>
+                          <Input
+                            id="title"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder="Prof. Dr."
+                            required
+                            className="w-full"
+                          />
+                        </div>
+                        {userType === 'doctor' && (
+                          <div>
+                            <Label htmlFor="degree">Degree</Label>
+                            <Input
+                              id="degree"
+                              value={degree}
+                              onChange={(e) => setDegree(e.target.value)}
+                              placeholder="PhD"
+                              required
+                              className="w-full"
+                            />
+                          </div>
+                        )}
+                        {userType === 'labtechnician' && (
+                          <div>
+                            <Label htmlFor="certificates">Certificates</Label>
+                            <Input
+                              id="certificates"
+                              value={certificates}
+                              onChange={(e) => setCertificates(e.target.value)}
+                              placeholder="Certification details"
+                              required
+                              className="w-full"
+                            />
+                          </div>
+                        )}
+
+                        {userType === 'labtechnician' ? (
+                          <div>
+                            <Label htmlFor="specialization">Specialization</Label>
+                            <select
+                              id="specialization"
+                              value={specialization}
+                              onChange={(e) => setSpecialization(e.target.value)}
+                              required
+                              className="w-full"
+                            >
+                              <option value="" disabled>Select a specialization</option>
+                              <option value="Hematology">Hematology</option>
+                              <option value="Clinical Pathology">Clinical Pathology</option>
+                              <option value="Biochemistry">Biochemistry</option>
+                              <option value="Radiology">Radiology</option>
+                              <option value="Neurology">Neurology</option>
+                            </select>
+                          </div>
+                        ) : (
+                          <div>
+                            <Label htmlFor="specialization">Specialization</Label>
+                            <Input
+                              id="specialization"
+                              value={specialization}
+                              onChange={(e) => setSpecialization(e.target.value)}
+                              placeholder="Enter specialization"
+                              required
+                              className="w-full"
+                            />
+                          </div>
+                        )}
+                        <div className="grid gap-2">
+                          <Label>Date of Birth</Label>
+                          <div className="flex w-full space-x-4">
+                            {/* Gün Dropdown */}
+                            <div className="flex-1">
+                              <Select>
+                                <SelectTrigger
+                                  value={selectedDay}
+                                  onClick={(e) => {
+                                    e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                    setIsDayDropdownOpen(!isDayDropdownOpen);
+                                  }}
+                                />
+                                <SelectContent isOpen={isDayDropdownOpen}>
+                                  <div className="max-h-60 overflow-y-auto">
+                                    {days.map((day) => (
+                                      <SelectItem
+                                        key={day}
+                                        value={day}
+                                        onSelect={() => {
+                                          setSelectedDay(day);
+                                          setIsDayDropdownOpen(false);
+                                        }}
+                                      />
+                                    ))}
+                                  </div>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {/* Ay Dropdown */}
+                            <div className="flex-1">
+                              <Select>
+                                <SelectTrigger
+                                  value={selectedMonth}
+                                  onClick={(e) => {
+                                    e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                    setIsMonthDropdownOpen(!isMonthDropdownOpen);
+                                  }}
+                                />
+                                <SelectContent isOpen={isMonthDropdownOpen}>
+                                  <div className="max-h-60 overflow-y-auto">
+                                    {months.map((month, index) => (
+                                      <SelectItem
+                                        key={index}
+                                        value={month}
+                                        onSelect={() => {
+                                          setSelectedMonth(month);
+                                          setIsMonthDropdownOpen(false);
+                                        }}
+                                      />
+                                    ))}
+                                  </div>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {/* Yıl Dropdown */}
+                            <div className="flex-1">
+                              <Select>
+                                <SelectTrigger
+                                  value={selectedYear}
+                                  onClick={(e) => {
+                                    e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                    setIsYearDropdownOpen(!isYearDropdownOpen);
+                                  }}
+                                />
+                                <SelectContent isOpen={isYearDropdownOpen}>
+                                  <div className="max-h-60 overflow-y-auto">
+                                    {years.map((year) => (
+                                      <SelectItem
+                                        key={year}
+                                        value={year}
+                                        onSelect={() => {
+                                          setSelectedYear(year);
+                                          setIsYearDropdownOpen(false);
+                                        }}
+                                      />
+                                    ))}
+                                  </div>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="grid gap-2">
+                          <Label>Job Start Date</Label>
+                          <div className="flex w-full space-x-4">
+                            {/* Gün Dropdown */}
+                            <div className="flex-1">
+                              <Select>
+                                <SelectTrigger
+                                  value={selectedJobStartDay}
+                                  onClick={(e) => {
+                                    e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                    setIsJobStartDayDropdownOpen(!isJobStartDayDropdownOpen);
+                                  }}
+                                />
+                                <SelectContent isOpen={isJobStartDayDropdownOpen}>
+                                  <div className="max-h-60 overflow-y-auto">
+                                    {days.map((day) => (
+                                      <SelectItem
+                                        key={day}
+                                        value={day}
+                                        onSelect={() => {
+                                          setSelectedJobStartDay(day);
+                                          setIsJobStartDayDropdownOpen(false);
+                                        }}
+                                      />
+                                    ))}
+                                  </div>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {/* Ay Dropdown */}
+                            <div className="flex-1">
+                              <Select>
+                                <SelectTrigger
+                                  value={selectedJobStartMonth}
+                                  onClick={(e) => {
+                                    e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                    setIsJobStartMonthDropdownOpen(!isJobStartMonthDropdownOpen);
+                                  }}
+                                />
+                                <SelectContent isOpen={isJobStartMonthDropdownOpen}>
+                                  <div className="max-h-60 overflow-y-auto">
+                                    {months.map((month, index) => (
+                                      <SelectItem
+                                        key={index}
+                                        value={month}
+                                        onSelect={() => {
+                                          setSelectedJobStartMonth(month);
+                                          setIsJobStartMonthDropdownOpen(false);
+                                        }}
+                                      />
+                                    ))}
+                                  </div>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {/* Yıl Dropdown */}
+                            <div className="flex-1">
+                              <Select>
+                                <SelectTrigger
+                                  value={selectedJobStartYear}
+                                  onClick={(e) => {
+                                    e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                    setIsJobStartYearDropdownOpen(!isJobStartYearDropdownOpen);
+                                  }}
+                                />
+                                <SelectContent isOpen={isJobStartYearDropdownOpen}>
+                                  <div className="max-h-60 overflow-y-auto">
+                                    {years.map((year) => (
+                                      <SelectItem
+                                        key={year}
+                                        value={year}
+                                        onSelect={() => {
+                                          setSelectedJobStartYear(year);
+                                          setIsJobStartYearDropdownOpen(false);
+                                        }}
+                                      />
+                                    ))}
+                                  </div>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div className="flex justify-between">
@@ -440,30 +762,39 @@ export default function AdminUserManagementPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-bold">User List</CardTitle>
+              <CardTitle className="text-xl font-bold">Staff List</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
+                    <TableHead>Surname</TableHead>
                     <TableHead>Email</TableHead>
+                    <TableHead>Role</TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>Specialization</TableHead>
+                    <TableHead>Hospital</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredUsers.map((user) => (
-                    <TableRow key={user._id}>
-                      <TableCell>{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.title}</TableCell>
-                      <TableCell>{user.specialization}</TableCell>
+                    <TableRow key={user?._id}>
+                      <TableCell>{user?.name}</TableCell>
+                      <TableCell>{user?.surname}</TableCell>
+                      <TableCell>{user?.email}</TableCell>
+                      <TableCell>{user?.role}</TableCell>
+                      <TableCell>{user?.title}</TableCell>
+                      <TableCell>{user?.specialization}</TableCell>
+                      <TableCell>{user.hospital?.name}</TableCell>
                       <TableCell>
-                        <Badge variant={user.status === 'Active' ? 'default' : 'secondary'}>
-                          {user.status}
+                        <Badge
+                          variant={user?.hospital ? 'success' : 'destructive'} //  user hospital varsa success, yoksa destructive
+                        >
+                          {user?.hospital ? 'Active' : 'Inactive'}
+                          {/* user hospital varsa active yoksa inactive */}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -473,7 +804,7 @@ export default function AdminUserManagementPage() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={(e) => { handleEditUser(e, user._id) }}
+                                onClick={(e) => { handleEditUser(e, user._id, user.role) }}
                               >
                                 <Edit className="w-4 h-4 mr-2" />
                                 Edit
@@ -565,38 +896,87 @@ export default function AdminUserManagementPage() {
                                       className="w-full"
                                     />
                                   </div>
-                                  <div>
-                                    <Label htmlFor="degree">Degree</Label>
-                                    <Input
-                                      id="degree"
-                                      value={editingUser?.degree || ''}
-                                      onChange={(e) =>
-                                        setEditingUser((prev) => ({
-                                          ...prev,
-                                          degree: e.target.value,
-                                        }))
-                                      }
-                                      placeholder="PhD"
-                                      required
-                                      className="w-full"
-                                    />
-                                  </div>
+                                  {/* Doktorlar için Degree Alanı */}
+                                  {editingUser?.role === 'Doctor' && (
+                                    <div>
+                                      <Label htmlFor="degree">Degree</Label>
+                                      <Input
+                                        id="degree"
+                                        value={editingUser?.degree || ''}
+                                        onChange={(e) =>
+                                          setEditingUser((prev) => ({
+                                            ...prev,
+                                            degree: e.target.value,
+                                          }))
+                                        }
+                                        placeholder="PhD"
+                                        required
+                                        className="w-full"
+                                      />
+                                    </div>
+                                  )}
+
+                                  {/* Laboratuvar Teknisyenleri için Certificates Alanı */}
+                                  {editingUser?.role === 'Lab Technician' && (
+                                    <div>
+                                      <Label htmlFor="certificates">Certificates</Label>
+                                      <Input
+                                        id="certificates"
+                                        value={(editingUser?.certificates || []).join(', ')} // Array'den string'e çevir
+                                        onChange={(e) =>
+                                          setEditingUser((prev) => ({
+                                            ...prev,
+                                            certificates: e.target.value.split(',').map((item) => item.trim()), // String'den array'e çevir
+                                          }))
+                                        }
+                                        placeholder="Certification1, Certification2"
+                                        required
+                                        className="w-full"
+                                      />
+                                    </div>
+                                  )}
+
+
                                   <div>
                                     <Label htmlFor="specialization">Specialization</Label>
-                                    <Input
-                                      id="specialization"
-                                      value={editingUser?.specialization || ''}
-                                      onChange={(e) =>
-                                        setEditingUser((prev) => ({
-                                          ...prev,
-                                          specialization: e.target.value,
-                                        }))
-                                      }
-                                      placeholder="Cardiology"
-                                      required
-                                      className="w-full"
-                                    />
+                                    {editingUser?.role === 'Lab Technician' ? (
+                                      <select
+                                        id="specialization"
+                                        value={editingUser?.specialization || ''}
+                                        onChange={(e) =>
+                                          setEditingUser((prev) => ({
+                                            ...prev,
+                                            specialization: e.target.value,
+                                          }))
+                                        }
+                                        required
+                                        className="w-full"
+                                      >
+                                        <option value="" disabled>Select a specialization</option>
+                                        <option value="Hematology">Hematology</option>
+                                        <option value="Clinical Pathology">Clinical Pathology</option>
+                                        <option value="Biochemistry">Biochemistry</option>
+                                        <option value="Radiology">Radiology</option>
+                                        <option value="Neurology">Neurology</option>
+                                      </select>
+                                    ) : (
+                                      <Input
+                                        id="specialization"
+                                        value={editingUser?.specialization || ''}
+                                        onChange={(e) =>
+                                          setEditingUser((prev) => ({
+                                            ...prev,
+                                            specialization: e.target.value,
+                                          }))
+                                        }
+                                        placeholder="Enter specialization"
+                                        required
+                                        className="w-full"
+                                      />
+                                    )}
                                   </div>
+
+
                                 </div>
                                 <div className="flex justify-end">
                                   <Button type="submit">Save Changes</Button>
@@ -607,7 +987,7 @@ export default function AdminUserManagementPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => deleteUser(user._id)}
+                            onClick={() => deleteUser(user._id, user.role)}
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
                             Delete

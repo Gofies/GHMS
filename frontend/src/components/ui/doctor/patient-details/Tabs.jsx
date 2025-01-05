@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useDarkMode } from "../../../../helpers/DarkModeContext";
+
 
 export const Tabs = ({ defaultValue, onValueChange, children }) => {
   const [activeTab, setActiveTab] = useState(defaultValue);
@@ -6,7 +8,7 @@ export const Tabs = ({ defaultValue, onValueChange, children }) => {
   const handleTabChange = (value) => {
     setActiveTab(value);
     if (onValueChange) {
-      onValueChange(value); // Parent component'in callback fonksiyonunu çağır
+      onValueChange(value);
     }
   };
 
@@ -19,29 +21,47 @@ export const Tabs = ({ defaultValue, onValueChange, children }) => {
   );
 };
 
+export const TabsList = ({ children, activeTab, onTabChange }) => {
+  const { darkMode } = useDarkMode();
+  return (
+    <div
+      className={`flex space-x-4 border-b pb-2 transition-all duration-300 ${
+        darkMode ? 'border-gray-700' : 'border-gray-300'
+      }`}
+    >
+      {React.Children.map(children, (child) =>
+        React.cloneElement(child, { activeTab, onTabChange })
+      )}
+    </div>
+  );
+};
 
-export const TabsList = ({ children, activeTab, onTabChange }) => (
-  <div className="flex space-x-4 border-b pb-2">
-    {React.Children.map(children, (child) =>
-      React.cloneElement(child, { activeTab, onTabChange })
-    )}
-  </div>
-);
-
-export const TabsTrigger = ({ value, activeTab, onTabChange, children }) => (
-  <button
-    className={`px-4 py-2 text-sm font-medium ${
-      activeTab === value
-        ? 'text-blue-600 border-b-2 border-blue-600'
-        : 'text-gray-600 hover:text-gray-800'
-    }`}
-    onClick={() => onTabChange(value)} // Tab değiştiğinde `onTabChange`'i çağır
-  >
-    {children}
-  </button>
-);
+export const TabsTrigger = ({ value, activeTab, onTabChange, children }) => {
+  const { darkMode } = useDarkMode();
+  return (
+    <button
+      className={`px-4 py-2 text-sm font-medium transition-all duration-300 ${
+        activeTab === value
+          ? darkMode
+            ? 'text-blue-400 border-b-2 border-blue-500'
+            : 'text-blue-600 border-b-2 border-blue-600'
+          : darkMode
+          ? 'text-gray-400 hover:text-gray-200'
+          : 'text-gray-600 hover:text-gray-800'
+      }`}
+      onClick={() => onTabChange(value)}
+    >
+      {children}
+    </button>
+  );
+};
 
 export const TabsContent = ({ value, activeTab, children }) => {
-  if (activeTab !== value) return null; // Sadece aktif tab'ın içeriğini göster
-  return <div className="mt-4">{children}</div>;
+  const { darkMode } = useDarkMode();
+  if (activeTab !== value) return null;
+  return (
+    <div className={`mt-4 transition-all duration-300 ${darkMode ? 'text-white' : 'text-black'}`}>
+      {children}
+    </div>
+  );
 };

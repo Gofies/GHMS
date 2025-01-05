@@ -2,10 +2,11 @@ import Hospital from '../../models/hospital.model.js';
 import Polyclinic from '../../models/polyclinic.model.js';
 import Doctor from '../../models/doctor.model.js';
 import LabTest from '../../models/lab.test.model.js';
+import LabTechnician from "../../models/lab.technician.model.js";
 
 const getHospitals = async (req, res) => {
     try {
-        const hospitals = await Hospital.find({}, 'name phone email');
+        const hospitals = await Hospital.find({}, 'name phone email address establishmentdate labTechnicians');
 
         if (hospitals) {
             return res.status(200).json({ hospitals });
@@ -60,17 +61,15 @@ const getHospital = async (req, res) => {
 
 const newHospital = async (req, res) => {
     try {
-        const { name, address, selecteddoctors, establishmentdate, phone, email, polyclinics } = req.body;
+        const { name, address, selecteddoctors = [], establishmentdate, phone, email, polyclinics = [], labTechnicians = [] } = req.body;
 
         if (
             name === undefined ||
             address === undefined ||
-            selecteddoctors === undefined ||
             establishmentdate === undefined ||
             phone === undefined ||
-            email === undefined ||
-            polyclinics === undefined
-        ) {
+            email === undefined 
+                ) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
@@ -113,46 +112,107 @@ const newHospital = async (req, res) => {
 
 const updateHospital = async (req, res) => {
     try {
-        const { name, address, doctors, establishmentdate, phone, email, polyclinics } = req.body;
-        const hospital = await Hospital.findById(req.params.id);
+        const { 
+            name, 
+            address, 
+            doctors = [], 
+            establishmentdate, 
+            phone, 
+            email, 
+            polyclinics = [], 
+            labTechnicians = [] // Güncel LabTechnicians listesi
+        } = req.body;
 
+        const hospital = await Hospital.findById(req.params.id).populate('labTechnicians');
         if (!hospital) {
             return res.status(404).json({ message: 'Hospital not found' });
         }
 
+        // Zorunlu alanları güncelle
         hospital.name = name || hospital.name;
         hospital.address = address || hospital.address;
         hospital.establishmentdate = establishmentdate || hospital.establishmentdate;
         hospital.phone = phone || hospital.phone;
         hospital.email = email || hospital.email;
 
-        if (polyclinics) {
+        // Polyclinics güncellemesi
+        if (polyclinics && polyclinics.length > 0) {
             for (let i = 0; i < polyclinics.length; i++) {
-                const polyclinic = await Polyclinic.create({ name: polyclinics[i].name, address: hospital.address, hospital: hospital._id });
+                const polyclinic = await Polyclinic.create({ 
+                    name: polyclinics[i].name, 
+                    address: hospital.address, 
+                    hospital: hospital._id 
+                });
                 hospital.polyclinics.push(polyclinic._id);
             }
         }
 
-        if (doctors) {
+        // Doctors güncellemesi
+        if (doctors && doctors.length > 0) {
             for (let i = 0; i < doctors.length; i++) {
                 hospital.doctors.push(doctors[i]);
             }
 
             for (let i = 0; i < doctors.length; i++) {
                 const doctor = await Doctor.findById(doctors[i]);
-                doctor.hospital = hospital._id;
-                await doctor.save();
+                if (doctor) {
+                    doctor.hospital = hospital._id;
+                    await doctor.save();
+                }
             }
         }
 
+        // LabTechnicians güncellemesi
+        if (labTechnicians && labTechnicians.length > 0) {
+            // Mevcut teknisyenlerden unselect edilenleri kaldır ve hospital alanını null yap
+            const removedTechnicians = hospital.labTechnicians.filter((existingTech) =>
+                !labTechnicians.includes(existingTech._id.toString())
+            );
+            for (const tech of removedTechnicians) {
+                const labTechnician = await LabTechnician.findById(tech._id);
+                if (labTechnician) {
+                    labTechnician.hospital = null; // Hospital alanını null yap
+                    await labTechnician.save();
+                }
+            }
 
+            // Yeni eklenen teknisyenleri ekle
+            for (let i = 0; i < labTechnicians.length; i++) {
+                const labTechnician = await LabTechnician.findById(labTechnicians[i]);
+                if (labTechnician) {
+                    // Eğer teknisyen zaten hastaneye atanmışsa ekleme yapmayın
+                    if (!hospital.labTechnicians.includes(labTechnician._id)) {
+                        hospital.labTechnicians.push(labTechnician._id);
+                    }
+                    // Teknisyenin hospital alanını güncelle
+                    labTechnician.hospital = hospital._id;
+                    await labTechnician.save();
+                }
+            }
+        } else {
+            // Eğer labTechnicians boşsa tüm teknisyenleri kaldır ve hospital alanını null yap
+            for (const tech of hospital.labTechnicians) {
+                const labTechnician = await LabTechnician.findById(tech._id);
+                if (labTechnician) {
+                    labTechnician.hospital = null; // Hospital alanını null yap
+                    await labTechnician.save();
+                }
+            }
+            hospital.labTechnicians = [];
+        }
+
+        // Güncellemeyi kaydet
         await hospital.save();
 
         return res.status(200).json({ message: 'Hospital updated successfully', hospital });
     } catch (error) {
-        return res.status(500).json({ message: 'error in admin.hospital.controller' + error.message });
+        console.error("Error updating hospital:", error);
+        return res.status(500).json({ message: 'Error in admin.hospital.controller: ' + error.message });
     }
-}
+};
+
+
+
 
 
 const deleteHospital = async (req, res) => {

@@ -3,7 +3,7 @@ export $(shell sed 's/=.*//' .env)
 
 all: build up
 
-deploy: build-deploy up
+deploy: clean-build build-deploy up
 
 up: mongo-up
 	docker-compose up -d $(service)
@@ -27,6 +27,12 @@ build-deploy: mongo-build
 	
 prune:
 	docker system prune -f
+
+clean-build:
+	docker-compose down --volumes --remove-orphans
+	rm -rf ./database/init_log.txt
+	rm -rf ./database/persistant
+	rm -rf ./database/mongodb-build/auth/mongodb-keyfile
 
 # Clean all services
 clean:
@@ -63,3 +69,7 @@ mongo-up:
 
 attach-mongo:
 	docker-compose exec router01 mongosh HospitalDatabase --port 27117 -u ${MONGO_USERNAME} -p ${MONGO_PASSWORD} --authenticationDatabase admin
+
+mocks-export:
+	chmod 777 ./database/export_database.sh
+	./database/export_database.sh

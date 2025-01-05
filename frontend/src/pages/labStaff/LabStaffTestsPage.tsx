@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "../../components/ui/lab-staff/tests/Button.jsx"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/lab-staff/tests/Card.jsx"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/lab-staff/tests/Table.jsx"
@@ -11,80 +11,162 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/lab-staff/tests/Tabs.jsx"
 import { Home, LogOut, FlaskRoundIcon as Flask, Clipboard, Search, AlertTriangle } from 'lucide-react'
 import Link from "../../components/ui/lab-staff/tests/Link.jsx"
+import { useDarkMode } from '../../helpers/DarkModeContext.js';
+import Sidebar from "../../components/ui/lab-staff/common/Sidebar.jsx"
+import Header from "../../components/ui/admin/Header.jsx";
 
-// Mock data for pending tests
-const pendingTests = [
-  { id: 1, patientName: "John Doe", testType: "Blood Test", urgency: "High", requestedBy: "Dr. Smith", requestDate: "2023-06-15" },
-  { id: 2, patientName: "Jane Smith", testType: "Urinalysis", urgency: "Medium", requestedBy: "Dr. Johnson", requestDate: "2023-06-14" },
-  { id: 3, patientName: "Bob Brown", testType: "X-Ray", urgency: "Low", requestedBy: "Dr. Williams", requestDate: "2023-06-13" },
-  { id: 4, patientName: "Alice Green", testType: "MRI", urgency: "High", requestedBy: "Dr. Davis", requestDate: "2023-06-15" },
-  { id: 5, patientName: "Charlie Wilson", testType: "CT Scan", urgency: "Medium", requestedBy: "Dr. Anderson", requestDate: "2023-06-14" },
-]
+import { Endpoint, getRequest, putRequest, deleteRequest } from "../../helpers/Network.js";
 
-// Mock data for completed tests
-const completedTests = [
-  { id: 1, patientName: "Eva Martinez", testType: "Blood Test", completedDate: "2023-06-14", result: "Normal" },
-  { id: 2, patientName: "Frank Johnson", testType: "X-Ray", completedDate: "2023-06-13", result: "Abnormal" },
-  { id: 3, patientName: "Grace Lee", testType: "Urinalysis", completedDate: "2023-06-12", result: "Normal" },
-]
+import { toast } from 'react-toastify';
+
 
 export default function LabStaffTests() {
+  const { darkMode } = useDarkMode();
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTest, setSelectedTest] = useState(null)
-  const [testResult, setTestResult] = useState({ result: '', notes: '' })
+  const [testResult, setTestResult] = useState({ result: '' })
+  const [additionalNotes, setAdditionalNotes] = useState(null);
+  const [pendingTests, setPendingTests] = useState(null)
+  const [completedTests, setCompletedTests] = useState(null)
 
-  const filteredPendingTests = pendingTests.filter(test => 
-    test.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    test.testType.toLowerCase().includes(searchTerm.toLowerCase())
-  )
 
-  const filteredCompletedTests = completedTests.filter(test => 
-    test.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    test.testType.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const [error, setError] = useState(null);
 
-  const handleTestCompletion = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    // Here you would typically send the test result to your backend
-    console.log(`Test ${selectedTest.id} completed:`, testResult)
-    setTestResult({ result: '', notes: '' })
-  }
+  const fetchAllLabTests = async () => {
+    try {
+      const response = await getRequest(Endpoint.GET_LAB_TECHNICIAN_TESTS);
+      console.log("response", response);
+      setPendingTests(response.pendingTests);
+      setCompletedTests(response.completedTests);
+    } catch (err) {
+      console.error('Error fetching patient profile:', err);
+      setError('Failed to load patient profile.');
+    }
+  };
+
+  useEffect(() => {
+    fetchAllLabTests();
+  }, []);
+
+
+  const handleTestCompletion = async (e) => {
+    e.preventDefault();
+
+    if (!selectedTest) {
+      console.error("No test selected.");
+      return;
+    }
+
+    try {
+      const requestedBody = {
+        testId: selectedTest._id, // Seçilen testin ID'si
+        result: testResult.result, // Test sonucu
+      };
+
+      console.log("Requested Body:", requestedBody);
+
+      const response = await putRequest(Endpoint.PUT_COMPLETE_TEST, requestedBody);
+
+      console.log("Test completion response:", response);
+
+      if (response) {
+        // Pending ve Completed listeleri yeniden çek
+        const updatedLabTests = await getRequest(Endpoint.GET_LAB_TECHNICIAN_TESTS);
+
+        setPendingTests(updatedLabTests.pendingTests);
+        setCompletedTests(updatedLabTests.completedTests);
+
+        // Test seçimini ve formu sıfırla
+        setSelectedTest(null);
+        setTestResult({ result: "" });
+
+        console.log("Test completed and lists updated successfully.");
+      } else {
+        throw new Error("Failed to complete test");
+      }
+    } catch (error) {
+      console.error("Error completing test:", error);
+      setError("Failed to complete test. Please try again.");
+    }
+  };
+
+
+  const handleDelete = async (labTestId) => {
+    console.log("ti", labTestId);
+    try {
+      // Silme isteğini backend'e gönder
+      const response = await deleteRequest(`/labtechnician/test/labTests/${labTestId}`);
+      console.log("reee", response);
+      if (response) {
+        toast.success('Lab test deleted successfully!');
+        fetchAllLabTests();
+        // Listeyi güncellemek için mevcut lab testleri yeniden yükle
+        //setLabTests((prevTests) => prevTests.filter(test => test._id !== labTestId));
+      } else {
+        const errorData = await response.json();
+        toast.error(`Failed to delete lab test: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error('Error deleting lab test:', error);
+      toast.error('An error occurred while deleting the lab test.');
+    }
+  };
+
+  const urgencyOrder = {
+    High: 1,
+    Medium: 2,
+    Low: 3,
+  };
+
+  const filteredPendingTests = Array.isArray(pendingTests)
+    ? pendingTests
+      .filter(test => {
+        const searchTermLower = searchTerm.toLowerCase();
+        return (
+          test.patient?.name.toLowerCase().includes(searchTermLower) || // Hasta adı
+          test.patient?.surname.toLowerCase().includes(searchTermLower) || // Hasta soyadı
+          test.testType?.toLowerCase().includes(searchTermLower) || // Test türü
+          test.urgency?.toLowerCase().includes(searchTermLower) // Aciliyet
+        );
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+
+        // Önce urgency seviyesine göre sıralama
+        if (urgencyOrder[a.urgency] !== urgencyOrder[b.urgency]) {
+          return urgencyOrder[a.urgency] - urgencyOrder[b.urgency];
+        }
+
+        // Aynı urgency seviyesine sahip olanları createdAt'e göre descending sırala
+        return dateB - dateA;
+      })
+    : [];
+
+
+
+  const filteredCompletedTests = Array.isArray(completedTests)
+    ? completedTests.filter(test => {
+      const searchTermLower = searchTerm.toLowerCase();
+      return (
+        test.patient?.name.toLowerCase().includes(searchTermLower) || // Hasta adı
+        test.patient?.surname.toLowerCase().includes(searchTermLower) || // Hasta soyadı
+        test.testType?.toLowerCase().includes(searchTermLower) || // Test türü
+        test.urgency?.toLowerCase().includes(searchTermLower) || // Aciliyet
+        test.result?.toLowerCase().includes(searchTermLower)
+      );
+    })
+    : [];
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md hidden md:block">
-        <div className="p-4">
-          <h2 className="text-2xl font-bold text-gray-800">Lab Management</h2>
-        </div>
-        <nav className="mt-6">
-          <Link href="/lab-staff-home" className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-200">
-            <Home className="w-5 h-5 mr-2" />
-            Dashboard
-          </Link>
-          <Link href="#" className="flex items-center px-4 py-2 mt-2 text-gray-700 bg-gray-200">
-            <Flask className="w-5 h-5 mr-2" />
-            Tests
-          </Link>
-          <Link href="#" className="flex items-center px-4 py-2 mt-2 text-gray-600 hover:bg-gray-200">
-            <Clipboard className="w-5 h-5 mr-2" />
-            Results
-          </Link>
-        </nav>
-      </aside>
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100"}text-gray-900`}>
+      <Sidebar />
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
-        {/* Header */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <h1 className="text-2xl font-semibold text-gray-900">Lab Tests</h1>
-            <Button variant="outline">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        </header>
+        <Header title="Tests" />
 
         {/* Tests Content */}
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -106,7 +188,7 @@ export default function LabStaffTests() {
               <TabsTrigger value="pending">Pending Tests</TabsTrigger>
               <TabsTrigger value="completed">Completed Tests</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="pending">
               <Card>
                 <CardHeader>
@@ -120,35 +202,47 @@ export default function LabStaffTests() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Patient Name</TableHead>
+                        <TableHead>Patient Surname</TableHead>
                         <TableHead>Test Type</TableHead>
                         <TableHead>Urgency</TableHead>
                         <TableHead>Requested By</TableHead>
                         <TableHead>Request Date</TableHead>
-                        <TableHead>Action</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredPendingTests.map((test) => (
-                        <TableRow key={test.id}>
-                          <TableCell>{test.patientName}</TableCell>
+                      {filteredPendingTests?.map((test) => (
+                        <TableRow key={test._id}>
+                          <TableCell>{test.patient.name}</TableCell>
+                          <TableCell>{test.patient.surname}</TableCell>
                           <TableCell>{test.testType}</TableCell>
                           <TableCell>
                             <Badge variant={test.urgency === 'High' ? 'destructive' : test.urgency === 'Medium' ? 'default' : 'secondary'}>
                               {test.urgency}
                             </Badge>
                           </TableCell>
-                          <TableCell>{test.requestedBy}</TableCell>
-                          <TableCell>{test.requestDate}</TableCell>
+                          <TableCell>{test.doctor.name}</TableCell>
                           <TableCell>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="outline" size="sm" onClick={() => setSelectedTest(test)}>
+                            {new Date(test.createdAt).toISOString().replace('T', ' ').slice(0, 16)}
+                          </TableCell>
+                          <TableCell>
+                            <Dialog
+                              isOpen={isDialogOpen} // Dialog açık/kapalı durumunu kontrol eder
+                              onClose={() => setIsDialogOpen(false)} // Dialog arka plana tıklandığında kapanır
+                            >                              
+                            <DialogTrigger asChild>
+                                <Button
+                                  className="text-blue-500 underline"
+                                  onClick={() => {setIsDialogOpen(true); setSelectedTest(test);}}
+                                >
                                   Complete Test
                                 </Button>
                               </DialogTrigger>
                               <DialogContent>
                                 <DialogHeader>
-                                  <DialogTitle>Complete Test for {selectedTest?.patientName}</DialogTitle>
+                                  <DialogTitle>
+                                    Complete Test for {selectedTest?.patient?.name || "Unknown"}
+                                  </DialogTitle>
                                 </DialogHeader>
                                 <form onSubmit={handleTestCompletion}>
                                   <div className="grid gap-4 py-4">
@@ -156,26 +250,13 @@ export default function LabStaffTests() {
                                       <Label htmlFor="result" className="text-right">
                                         Test Result
                                       </Label>
-                                      <Select onValueChange={(value) => setTestResult({...testResult, result: value})}>
-                                        <SelectTrigger className="col-span-3">
-                                          <SelectValue placeholder="Select result" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="normal">Normal</SelectItem>
-                                          <SelectItem value="abnormal">Abnormal</SelectItem>
-                                          <SelectItem value="inconclusive">Inconclusive</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                      <Label htmlFor="notes" className="text-right">
-                                        Additional Notes
-                                      </Label>
-                                      <Textarea 
-                                        id="notes" 
+                                      <Textarea
+                                        id="result"
                                         className="col-span-3"
-                                        value={testResult.notes}
-                                        onChange={(e) => setTestResult({...testResult, notes: e.target.value})}
+                                        value={testResult.result}
+                                        onChange={(e) =>
+                                          setTestResult((prev) => ({ ...prev, result: e.target.value }))
+                                        }
                                       />
                                     </div>
                                   </div>
@@ -185,7 +266,14 @@ export default function LabStaffTests() {
                                 </form>
                               </DialogContent>
                             </Dialog>
+                            <Button
+                              variant="primary"
+                              onClick={() => handleDelete(test._id)}
+                            >
+                              Delete
+                            </Button>
                           </TableCell>
+
                         </TableRow>
                       ))}
                     </TableBody>
@@ -193,7 +281,6 @@ export default function LabStaffTests() {
                 </CardContent>
               </Card>
             </TabsContent>
-
             <TabsContent value="completed">
               <Card>
                 <CardHeader>
@@ -207,21 +294,38 @@ export default function LabStaffTests() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Patient Name</TableHead>
+                        <TableHead>Patient Surname</TableHead>
                         <TableHead>Test Type</TableHead>
-                        <TableHead>Completed Date</TableHead>
+                        <TableHead>Requested By</TableHead>
                         <TableHead>Result</TableHead>
+                        <TableHead>Completed Date</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredCompletedTests.map((test) => (
-                        <TableRow key={test.id}>
-                          <TableCell>{test.patientName}</TableCell>
+                      {filteredCompletedTests?.map((test) => (
+                        <TableRow key={test._id}>
+                          <TableCell>{test.patient.name}</TableCell>
+                          <TableCell>{test.patient.surname}</TableCell>
                           <TableCell>{test.testType}</TableCell>
-                          <TableCell>{test.completedDate}</TableCell>
+                          <TableCell>{test.doctor.name}</TableCell>
                           <TableCell>
-                            <Badge variant={test.result === 'Normal' ? 'default' : 'destructive'}>
-                              {test.result}
-                            </Badge>
+                            {/* <Badge variant={test.result === 'Normal' ? 'default' : 'destructive'}> */}
+                            {test.result}
+                            {/* </Badge> */}
+                          </TableCell>
+                          <TableCell>
+                            {test.resultDate && !isNaN(new Date(test.resultDate).getTime())
+                              ? new Date(test.resultDate).toISOString().replace('T', ' ').slice(0, 16)
+                              : "Invalid Date"}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="primary"
+                              onClick={() => handleDelete(test._id)}
+                            >
+                              Delete
+                            </Button>
                           </TableCell>
                         </TableRow>
                       ))}

@@ -1,97 +1,191 @@
 [
-    {"_id":{"$oid":"6748a0de0a848b7acb803a0b"},"name":"Dahiliye (İç Hastalıkları)","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:02.47Z"},"updatedAt":{"$date":"2024-11-28T16:57:02.47Z"},"__v":0},
-    {"_id":{"$oid":"6748a0de0a848b7acb803a0d"},"name":"Kardiyoloji","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:02.615Z"},"updatedAt":{"$date":"2024-11-28T16:57:02.615Z"},"__v":0},
-    {"_id":{"$oid":"6748a0de0a848b7acb803a0f"},"name":"Ortopedi ve Travmatoloji","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:02.755Z"},"updatedAt":{"$date":"2024-11-28T16:57:02.755Z"},"__v":0},
-    {"_id":{"$oid":"6748a0de0a848b7acb803a11"},"name":"Kadın Hastalıkları ve Doğum","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:02.893Z"},"updatedAt":{"$date":"2024-11-28T16:57:02.893Z"},"__v":0},
-    {"_id":{"$oid":"6748a0df0a848b7acb803a13"},"name":"Kulak Burun Boğaz (KBB)","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:03.031Z"},"updatedAt":{"$date":"2024-11-28T16:57:03.031Z"},"__v":0},
-    {"_id":{"$oid":"6748a0df0a848b7acb803a15"},"name":"Göz Hastalıkları","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:03.17Z"},"updatedAt":{"$date":"2024-11-28T16:57:03.17Z"},"__v":0},
-    {"_id":{"$oid":"6748a0df0a848b7acb803a17"},"name":"Nöroloji","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:03.308Z"},"updatedAt":{"$date":"2024-11-28T16:57:03.308Z"},"__v":0},
-    {"_id":{"$oid":"6748a0df0a848b7acb803a19"},"name":"Psikiyatri","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:03.509Z"},"updatedAt":{"$date":"2024-11-28T16:57:03.509Z"},"__v":0},
-    {"_id":{"$oid":"6748a0df0a848b7acb803a1b"},"name":"Çocuk Sağlığı ve Hastalıkları","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:03.648Z"},"updatedAt":{"$date":"2024-11-28T16:57:03.648Z"},"__v":0},
-    {"_id":{"$oid":"6748a0df0a848b7acb803a1d"},"name":"Üroloji","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:03.786Z"},"updatedAt":{"$date":"2024-11-28T16:57:03.786Z"},"__v":0},
-    {"_id":{"$oid":"6748a0df0a848b7acb803a1f"},"name":"Dermatoloji (Cildiye)","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:03.924Z"},"updatedAt":{"$date":"2024-11-28T16:57:03.924Z"},"__v":0},
-    {"_id":{"$oid":"6748a0e00a848b7acb803a21"},"name":"Genel Cerrahi","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:04.064Z"},"updatedAt":{"$date":"2024-11-28T16:57:04.064Z"},"__v":0},
-    {"_id":{"$oid":"6748a0e00a848b7acb803a23"},"name":"Fizik Tedavi ve Rehabilitasyon","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:04.202Z"},"updatedAt":{"$date":"2024-11-28T16:57:04.202Z"},"__v":0},
-    {"_id":{"$oid":"6748a0e00a848b7acb803a25"},"name":"Enfeksiyon Hastalıkları","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:04.34Z"},"updatedAt":{"$date":"2024-11-28T16:57:04.34Z"},"__v":0},
-    {"_id":{"$oid":"6748a0e00a848b7acb803a27"},"name":"Göğüs Hastalıkları","hospital":{"$oid":"6748a0de0a848b7acb803a09"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:57:04.478Z"},"updatedAt":{"$date":"2024-11-28T16:57:04.478Z"},"__v":0},
-    {"_id":{"$oid":"6748a11b903b1ad6cc25333a"},"name":"Dahiliye (İç Hastalıkları)","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:03.514Z"},"updatedAt":{"$date":"2024-11-28T16:58:03.514Z"},"__v":0},
-    {"_id":{"$oid":"6748a11b903b1ad6cc25333c"},"name":"Kardiyoloji","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:03.677Z"},"updatedAt":{"$date":"2024-11-28T16:58:03.677Z"},"__v":0},
-    {"_id":{"$oid":"6748a11b903b1ad6cc25333e"},"name":"Ortopedi ve Travmatoloji","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:03.825Z"},"updatedAt":{"$date":"2024-11-28T16:58:03.825Z"},"__v":0},
-    {"_id":{"$oid":"6748a11b903b1ad6cc253340"},"name":"Kadın Hastalıkları ve Doğum","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:03.973Z"},"updatedAt":{"$date":"2024-11-28T16:58:03.973Z"},"__v":0},
-    {"_id":{"$oid":"6748a11c903b1ad6cc253342"},"name":"Cardiology","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":["674c5d3911124350927b2c7c"],"createdAt":{"$date":"2024-11-28T16:58:04.112Z"},"updatedAt":{"$date":"2024-11-28T16:58:04.112Z"},"__v":0},
-    {"_id":{"$oid":"6748a11c903b1ad6cc253344"},"name":"Göz Hastalıkları","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:04.25Z"},"updatedAt":{"$date":"2024-11-28T16:58:04.25Z"},"__v":0},
-    {"_id":{"$oid":"6748a11c903b1ad6cc253346"},"name":"Nöroloji","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:04.388Z"},"updatedAt":{"$date":"2024-11-28T16:58:04.388Z"},"__v":0},
-    {"_id":{"$oid":"6748a11c903b1ad6cc253348"},"name":"Psikiyatri","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:04.527Z"},"updatedAt":{"$date":"2024-11-28T16:58:04.527Z"},"__v":0},
-    {"_id":{"$oid":"6748a11c903b1ad6cc25334a"},"name":"Çocuk Sağlığı ve Hastalıkları","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:04.665Z"},"updatedAt":{"$date":"2024-11-28T16:58:04.665Z"},"__v":0},
-    {"_id":{"$oid":"6748a11c903b1ad6cc25334c"},"name":"Üroloji","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:04.803Z"},"updatedAt":{"$date":"2024-11-28T16:58:04.803Z"},"__v":0},
-    {"_id":{"$oid":"6748a11c903b1ad6cc25334e"},"name":"Dermatoloji (Cildiye)","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:04.945Z"},"updatedAt":{"$date":"2024-11-28T16:58:04.945Z"},"__v":0},
-    {"_id":{"$oid":"6748a11d903b1ad6cc253350"},"name":"Genel Cerrahi","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:05.085Z"},"updatedAt":{"$date":"2024-11-28T16:58:05.085Z"},"__v":0},
-    {"_id":{"$oid":"6748a11d903b1ad6cc253352"},"name":"Fizik Tedavi ve Rehabilitasyon","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:05.222Z"},"updatedAt":{"$date":"2024-11-28T16:58:05.222Z"},"__v":0},
-    {"_id":{"$oid":"6748a11d903b1ad6cc253354"},"name":"Enfeksiyon Hastalıkları","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:05.367Z"},"updatedAt":{"$date":"2024-11-28T16:58:05.367Z"},"__v":0},
-    {"_id":{"$oid":"6748a11d903b1ad6cc253356"},"name":"Göğüs Hastalıkları","hospital":{"$oid":"6748a11b903b1ad6cc253338"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:05.52Z"},"updatedAt":{"$date":"2024-11-28T16:58:05.52Z"},"__v":0},
-    {"_id":{"$oid":"6748a13773122dc7f0e7ae98"},"name":"Dahiliye (İç Hastalıkları)","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:31.713Z"},"updatedAt":{"$date":"2024-11-28T16:58:31.713Z"},"__v":0},
-    {"_id":{"$oid":"6748a13773122dc7f0e7ae9a"},"name":"Kardiyoloji","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:31.853Z"},"updatedAt":{"$date":"2024-11-28T16:58:31.853Z"},"__v":0},
-    {"_id":{"$oid":"6748a13773122dc7f0e7ae9c"},"name":"Ortopedi ve Travmatoloji","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:31.992Z"},"updatedAt":{"$date":"2024-11-28T16:58:31.992Z"},"__v":0},
-    {"_id":{"$oid":"6748a13873122dc7f0e7ae9e"},"name":"Kadın Hastalıkları ve Doğum","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:32.172Z"},"updatedAt":{"$date":"2024-11-28T16:58:32.172Z"},"__v":0},
-    {"_id":{"$oid":"6748a13873122dc7f0e7aea0"},"name":"Kulak Burun Boğaz (KBB)","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:32.313Z"},"updatedAt":{"$date":"2024-11-28T16:58:32.313Z"},"__v":0},
-    {"_id":{"$oid":"6748a13873122dc7f0e7aea2"},"name":"Göz Hastalıkları","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:32.452Z"},"updatedAt":{"$date":"2024-11-28T16:58:32.452Z"},"__v":0},
-    {"_id":{"$oid":"6748a13873122dc7f0e7aea4"},"name":"Nöroloji","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:32.591Z"},"updatedAt":{"$date":"2024-11-28T16:58:32.591Z"},"__v":0},
-    {"_id":{"$oid":"6748a13873122dc7f0e7aea6"},"name":"Psikiyatri","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:32.739Z"},"updatedAt":{"$date":"2024-11-28T16:58:32.739Z"},"__v":0},
-    {"_id":{"$oid":"6748a13873122dc7f0e7aea8"},"name":"Çocuk Sağlığı ve Hastalıkları","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:32.887Z"},"updatedAt":{"$date":"2024-11-28T16:58:32.887Z"},"__v":0},
-    {"_id":{"$oid":"6748a13973122dc7f0e7aeaa"},"name":"Üroloji","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:33.035Z"},"updatedAt":{"$date":"2024-11-28T16:58:33.035Z"},"__v":0},
-    {"_id":{"$oid":"6748a13973122dc7f0e7aeac"},"name":"Dermatoloji (Cildiye)","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:33.184Z"},"updatedAt":{"$date":"2024-11-28T16:58:33.184Z"},"__v":0},
-    {"_id":{"$oid":"6748a13973122dc7f0e7aeae"},"name":"Genel Cerrahi","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:33.332Z"},"updatedAt":{"$date":"2024-11-28T16:58:33.332Z"},"__v":0},
-    {"_id":{"$oid":"6748a13973122dc7f0e7aeb0"},"name":"Fizik Tedavi ve Rehabilitasyon","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:33.481Z"},"updatedAt":{"$date":"2024-11-28T16:58:33.481Z"},"__v":0},
-    {"_id":{"$oid":"6748a13973122dc7f0e7aeb2"},"name":"Enfeksiyon Hastalıkları","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:33.622Z"},"updatedAt":{"$date":"2024-11-28T16:58:33.622Z"},"__v":0},
-    {"_id":{"$oid":"6748a13973122dc7f0e7aeb4"},"name":"Göğüs Hastalıkları","hospital":{"$oid":"6748a13773122dc7f0e7ae96"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:58:33.76Z"},"updatedAt":{"$date":"2024-11-28T16:58:33.76Z"},"__v":0},
-    {"_id":{"$oid":"6748a16c6547baada5089ff5"},"name":"Ortopedi ve Travmatoloji","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:59:24.528Z"},"updatedAt":{"$date":"2024-11-28T16:59:24.528Z"},"__v":0},
-    {"_id":{"$oid":"6748a16c6547baada5089ff7"},"name":"Kadın Hastalıkları ve Doğum","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:59:24.676Z"},"updatedAt":{"$date":"2024-11-28T16:59:24.676Z"},"__v":0},
-    {"_id":{"$oid":"6748a16c6547baada5089ff9"},"name":"Kulak Burun Boğaz (KBB)","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:59:24.825Z"},"updatedAt":{"$date":"2024-11-28T16:59:24.825Z"},"__v":0},
-    {"_id":{"$oid":"6748a16c6547baada5089ffb"},"name":"Göz Hastalıkları","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:59:24.973Z"},"updatedAt":{"$date":"2024-11-28T16:59:24.973Z"},"__v":0},
-    {"_id":{"$oid":"6748a16d6547baada5089ffd"},"name":"Nöroloji","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:59:25.118Z"},"updatedAt":{"$date":"2024-11-28T16:59:25.118Z"},"__v":0},
-    {"_id":{"$oid":"6748a16d6547baada5089fff"},"name":"Psikiyatri","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:59:25.261Z"},"updatedAt":{"$date":"2024-11-28T16:59:25.261Z"},"__v":0},
-    {"_id":{"$oid":"6748a16d6547baada508a001"},"name":"Çocuk Sağlığı ve Hastalıkları","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:59:25.402Z"},"updatedAt":{"$date":"2024-11-28T16:59:25.402Z"},"__v":0},
-    {"_id":{"$oid":"6748a16d6547baada508a003"},"name":"Üroloji","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:59:25.541Z"},"updatedAt":{"$date":"2024-11-28T16:59:25.541Z"},"__v":0},
-    {"_id":{"$oid":"6748a16d6547baada508a005"},"name":"Dermatoloji (Cildiye)","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:59:25.679Z"},"updatedAt":{"$date":"2024-11-28T16:59:25.679Z"},"__v":0},
-    {"_id":{"$oid":"6748a16d6547baada508a007"},"name":"Genel Cerrahi","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:59:25.818Z"},"updatedAt":{"$date":"2024-11-28T16:59:25.818Z"},"__v":0},
-    {"_id":{"$oid":"6748a16d6547baada508a009"},"name":"Fizik Tedavi ve Rehabilitasyon","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:59:25.957Z"},"updatedAt":{"$date":"2024-11-28T16:59:25.957Z"},"__v":0},
-    {"_id":{"$oid":"6748a16e6547baada508a00b"},"name":"Enfeksiyon Hastalıkları","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:59:26.095Z"},"updatedAt":{"$date":"2024-11-28T16:59:26.095Z"},"__v":0},
-    {"_id":{"$oid":"6748a16e6547baada508a00d"},"name":"Göğüs Hastalıkları","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T16:59:26.233Z"},"updatedAt":{"$date":"2024-11-28T16:59:26.233Z"},"__v":0},
-    {"_id":{"$oid":"6748a74720829f93eb83dd03"},"name":"Kardiyovasküler Cerrahi","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[{"$oid":"67489e41c86125f3a203bebf"},{"$oid":"6744539d713440260ffc4d2c"}],"createdAt":{"$date":"2024-11-28T17:24:23.644Z"},"updatedAt":{"$date":"2024-11-28T17:24:23.644Z"},"__v":0},
-    {"_id":{"$oid":"6748f55be3a18cfa57201c7f"},"name":"Kardiyovasküler Cerrahi","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[{"$oid":"6748f48ce3a18cfa57201c6f"}],"createdAt":{"$date":"2024-11-28T22:57:31.02Z"},"updatedAt":{"$date":"2024-11-28T22:57:31.02Z"},"__v":0},
-    {"_id":{"$oid":"6748f5754c2f7dfd78aa98f4"},"name":"Kardiyovasküler Cerrahi","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[{"$oid":"6748f48ce3a18cfa57201c6f"}],"createdAt":{"$date":"2024-11-28T22:57:57.524Z"},"updatedAt":{"$date":"2024-11-28T22:57:57.524Z"},"__v":0},
-    {"_id":{"$oid":"6748f625e2b43ef7002abcae"},"name":"Kardiyovasküler Cerrahi","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[{"$oid":"6748f48ce3a18cfa57201c6f"}],"createdAt":{"$date":"2024-11-28T23:00:53.041Z"},"updatedAt":{"$date":"2024-11-28T23:00:53.041Z"},"__v":0},
-    {"_id":{"$oid":"6748f632e2cd3993592df55b"},"name":"Kardiyovasküler Cerrahi","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[{"$oid":"6748f48ce3a18cfa57201c6f"}],"createdAt":{"$date":"2024-11-28T23:01:06.883Z"},"updatedAt":{"$date":"2024-11-28T23:01:06.883Z"},"__v":0},
-    {"_id":{"$oid":"6748f64c37940f3ae49515ef"},"name":"Kardiyovasküler Cerrahi","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[{"$oid":"6748f48ce3a18cfa57201c6f"}],"createdAt":{"$date":"2024-11-28T23:01:32.895Z"},"updatedAt":{"$date":"2024-11-28T23:01:32.895Z"},"__v":0},
-    {"_id":{"$oid":"6748f695ad92b3b5e6032dfb"},"name":"Kardiyovasküler Cerrahi","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:02:45.318Z"},"updatedAt":{"$date":"2024-11-28T23:02:45.318Z"},"__v":0},
-    {"_id":{"$oid":"6748f6a68e769dcc8d18e91a"},"name":"Kardiyovasküler Cerrahi","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:03:02.509Z"},"updatedAt":{"$date":"2024-11-28T23:03:02.509Z"},"__v":0},
-    {"_id":{"$oid":"6748f6ad8e769dcc8d18e91f"},"name":"Kardiyovasküler Cerrahi","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:03:09.249Z"},"updatedAt":{"$date":"2024-11-28T23:03:09.249Z"},"__v":0},
-    {"_id":{"$oid":"6748f6d542102308ca2fab38"},"name":"Kardiyovasküler Cerrahi","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:03:49.656Z"},"updatedAt":{"$date":"2024-11-28T23:03:49.656Z"},"__v":0},
-    {"_id":{"$oid":"6748f6ec7ddf00246361c412"},"name":"Kardiyovasküler Cerrahi","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:04:12.051Z"},"updatedAt":{"$date":"2024-11-28T23:04:12.051Z"},"__v":0},
-    {"_id":{"$oid":"6748f762c0c25574fe588ff6"},"name":"Kardiyovasküler Cerrahi","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:06:10.815Z"},"updatedAt":{"$date":"2024-11-28T23:06:10.815Z"},"__v":0},
-    {"_id":{"$oid":"6748f9ecc5d8f5ed5595d001"},"name":"Kardiyovasküler Cerrahi","hospital":{"$oid":"6748a16c6547baada5089fef"},"doctors":[{"$oid":"6748f48ce3a18cfa57201c6f"}],"createdAt":{"$date":"2024-11-28T23:17:00.032Z"},"updatedAt":{"$date":"2024-11-28T23:17:00.032Z"},"__v":0},
-    {"_id":{"$oid":"6748fb3e92186e0302e622a7"},"name":"Dahiliye (İç Hastalıkları)","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[{"$oid":"6748f470e3a18cfa57201c6c"},{"$oid":"674c5d3911124350927b2c7c"}],"createdAt":{"$date":"2024-11-28T23:22:38.245Z"},"updatedAt":{"$date":"2024-12-01T12:58:46.266Z"},"__v":2},
-    {"_id":{"$oid":"6748fb3e92186e0302e622a9"},"name":"Kardiyoloji","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[{"$oid":"674c5d3911124350927b2c7c"}],"createdAt":{"$date":"2024-11-28T23:22:38.394Z"},"updatedAt":{"$date":"2024-12-01T13:02:38.595Z"},"__v":1},
-    {"_id":{"$oid":"6748fb3e92186e0302e622ab"},"name":"Ortopedi ve Travmatoloji","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:22:38.543Z"},"updatedAt":{"$date":"2024-11-28T23:22:38.543Z"},"__v":0},
-    {"_id":{"$oid":"6748fb3e92186e0302e622ad"},"name":"Kadın Hastalıkları ve Doğum","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:22:38.691Z"},"updatedAt":{"$date":"2024-11-28T23:22:38.691Z"},"__v":0},
-    {"_id":{"$oid":"6748fb3e92186e0302e622af"},"name":"Kulak Burun Boğaz (KBB)","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:22:38.838Z"},"updatedAt":{"$date":"2024-11-28T23:22:38.838Z"},"__v":0},
-    {"_id":{"$oid":"6748fb3e92186e0302e622b1"},"name":"Göz Hastalıkları","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:22:38.985Z"},"updatedAt":{"$date":"2024-11-28T23:22:38.985Z"},"__v":0},
-    {"_id":{"$oid":"6748fb3f92186e0302e622b3"},"name":"Nöroloji","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:22:39.134Z"},"updatedAt":{"$date":"2024-11-28T23:22:39.134Z"},"__v":0},
-    {"_id":{"$oid":"6748fb3f92186e0302e622b5"},"name":"Psikiyatri","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:22:39.282Z"},"updatedAt":{"$date":"2024-11-28T23:22:39.282Z"},"__v":0},
-    {"_id":{"$oid":"6748fb3f92186e0302e622b7"},"name":"Çocuk Sağlığı ve Hastalıkları","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:22:39.428Z"},"updatedAt":{"$date":"2024-11-28T23:22:39.428Z"},"__v":0},
-    {"_id":{"$oid":"6748fb3f92186e0302e622b9"},"name":"Üroloji","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:22:39.575Z"},"updatedAt":{"$date":"2024-11-28T23:22:39.575Z"},"__v":0},
-    {"_id":{"$oid":"6748fb3f92186e0302e622bb"},"name":"Dermatoloji (Cildiye)","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:22:39.72Z"},"updatedAt":{"$date":"2024-11-28T23:22:39.72Z"},"__v":0},
-    {"_id":{"$oid":"6748fb3f92186e0302e622bd"},"name":"Genel Cerrahi","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:22:39.869Z"},"updatedAt":{"$date":"2024-11-28T23:22:39.869Z"},"__v":0},
-    {"_id":{"$oid":"6748fb4092186e0302e622bf"},"name":"Fizik Tedavi ve Rehabilitasyon","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:22:40.016Z"},"updatedAt":{"$date":"2024-11-28T23:22:40.016Z"},"__v":0},
-    {"_id":{"$oid":"6748fb4092186e0302e622c1"},"name":"Enfeksiyon Hastalıkları","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:22:40.163Z"},"updatedAt":{"$date":"2024-11-28T23:22:40.163Z"},"__v":0},
-    {"_id":{"$oid":"6748fb4092186e0302e622c3"},"name":"Göğüs Hastalıkları","hospital":{"$oid":"6748fb3e92186e0302e622a5"},"doctors":[],"createdAt":{"$date":"2024-11-28T23:22:40.308Z"},"updatedAt":{"$date":"2024-11-28T23:22:40.308Z"},"__v":0},
-    {"_id":{"$oid":"675434d540385347ead9eb32"},"name":"Dahiliye (İç Hastalıkları)","hospital":{"$oid":"675434d540385347ead9eb30"},"doctors":[],"createdAt":{"$date":"2024-12-07T11:43:17.776Z"},"updatedAt":{"$date":"2024-12-07T11:43:17.776Z"},"__v":0},
-    {"_id":{"$oid":"675434d540385347ead9eb34"},"name":"Kardiyoloji","hospital":{"$oid":"675434d540385347ead9eb30"},"doctors":[],"createdAt":{"$date":"2024-12-07T11:43:17.946Z"},"updatedAt":{"$date":"2024-12-07T11:43:17.946Z"},"__v":0},
-    {"_id":{"$oid":"675434d640385347ead9eb36"},"name":"Ortopedi ve Travmatoloji","hospital":{"$oid":"675434d540385347ead9eb30"},"doctors":[],"createdAt":{"$date":"2024-12-07T11:43:18.098Z"},"updatedAt":{"$date":"2024-12-07T11:43:18.098Z"},"__v":0},
-    {"_id":{"$oid":"675434d640385347ead9eb38"},"name":"Kadın Hastalıkları ve Doğum","hospital":{"$oid":"675434d540385347ead9eb30"},"doctors":[],"createdAt":{"$date":"2024-12-07T11:43:18.262Z"},"updatedAt":{"$date":"2024-12-07T11:43:18.262Z"},"__v":0},
-    {"_id":{"$oid":"675434d640385347ead9eb3a"},"name":"Kulak Burun Boğaz (KBB)","hospital":{"$oid":"675434d540385347ead9eb30"},"doctors":[],"createdAt":{"$date":"2024-12-07T11:43:18.416Z"},"updatedAt":{"$date":"2024-12-07T11:43:18.416Z"},"__v":0},
-    {"_id":{"$oid":"675434d640385347ead9eb3c"},"name":"Göz Hastalıkları","hospital":{"$oid":"675434d540385347ead9eb30"},"doctors":[],"createdAt":{"$date":"2024-12-07T11:43:18.568Z"},"updatedAt":{"$date":"2024-12-07T11:43:18.568Z"},"__v":0},
-    {"_id":{"$oid":"675434d640385347ead9eb3e"},"name":"Nöroloji","hospital":{"$oid":"675434d540385347ead9eb30"},"doctors":[],"createdAt":{"$date":"2024-12-07T11:43:18.722Z"},"updatedAt":{"$date":"2024-12-07T11:43:18.722Z"},"__v":0},
-    {"_id":{"$oid":"675458c92f18ee2443a58fee"},"name":"Cardiology","hospital":{"$oid":"675434d540385347ead9eb30"},"doctors":["674c59623a24cac9869f808c"],"createdAt":{"$date":"2024-11-28T16:58:04.112Z"},"updatedAt":{"$date":"2024-11-28T16:58:04.112Z"},"__v":0}
-    
-    ]
+    {
+        "_id": {
+            "$oid": "6776f523e319b7fdab1acfee"
+        },
+        "name": "Cardiology",
+        "hospital": {
+            "$oid": "676db7afdc2d5a014902640f"
+        },
+        "doctors": [
+            {
+                "$oid": "676db51ddc2d5a0149025cfc"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:20:51.652Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:20:51.652Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f535e319b7fdab1ad0bc"
+        },
+        "name": "Neurology",
+        "hospital": {
+            "$oid": "676db85ddc2d5a0149026435"
+        },
+        "doctors": [
+            {
+                "$oid": "676db552dc2d5a0149025e22"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:21:09.693Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:21:09.693Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f56be319b7fdab1ad3be"
+        },
+        "name": "Orthopedics",
+        "hospital": {
+            "$oid": "676db85ddc2d5a0149026435"
+        },
+        "doctors": [
+            {
+                "$oid": "676db582dc2d5a0149025eb6"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:22:03.863Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:22:03.863Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f515e319b7fdab1acf37"
+        },
+        "name": "Dermatology",
+        "hospital": {
+            "$oid": "676db820dc2d5a014902642b"
+        },
+        "doctors": [
+            {
+                "$oid": "676db5e8dc2d5a01490260f9"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:20:37.124Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:20:37.124Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f53fe319b7fdab1ad173"
+        },
+        "name": "Ophthalmology",
+        "hospital": {
+            "$oid": "676db7c8dc2d5a0149026416"
+        },
+        "doctors": [
+            {
+                "$oid": "676db615dc2d5a014902618d"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:21:19.628Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:21:19.628Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f552e319b7fdab1ad24a"
+        },
+        "name": "Otolaryngology",
+        "hospital": {
+            "$oid": "676db7c8dc2d5a0149026416"
+        },
+        "doctors": [
+            {
+                "$oid": "676db66fdc2d5a01490262b9"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:21:38.439Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:21:38.439Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f55ee319b7fdab1ad2fc"
+        },
+        "name": "Psychiatry",
+        "hospital": {
+            "$oid": "676db820dc2d5a014902642b"
+        },
+        "doctors": [
+            {
+                "$oid": "676db6a7dc2d5a014902634d"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:21:50.809Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:21:50.809Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f57be319b7fdab1ad485"
+        },
+        "name": "Pediatrics",
+        "hospital": {
+            "$oid": "676db7e2dc2d5a014902641d"
+        },
+        "doctors": [
+            {
+                "$oid": "676db640dc2d5a0149026225"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:22:19.658Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:22:19.658Z"
+        },
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6776f595e319b7fdab1ad5c7"
+        },
+        "name": "Urology",
+        "hospital": {
+            "$oid": "676db7afdc2d5a014902640f"
+        },
+        "doctors": [
+            {
+                "$oid": "676db97edc2d5a0149026b13"
+            }
+        ],
+        "createdAt": {
+            "$date": "2025-01-02T20:22:45.859Z"
+        },
+        "updatedAt": {
+            "$date": "2025-01-02T20:22:45.859Z"
+        },
+        "__v": 0
+    }
+]

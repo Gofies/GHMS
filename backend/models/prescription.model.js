@@ -23,7 +23,17 @@ const prescription = new mongoose.Schema({
     status: {
         type: String,
         required: true
-    }
+    },
+    hospital: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Hospital',
+        required: true
+    },
+    doctor: { // Reçeteyi yazan doktor
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Doctor', // Doctor modeline referans
+        required: true
+    },
 }, { timestamps: true });
 
 const Prescription = mongoose.model('Prescription', prescription);

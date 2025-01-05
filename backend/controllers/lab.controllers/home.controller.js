@@ -46,17 +46,36 @@ const getHomePage = async (req, res) => {
 
 const completeTest = async (req, res) => {
     try {
-        const { testId } = req.body;
+        const { testId, result } = req.body; // testId ve result bilgilerini alın
 
-        await LabTest.findByIdAndUpdate(testId, { status: 'completed' });
+        // Testin mevcut olup olmadığını kontrol edin
+        const labTest = await LabTest.findById(testId);
+        if (!labTest) {
+            return res.status(404).json({ message: 'Lab test not found' });
+        }
 
-        return res.status(200).json({ message: 'Lab test completed successfully' });
+        // Testi güncelle
+        labTest.status = 'completed';
+        labTest.result = result || labTest.result; // Eğer bir result gönderildiyse güncelle
+        labTest.resultdate = new Date(); // Testin tamamlandığı zamanı kaydedin
+
+        await labTest.save(); // Değişiklikleri kaydet
+
+        // Güncel durumu yeniden al
+        const updatedLabTest = await LabTest.findById(testId)
+            .populate('patient', 'name surname') // Patient bilgilerini al
+            .populate('doctor', 'name surname'); // Doctor bilgilerini al
+
+        return res.status(200).json({ 
+            message: 'Lab test completed successfully', 
+            completedTest: updatedLabTest 
+        });
+    } catch (error) {
+        console.error('Error in completeTest controller:', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch (error) {
-        console.error(error, 'Error in completeTest controller');
-        res.status(500).send('Server Error');
-    }
-}
+};
+
 
 export { getHomePage, completeTest };
 

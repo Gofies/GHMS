@@ -20,7 +20,12 @@ const labTestSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
-    testtype: { // doctor, lab, radiology
+    labTechnician: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'LabTechnician',
+        required: true
+    },
+    testType: { // doctor, lab, radiology
         type: String,
     },
     resultdate: {

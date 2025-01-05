@@ -6,12 +6,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Switch } from "../../components/ui/patient/settings/Switch.jsx"
 import { CalendarDays, Home, User, FileText, PieChart, Settings, LogOut, Moon, Bell, Lock } from 'lucide-react'
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
-import Header from "../../components/ui/common/Header.jsx";
-import { useDarkMode } from '../../helpers/DarkModeContext';
+import Header from "../../components/ui/admin/Header.jsx";
+import { useDarkMode } from '../../helpers/DarkModeContext.js';
 import { Endpoint, getRequest, putRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/patient/appointment/Dialog.jsx"
-import { Input } from '../../components/ui/login/Input';
+import { Input } from "../../components/ui/patient/settings/Input.jsx"
 //import { Label } from '../../components/ui/login/Label';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
@@ -19,23 +19,8 @@ export default function SettingsPage() {
   const [language, setLanguage] = useState('english')
   const [notifications, setNotifications] = useState(true)
   const [twoFactor, setTwoFactor] = useState(false)
-
-  // const [darkMode, setDarkMode] = useState(
-  //   localStorage.getItem("darkMode") === "true" // Dark mode durumu yerel depolamadan alınır
-  // );
-  const [darkMode, setDarkMode] = useState(false);
-
-  const handleDarkModeToggle = (checked) => {
-    // setDarkMode(checked);
-    // if (checked) {
-    //   document.documentElement.classList.add("dark"); // `dark` sınıfını ekler
-    //   localStorage.setItem("darkMode", "true"); // Yerel depolamada dark mode'u aktif olarak kaydeder
-    // } else {
-    //   document.documentElement.classList.remove("dark"); // `dark` sınıfını kaldırır
-    //   localStorage.setItem("darkMode", "false"); // Yerel depolamada dark mode'u devre dışı bırakır
-    // }
-  };
-
+  const { darkMode, toggleDarkMode } = useDarkMode(); 
+  
   const handleLanguageChange = (value: string) => {
     setLanguage(value)
     // Here you would typically update the language in your app
@@ -72,7 +57,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
@@ -96,7 +81,7 @@ export default function SettingsPage() {
                 <Switch
                   id="dark-mode"
                   checked={darkMode}
-                  onCheckedChange={handleDarkModeToggle}
+                  onCheckedChange={toggleDarkMode}
                 />
               </div>
               {/* <div className="space-y-2">

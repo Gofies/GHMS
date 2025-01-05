@@ -1,43 +1,72 @@
-import React from "react";
+import { useDarkMode } from "../../../../helpers/DarkModeContext";
 
-export function Card({ children, className }) {
+export function Card({ children, className = "" }) {
+  const { darkMode } = useDarkMode();
   return (
-    <div className={`bg-white shadow rounded-lg p-4 ${className || ""}`}>
+    <div
+      className={`shadow-md rounded-lg p-6 transition-all duration-300 ${
+        darkMode
+          ? "bg-gray-800 text-white border border-gray-700"
+          : "bg-white text-gray-900 border border-gray-200"
+      } ${className}`}
+    >
       {children}
     </div>
   );
 }
 
-export function CardHeader({ children, className }) {
+export function CardHeader({ children, className = "" }) {
+  const { darkMode } = useDarkMode();
   return (
-    <div className={`border-b pb-2 ${className || ""}`}>
+    <div
+      className={`pb-4 mb-4 border-b transition-all duration-300 ${
+        darkMode ? "border-gray-700" : "border-gray-200"
+      } ${className}`}
+    >
       {children}
     </div>
   );
 }
 
-export function CardTitle({ children, className }) {
-  return (
-    <h2 className={`text-xl font-bold ${className || ""}`}>{children}</h2>
-  );
+export function CardContent({ children, className = "" }) {
+  return <div className={className}>{children}</div>;
 }
 
-export function CardDescription({ children, className }) {
+export function CardFooter({ children, className = "" }) {
+  const { darkMode } = useDarkMode();
   return (
-    <p className={`text-gray-600 ${className || ""}`}>{children}</p>
-  );
-}
-
-export function CardContent({ children, className }) {
-  return (
-    <div className={`mt-4 ${className || ""}`}>{children}</div>
-  );
-}
-
-export function CardFooter({ children, className }) {
-  return (
-    <div className={`border-t pt-2 mt-4 ${className || ""}`}>
+    <div
+      className={`pt-4 mt-4 border-t transition-all duration-300 ${
+        darkMode ? "border-gray-700" : "border-gray-200"
+      } ${className}`}
+    >
       {children}
     </div>
+  );
+}
+
+export function CardTitle({ children, className = "" }) {
+  const { darkMode } = useDarkMode();
+  return (
+    <h2
+      className={`text-xl font-bold transition-all duration-300 ${
+        darkMode ? "text-white" : "text-gray-900"
+      } ${className}`}
+    >
+      {children}
+    </h2>
+  );
+}
+
+export function CardDescription({ children, className = "" }) {
+  const { darkMode } = useDarkMode();
+  return (
+    <p
+      className={`transition-all duration-300 ${
+        darkMode ? "text-gray-400" : "text-gray-600"
+      } ${className}`}
+    >
+      {children}
+    </p>
   );
 }

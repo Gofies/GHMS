@@ -6,50 +6,39 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/patient/appointment/Table.jsx"
 import { Plus, Info } from 'lucide-react'
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
-import Header from "../../components/ui/common/Header.jsx";
+import Header from "../../components/ui/admin/Header.jsx";
 import { Input } from "../../components/ui/patient/profile/Input.jsx"
 import { Label } from "../../components/ui/patient/profile/Label.jsx"
 import { Endpoint, postRequest, getRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify'
-
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useDarkMode } from '../../helpers/DarkModeContext.js';
 const cities = [
-  "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Ankara",
-  "Antalya", "Ardahan", "Artvin", "Aydın", "Balıkesir", "Bartın", "Batman",
-  "Bayburt", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale",
-  "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Düzce", "Edirne", "Elazığ", "Erzincan",
-  "Erzurum", "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari", "Hatay",
-  "Iğdır", "Isparta", "İstanbul", "İzmir", "Kahramanmaraş", "Karabük", "Karaman",
-  "Kars", "Kastamonu", "Kayseri", "Kırıkkale", "Kırklareli", "Kırşehir", "Kilis",
-  "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Mardin", "Mersin",
-  "Muğla", "Muş", "Nevşehir", "Niğde", "Ordu", "Osmaniye", "Rize", "Sakarya",
-  "Samsun", "Siirt", "Sinop", "Sivas", "Şanlıurfa", "Şırnak", "Tekirdağ",
-  "Tokat", "Trabzon", "Tunceli", "Uşak", "Van", "Yalova", "Yozgat", "Zonguldak"
+  "New York",
+  "San Francisco",
+  "Baltimore",
+  "Chicago",
+  "Los Angeles",
+  "Houston"
 ];
 
 const polyclinics = [
-  "Cardiology",
-  "Dermatology",
-  "Endocrinology",
-  "Gastroenterology",
-  "Neurology",
-  "Oncology",
-  "Ophthalmology",
-  "Orthopedics",
-  "Pediatrics",
-  "Psychiatry",
-  "Pulmonology",
-  "Rheumatology",
   "Urology",
-  "Gynecology",
-  "Nephrology",
-  "Hematology",
-  "Infectious Diseases",
-  "Otolaryngology (ENT)",
-  "General Surgery",
-  "Plastic Surgery"
+  "Pediatrics",
+  "Neurology",
+  "Psychiatry",
+  "Cardiology",
+  "Ophthalmology",
+  "Otolaryngology",
+  "Orthopedics",
+  "Dermatology"
 ];
 
 export default function NewAppointmentsPage() {
+  const { darkMode, toggleDarkMode } = useDarkMode(); 
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     if (!selectedDoctor || !selectedDate || !selectedTimeSlot) {
@@ -73,7 +62,8 @@ export default function NewAppointmentsPage() {
       if (response) {
         //const responseData = await response.json();
         toast("Appointment successfully created!");
-        console.log("API Response:", response);
+        const basePath = location.pathname.replace(/\/new$/, '');
+        navigate(basePath);
       } else {
         console.error("Failed to create appointment:", response.statusText);
         toast("Failed to create appointment. Please try again.");
@@ -230,7 +220,6 @@ export default function NewAppointmentsPage() {
     console.log("API call initiated");
     try {
       console.log("Fetching data...");
-      console.log("p", params);
       const response = await getRequest("/patient/appointments/new/", params);
 
       if (response) {
@@ -264,7 +253,7 @@ export default function NewAppointmentsPage() {
 
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <Header title="New Appointment" />
@@ -275,7 +264,7 @@ export default function NewAppointmentsPage() {
             </CardHeader>
             <CardContent className="grid gap-4">
               <div className="grid gap-2 w-full">
-                <Label className="block text-sm font-medium text-gray-700">Select a City</Label>
+                <Label className="block text-sm font-medium">Select a City</Label>
                 <div className="relative">
                   <Select className="w-full max-w-md"> {/* Sabit genişlik */}
                     <SelectTrigger

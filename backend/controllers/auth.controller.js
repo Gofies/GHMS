@@ -66,28 +66,28 @@ const login = async (req, res) => {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
             generateJwt(patient._id, res);
-            return res.status(200).json({ message: 'Login successful', id: patient._id, role: patient.role });
+            return res.status(200).json({ message: 'Login successful', id: patient._id, role: patient.role, name: patient.name, surname: patient.surname });
         } else if (doctor) {
             const validPassword = await bcryptjs.compare(password, doctor.password);
             if (!validPassword) {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
             generateJwt(doctor._id, res);
-            return res.status(200).json({ message: 'Login successful', id: doctor._id, role: doctor.role });
+            return res.status(200).json({ message: 'Login successful', id: doctor._id, role: doctor.role, name: doctor.name, surname: doctor.surname });
         } else if (admin) {
             const validPassword = await bcryptjs.compare(password, admin.password);
             if (!validPassword) {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
             generateJwt(admin._id, res);
-            return res.status(200).json({ message: 'Login successful', id: admin._id, role: admin.role });
+            return res.status(200).json({ message: 'Login successful', id: admin._id, role: admin.role, name: admin.name, surname: admin.surname });
         } else if (labTechnician) {
             const validPassword = await bcryptjs.compare(password, labTechnician.password);
             if (!validPassword) {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
             generateJwt(labTechnician._id, res);
-            return res.status(200).json({ message: 'Login successful', id: labTechnician._id, role: labTechnician.role });
+            return res.status(200).json({ message: 'Login successful', id: labTechnician._id, role: labTechnician.role, name: labTechnician.name, surname: labTechnician.surname });
         }
 
     } catch (error) {
@@ -107,8 +107,6 @@ const logout = (req, res) => {
     }
 };
 
-
-
 const refreshToken = async (req, res) => {
     try {
         const { refreshToken } = req.cookies;
@@ -122,21 +120,34 @@ const refreshToken = async (req, res) => {
                 return res.status(403).json({ message: 'Invalid refresh token' });
             }
 
-            // Find user based on decoded user ID from the refresh token
-            const patient = await Patient.findById(decoded.id).select('-password');
+            // Kullanıcıyı kontrol etmek için modelleri sırayla kontrol ediyoruz
+            let user = await Patient.findById(decoded.id).select('-password');
 
-            if (!patient) {
+            if (!user) {
+                user = await Doctor.findById(decoded.id).select('-password');
+            }
+
+            if (!user) {
+                user = await Admin.findById(decoded.id).select('-password');
+            }
+
+            if (!user) {
+                user = await LabTechnician.findById(decoded.id).select('-password');
+            }
+
+            if (!user) {
                 return res.status(401).json({ message: 'Unauthorized' });
             }
 
-            // Generate new tokens and send them in response
-            generateJwt(patient._id, res);
+            // Yeni token'lar oluşturulup gönderilir
+            generateJwt(user._id, res);
             return res.status(200).json({ message: 'Token refreshed' });
         });
     } catch (error) {
-        console.log('Error in refresh token endpoint: ', error.message);
+        console.error('Error in refresh token endpoint: ', error.message);
         return res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
+
 
 export { login, logout, refreshToken, adminSignup };
