@@ -5,10 +5,10 @@ import { Input } from '../../../components/ui/login/Input';
 import { Label } from '../../../components/ui/login/Label';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { NavLink } from "react-router-dom";
-import { Images } from "../../../assets/images/Images";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { login, clearError } from '../../../redux/authSlice';
+import gofiesBg from "../../../assets/images/gofies_bg.jpeg";
 
 export default function LoginPage() {
 
@@ -56,7 +56,7 @@ export default function LoginPage() {
       <div
         className="absolute inset-0 bg-cover bg-center z-0"
         style={{
-          backgroundImage: `url(${Images.LOGIN_PAGE_BACKGROUND_IMAGE})`,
+          backgroundImage: `url(${gofiesBg})`,
           filter: "blur(5px)"
         }}
       ></div>
