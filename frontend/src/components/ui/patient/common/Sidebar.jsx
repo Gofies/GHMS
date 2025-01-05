@@ -13,7 +13,7 @@ export default function Sidebar() {
 
     const { userId } = useSelector((state) => state.auth);
 
-    const [currentPath, setCurrentPath] = useState(location.pathname); // Sayfa değişim kontrolü
+    const [currentPath, setCurrentPath] = useState(location.pathname);
 
 
     const links = [
@@ -49,12 +49,11 @@ export default function Sidebar() {
         },
     ];
 
-       // Eğer pathname değişirse "soft refresh" yap
-       useEffect(() => {
-        if (location.pathname !== currentPath) {
-            setCurrentPath(location.pathname); // Path güncelleniyor
-            window.location.reload(); // Sayfa yenileniyor
-        }
+    useEffect(() => {
+      if (location.pathname !== currentPath) {
+          setCurrentPath(location.pathname);
+          window.location.reload(); 
+      }
     }, [location.pathname]);
 
     return (

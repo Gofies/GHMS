@@ -1,4 +1,3 @@
-// Button.js
 import React from 'react';
 
 export const Button = ({ children, onClick, variant = 'default', size = 'md' }) => {

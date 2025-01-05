@@ -120,7 +120,6 @@ const refreshToken = async (req, res) => {
                 return res.status(403).json({ message: 'Invalid refresh token' });
             }
 
-            // Kullanıcıyı kontrol etmek için modelleri sırayla kontrol ediyoruz
             let user = await Patient.findById(decoded.id).select('-password');
 
             if (!user) {
@@ -139,7 +138,6 @@ const refreshToken = async (req, res) => {
                 return res.status(401).json({ message: 'Unauthorized' });
             }
 
-            // Yeni token'lar oluşturulup gönderilir
             generateJwt(user._id, res);
             return res.status(200).json({ message: 'Token refreshed' });
         });
@@ -148,6 +146,5 @@ const refreshToken = async (req, res) => {
         return res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
-
 
 export { login, logout, refreshToken, adminSignup };

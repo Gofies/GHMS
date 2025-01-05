@@ -23,7 +23,16 @@ export default function AdminHospitalManagementPage() {
   const [labTechnicians, setLabTechnicians] = useState([]);
   const [selectedLabTechnicians, setSelectedLabTechnicians] = useState([]);
   const [combinedLabTechnicians, setCombinedLabTechnicians] = useState([]);
-  const { darkMode } = useDarkMode(); // Context'ten alınan değerler
+  const { darkMode } = useDarkMode();
+
+  const cities = [
+    "New York",
+    "San Francisco",
+    "Baltimore",
+    "Chicago",
+    "Los Angeles",
+    "Houston"
+  ];
 
   const fetchHospitals = async () => {
     try {
@@ -43,10 +52,8 @@ export default function AdminHospitalManagementPage() {
   const fetchLabTechnicians = async () => {
     try {
       const response = await getRequest(Endpoint.GET_ADMIN_LAB_TECHNICIAN);
-      console.log("raa", response);
       if (response) {
         setLabTechnicians(response.labTechnicians);
-        //setFilteredHospitals(response.hospitals);
       } else {
         toast.error('Failed to fetch labtechs.');
       }
@@ -66,6 +73,8 @@ export default function AdminHospitalManagementPage() {
     polyclinics: []
   });
 
+  const [error, setError] = useState(null);
+
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormData(prev => ({
@@ -77,7 +86,7 @@ export default function AdminHospitalManagementPage() {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        await fetchHospitals(); // Hastane verilerini getir
+        await fetchHospitals();
         await fetchLabTechnicians();
       } catch (error) {
         console.error("Error fetching initial data:", error);
@@ -86,24 +95,18 @@ export default function AdminHospitalManagementPage() {
     fetchInitialData();
   }, []);
 
-
   const navigate = useNavigate();
   const location = useLocation();
-
 
   const handleCreateHospital = async (e) => {
     e.preventDefault();
 
     try {
-      console.log(formData);
       const responseData = await postRequest(Endpoint.GET_ADMIN_HOSPITAL, formData);
       if (responseData) {
         toast.success("Hospital created successfully!");
-        if (toast.success) {
-          setTimeout(() => {
-            navigate(0); // Refresh the page or redirect
-          }, 1000);
-        }
+        setIsDialogOpen(false);
+        fetchHospitals();
       } else {
         toast.error("An error occurred during hospital creation.");
       }
@@ -119,15 +122,16 @@ export default function AdminHospitalManagementPage() {
         hospital.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         hospital.email.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      setFilteredHospitals(filtered); // Filtrelenmiş listeyi güncelle
+      setFilteredHospitals(filtered);
     } else {
-      setFilteredHospitals(hospitals); // Tüm listeyi göster
+      setFilteredHospitals(hospitals);
     }
   }, [searchTerm, hospitals]);
 
   const handleLocationChange = (hospitalId) => {
     const pathParts = window.location.pathname.split("/");
     const adminId = pathParts[2];
+    
     navigate(`/admin/${adminId}/polyclinic-management/${hospitalId}`);
   };
 
@@ -148,24 +152,19 @@ export default function AdminHospitalManagementPage() {
   };
 
   const handleEditHospital = async (hospital) => {
-    // Poliklinik bilgilerini doldur
-     setSelectedHospital(hospital);
-    //setName(polyclinic.name);
-    setSelectedLabTechnicians(hospital.labTechnicians || []); // Seçili doktorları doldur
+    setSelectedHospital(hospital);
+    setSelectedLabTechnicians(hospital.labTechnicians || []);
 
     try {
-      // Inactive doktorları getir
       const response = await getRequest(Endpoint.GET_ADMIN_LAB_TECHNICIAN);
       if (response) {
-       const inactiveLabTechnicians = response.labTechnicians.filter(tech => !tech.hospital);
+        const inactiveLabTechnicians = response.labTechnicians.filter(tech => !tech.hospital);
         const combined = [
           ...inactiveLabTechnicians,
           ...response.labTechnicians.filter(tech => hospital.labTechnicians.includes(tech._id)),
         ];
-
-        // combinedDoctors state'ini güncelle
-       setCombinedLabTechnicians(combined);
-       setLabTechnicians(response.labTechnicians)
+        setCombinedLabTechnicians(combined);
+        setLabTechnicians(response.labTechnicians)
 
       } else {
         toast.error('Failed to fetch labtechs.');
@@ -176,45 +175,35 @@ export default function AdminHospitalManagementPage() {
     }
   };
 
-
   useEffect(() => {
     if (selectedHospital) {
       setSelectedLabTechnicians(selectedHospital.labTechnicians || []);
     }
   }, [selectedHospital]);
 
-  
-
   const handleUpdateHospital = async (e) => {
     e.preventDefault();
-  
+
     const requestBody = {
       name: selectedHospital.name,
       address: selectedHospital.address,
       establishmentdate: selectedHospital.establishmentdate,
       phone: selectedHospital.phone,
       email: selectedHospital.email,
-      polyclinics: selectedHospital.polyclinics, // Polyclinic listesi
-      doctors: selectedHospital.doctors, // Doctor listesi
-      labTechnicians: selectedLabTechnicians || [], // Güncellenmiş laboratuvar teknisyenleri
+      polyclinics: selectedHospital.polyclinics,
+      doctors: selectedHospital.doctors,
+      labTechnicians: selectedLabTechnicians || [],
     };
-  
+
     try {
-      console.log("Request Body:", requestBody);
-      const responseData = await putRequest(
-        `${Endpoint.GET_ADMIN_HOSPITAL}/${selectedHospital._id}`,
-        requestBody
-      );
+      const responseData = await putRequest(`${Endpoint.GET_ADMIN_HOSPITAL}/${selectedHospital._id}`, requestBody);
       if (responseData) {
         toast.success("Hospital updated successfully!");
-  
-        // Güncellemeden sonra hospital listesini yeniden fetch et
         await fetchHospitals();
-  
-        // Dialog kapatma veya state sıfırlama işlemleri
         setSelectedHospital(null);
         setSelectedLabTechnicians([]);
         setCombinedLabTechnicians([]);
+        setIsDialogOpen(false);
       } else {
         toast.error("An error occurred during hospital update.");
       }
@@ -223,40 +212,31 @@ export default function AdminHospitalManagementPage() {
       toast.error("An unexpected error occurred.");
     }
   };
-  
-  
 
   const handleLabTechnicianSelect = (techId) => {
     setSelectedLabTechnicians((prev) => {
       let updatedLabTechs;
       if (prev?.includes(techId)) {
-        // Eğer zaten seçilmişse, çıkar
         updatedLabTechs = prev.filter((id) => id !== techId);
       } else {
-        // Eğer seçili değilse, ekle
         updatedLabTechs = [...prev, techId];
       }
-  
-      // selectedHospital'ın labTechnicians alanını güncelle
       setSelectedHospital((prevHospital) => ({
         ...prevHospital,
         labTechnicians: updatedLabTechs,
       }));
-  
+
       return updatedLabTechs;
     });
   };
-  
-  
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false); 
 
   return (
-    <div className={`flex h-screen ${darkMode ? "bg-gray-900 " : "bg-gray-100" }text-gray-900`}>
+    <div className={`flex h-screen ${darkMode ? "bg-gray-900 " : "bg-gray-100"}text-gray-900`}>
       <Sidebar />
-
       <main className="flex-1 overflow-y-auto">
         <Header title="Hospital Management" />
-
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center">
@@ -271,80 +251,80 @@ export default function AdminHospitalManagementPage() {
             </div>
             <Dialog>
               <DialogTrigger asChild>
-                <Button>
+                <Button onClick={() => setIsDialogOpen(true)}> 
                   <Plus className="w-4 h-4 mr-2" />
                   Create Hospital
                 </Button>
               </DialogTrigger>
-              <DialogContent className="dialog-large">
-                <DialogHeader>
-                  <DialogTitle>Create New Hospital</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleCreateHospital}>
-                  <div className="grid grid-cols-2 gap-6 py-4">
-                    <div>
-                      <Label htmlFor="name">Name</Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        placeholder="Hospital Name"
-                        required
-                        className="w-full"
-                      />
+              {isDialogOpen && ( 
+                <DialogContent className="dialog-large">
+                  <DialogHeader>
+                    <DialogTitle>Create New Hospital</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleCreateHospital}>
+                    <div className="grid grid-cols-2 gap-6 py-4">
+                      <div>
+                        <Label htmlFor="name">Name</Label>
+                        <Input
+                          id="name"
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          placeholder="Hospital Name"
+                          required
+                          className="w-full"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="address">Address</Label>
+                        <Input
+                          id="address"
+                          value={formData.address}
+                          onChange={handleInputChange}
+                          placeholder="Full Address"
+                          required
+                          className="w-full"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="email">E-Mail</Label>
+                        <Input
+                          id="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          placeholder="example@domain.com"
+                          required
+                          className="w-full"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="phone">Phone</Label>
+                        <Input
+                          id="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          placeholder="0212 XXX XX XX"
+                          required
+                          className="w-full"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="establishmentdate">Establishment Date</Label>
+                        <Input
+                          id="establishmentdate"
+                          value={formData.establishmentdate}
+                          onChange={handleInputChange}
+                          placeholder="YYYY"
+                          required
+                          className="w-full"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <Label htmlFor="address">Address</Label>
-                      <Input
-                        id="address"
-                        value={formData.address}
-                        onChange={handleInputChange}
-                        placeholder="Full Address"
-                        required
-                        className="w-full"
-                      />
+                    <div className="flex justify-end">
+                      <Button type="submit">Create Hospital</Button>
                     </div>
-                    <div>
-                      <Label htmlFor="email">E-Mail</Label>
-                      <Input
-                        id="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="example@domain.com"
-                        required
-                        className="w-full"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="phone">Phone</Label>
-                      <Input
-                        id="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        placeholder="0212 XXX XX XX"
-                        required
-                        className="w-full"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="establishmentdate">Establishment Date</Label>
-                      <Input
-                        id="establishmentdate"
-                        value={formData.establishmentdate}
-                        onChange={handleInputChange}
-                        placeholder="YYYY"
-                        required
-                        className="w-full"
-                      />
-                    </div>
-
-                  </div>
-                  <div className="flex justify-end">
-                    <Button type="submit">Create Hospital</Button>
-                  </div>
-                </form>
-              </DialogContent>
+                  </form>
+                </DialogContent>
+              )}
             </Dialog>
           </div>
           <Card>
@@ -467,43 +447,45 @@ export default function AdminHospitalManagementPage() {
                                           />
                                         </div>
                                         <div>
-                                          <Label htmlFor="phone">Establishment Date</Label>
+                                          <Label htmlFor="establishmentdate">Establishment Date</Label>
                                           <Input
-                                            id="establishmentDate"
-                                            value={selectedHospital.establishmentdate}
-                                            onChange={(e) =>
+                                            id="establishmentdate"
+                                            type="number" 
+                                            value={selectedHospital.establishmentdate?.split('-')[0] || ""}
+                                            onChange={(e) => {
+                                              const year = e.target.value;
                                               setSelectedHospital((prev) => ({
                                                 ...prev,
-                                                establishmentdate: e.target.value,
-                                              }))
-                                            }
-                                            placeholder="XXXX"
+                                                establishmentdate: `${year}-01-01T00:00:00.000Z`, 
+                                              }));
+                                            }}
+                                            placeholder="YYYY"
                                             required
                                             className="w-full"
                                           />
                                         </div>
                                         <div>
-                                    <Label>Lab Techs</Label>
-                                    <div className="border p-2 rounded">
-                                      {combinedLabTechnicians?.map((tech) => (
-                                        <div key={tech._id} className="flex items-center mb-2">
-                                          <input
-                                            type="checkbox"
-                                            id={tech._id}
-                                            checked={selectedLabTechnicians?.includes(tech._id)}
-                                            onChange={() => handleLabTechnicianSelect(tech._id)}
-                                            className="mr-2"
-                                          />
-                                          <label htmlFor={tech._id} className="text-sm">
-                                            {tech.name}
-                                          </label>
+                                          <Label>Lab Techs</Label>
+                                          <div className="border p-2 rounded">
+                                            {combinedLabTechnicians?.map((tech) => (
+                                              <div key={tech._id} className="flex items-center mb-2">
+                                                <input
+                                                  type="checkbox"
+                                                  id={tech._id}
+                                                  checked={selectedLabTechnicians?.includes(tech._id)}
+                                                  onChange={() => handleLabTechnicianSelect(tech._id)}
+                                                  className="mr-2"
+                                                />
+                                                <label htmlFor={tech._id} className="text-sm">
+                                                  {tech.name}
+                                                </label>
+                                              </div>
+                                            ))}
+                                          </div>
+                                          <p className="text-sm text-gray-500">
+                                            Select lab techs for this hospital
+                                          </p>
                                         </div>
-                                      ))}
-                                    </div>
-                                    <p className="text-sm text-gray-500">
-                                      Select lab techs for this hospital
-                                    </p>
-                                  </div>
                                       </div>
                                       <div className="flex justify-end">
                                         <Button type="submit">Save Changes</Button>

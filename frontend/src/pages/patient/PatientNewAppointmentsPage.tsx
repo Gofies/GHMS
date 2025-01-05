@@ -1,18 +1,15 @@
 import { useState, useEffect } from 'react'
 import { Button } from "../../components/ui/patient/appointment/Button.jsx"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/patient/appointment/Card.jsx"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/patient/appointment/Dialog.jsx"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/patient/appointment/Select.jsx"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/patient/appointment/Table.jsx"
-import { Plus, Info } from 'lucide-react'
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
-import { Input } from "../../components/ui/patient/profile/Input.jsx"
 import { Label } from "../../components/ui/patient/profile/Label.jsx"
 import { Endpoint, postRequest, getRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDarkMode } from '../../helpers/DarkModeContext.js';
+
 const cities = [
   "New York",
   "San Francisco",
@@ -35,42 +32,39 @@ const polyclinics = [
 ];
 
 export default function NewAppointmentsPage() {
-  const { darkMode, toggleDarkMode } = useDarkMode(); 
+
+  const { darkMode, toggleDarkMode } = useDarkMode();
 
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
     if (!selectedDoctor || !selectedDate || !selectedTimeSlot) {
-      toast("Please select a doctor, date, and time slot before submitting.");
+      toast.error("Please select a doctor, date, and time slot before submitting.");
       return;
     }
 
     const appointmentData = {
-      doctorId: selectedDoctor._id, 
-      date: selectedDate, 
-      time: selectedTimeSlot, 
+      doctorId: selectedDoctor._id,
+      date: selectedDate,
+      time: selectedTimeSlot,
       type: "doctor",
       testType: "aaa"
     };
 
-    console.log("Submitting Appointment:", appointmentData);
-
     try {
       const response = await postRequest("/patient/appointments/new", appointmentData);
-      console.log("r", response);
       if (response) {
-        //const responseData = await response.json();
-        toast("Appointment successfully created!");
+        toast.success("Appointment successfully created!");
         const basePath = location.pathname.replace(/\/new$/, '');
         navigate(basePath);
       } else {
         console.error("Failed to create appointment:", response.statusText);
-        toast("Failed to create appointment. Please try again.");
+        toast.error("Failed to create appointment. Please try again.");
       }
     } catch (error) {
       console.error("Error creating appointment:", error);
-      toast("An error occurred while creating the appointment.");
+      toast.error("An error occurred while creating the appointment.");
     }
   };
 
@@ -91,7 +85,6 @@ export default function NewAppointmentsPage() {
   const [selectedDoctorDates, setSelectedDoctorDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
-
 
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
@@ -159,101 +152,81 @@ export default function NewAppointmentsPage() {
     }
   };
 
-
   const handleHospitalSelect = (hospitalId) => {
-    resetSelections("hospital"); // Altındaki seçimleri temizle
-
+    resetSelections("hospital");
     setSelectedHospital(hospitalId);
 
-    // queryResults'tan seçilen hastanenin doktorlarını filtrele
     const selectedDoctors = queryResults
-      .filter((item) => item.hospital._id === hospitalId) // Seçilen hastane ID'sine göre filtrele
-      .flatMap((item) => item.doctors); // Doktorları listele
+      .filter((item) => item.hospital._id === hospitalId)
+      .flatMap((item) => item.doctors);
 
-    console.log("Selected Doctors:", selectedDoctors);
     setDoctors(selectedDoctors);
   };
 
   const [queryResults, setQueryResults] = useState([]);
 
-
   const handleDoctorSelect = (doctor) => {
-    resetSelections("doctor"); // Altındaki seçimleri temizle
-    setSelectedDoctor(doctor); // Doktor objesini kaydet
-    setSelectedSchedule(doctor.schedule.map((schedule) => schedule)); // Doktorun programını kaydet
-    console.log(doctor.schedule)
-    setSelectedDoctorDates(doctor.schedule.map((schedule) => schedule.date)); // Doktorun tarihlerini al
-    setIsDoctorDropdownOpen(false); // Dropdown'u kapat
+    resetSelections("doctor");
+    setSelectedDoctor(doctor);
+    setSelectedSchedule(doctor.schedule.map((schedule) => schedule));
+    setSelectedDoctorDates(doctor.schedule.map((schedule) => schedule.date));
+    setIsDoctorDropdownOpen(false);
   };
 
-
   const handleDateSelect = (date) => {
-    resetSelections("date"); // Altındaki seçimleri temizle
+    resetSelections("date");
     const selectedElement = selectedSchedule.find((element) => element.date === date);
 
     if (selectedElement) {
       const timeSlots = selectedElement.timeSlots;
-      console.log("Time Slots for the selected date:", timeSlots);
-      setSelectedDate(date); // Seçilen tarihi kaydet
-      setIsDateDropdownOpen(false); // Dropdown'u kapat
+      setSelectedDate(date);
+      setIsDateDropdownOpen(false);
       setSelectedTimeSlots(timeSlots);
     } else {
-      console.log("No time slots available for the selected date.");
+      console.error("No time slots available for the selected date.");
     }
   };
 
-
-  // Time slot seçimi için handle metodu
   const handleTimeSlotSelect = (time) => {
-    console.log("Selected Time Slot:", time);
-    setSelectedTimeSlot(time); // Time slotu seç
+    setSelectedTimeSlot(time);
     setIsTimeDropdownOpen(false);
   };
-
 
   const params = {
     city: selectedCity,
     polyclinicName: selectedPolyclinic,
   };
 
-  const handleApiCall = async () => {
-    console.log("API call initiated");
+  const handleGetAvailableAppointments = async () => {
     try {
-      console.log("Fetching data...");
       const response = await getRequest("/patient/appointments/new/", params);
 
       if (response) {
-        console.log("API Response:", response.queryResults);
         setQueryResults(response.queryResults);
 
         const hospitals = response.queryResults.map((item) => ({
           id: item.hospital._id,
           name: item.hospital.name,
         }));
-        console.log("Hospitals:", hospitals);
+
         setHospitals(hospitals);
-        //toast("API call successful!");
       } else {
         console.error("API Error:", response);
-        toast("API call failed!");
       }
     } catch (error) {
       console.error("API Error:", error);
-      toast("An error occurred while making the API call.");
+      toast.error("An error occurred.");
     }
   };
 
-  // City ve Polyclinic değişimlerini izleyen useEffect
   useEffect(() => {
     if (selectedCity && selectedPolyclinic) {
-      handleApiCall();
+      handleGetAvailableAppointments();
     }
   }, [selectedCity, selectedPolyclinic]);
 
-
-
   return (
-    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100"}text-gray-900`}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <Header title="New Appointment" />
@@ -266,7 +239,7 @@ export default function NewAppointmentsPage() {
               <div className="grid gap-2 w-full">
                 <Label className="block text-sm font-medium">Select a City</Label>
                 <div className="relative">
-                  <Select className="w-full max-w-md"> {/* Sabit genişlik */}
+                  <Select className="w-full max-w-md">
                     <SelectTrigger
                       className="w-full border rounded-md px-4 py-2 text-left bg-white"
                       value={selectedCity}
@@ -282,7 +255,7 @@ export default function NewAppointmentsPage() {
                               key={city}
                               value={city}
                               onSelect={() => {
-                                resetSelections("city"); // Altındaki seçimleri temizle
+                                resetSelections("city");
                                 setSelectedCity(city);
                                 setIsCityDropdownOpen(false);
                               }}
@@ -295,21 +268,19 @@ export default function NewAppointmentsPage() {
                     )}
                   </Select>
                 </div>
-
                 {selectedCity && polyclinics.length > 0 && (
                   <div>
                     <Label className="block text-sm font-medium text-gray-700">Select a Polyclinic</Label>
                     <div className="relative">
                       <Select
-                        className={`w-full max-w-md ${!selectedCity ? "bg-gray-300 cursor-not-allowed" : "bg-white"
-                          }`} // City seçilmediyse devre dışı
-                        disabled={!selectedCity} // City seçilmediyse Select'i devre dışı bırak
+                        className={`w-full max-w-md ${!selectedCity ? "bg-gray-300 cursor-not-allowed" : "bg-white"}`}
+                        disabled={!selectedCity}
                       >
                         <SelectTrigger
                           className={`w-full border rounded-md px-4 py-2 text-left ${!selectedCity ? "cursor-not-allowed text-gray-500" : ""
                             }`}
                           value={selectedPolyclinic}
-                          onClick={() => selectedCity && setIsPolyclinicDropdownOpen(!isPolyclinicDropdownOpen)} // Sadece City seçildiyse aç
+                          onClick={() => selectedCity && setIsPolyclinicDropdownOpen(!isPolyclinicDropdownOpen)}
                         >
                           <SelectValue
                             value={
@@ -325,10 +296,9 @@ export default function NewAppointmentsPage() {
                                   key={polyclinic}
                                   value={polyclinic}
                                   onSelect={() => {
-                                    resetSelections("polyclinic"); // Altındaki seçimleri temizle
+                                    resetSelections("polyclinic");
                                     setSelectedPolyclinic(polyclinic);
                                     setIsPolyclinicDropdownOpen(false);
-                                    //handleApiCall(); // Polyclinic seçimine göre hastaneleri getir
                                   }}
                                 >
                                   {polyclinic}
@@ -341,8 +311,6 @@ export default function NewAppointmentsPage() {
                     </div>
                   </div>
                 )}
-
-                {/* Hospital Seçimi */}
                 {selectedPolyclinic && hospitals.length > 0 && (
                   <div>
                     <Label className="block text-sm font-medium text-gray-700">Select a Hospital</Label>
@@ -370,9 +338,9 @@ export default function NewAppointmentsPage() {
                               {hospitals.map((hospital) => (
                                 <SelectItem
                                   key={hospital.name}
-                                  value={hospital.name} // Hastanenin ID'sini kullan
+                                  value={hospital.name}
                                   onSelect={() => {
-                                    handleHospitalSelect(hospital.id); // Hastane seçildiğinde doktorları filtrele
+                                    handleHospitalSelect(hospital.id);
                                     setSelectedHospital(hospital.name);
                                     setIsHospitalDropdownOpen(false);
                                   }}
@@ -387,9 +355,6 @@ export default function NewAppointmentsPage() {
                     </div>
                   </div>
                 )}
-
-
-                {/* Doctor Seçimi */}
                 {selectedHospital && doctors.length > 0 && (
                   <div>
                     <Label className="block text-sm font-medium text-gray-700">Select a Doctor</Label>
@@ -425,9 +390,6 @@ export default function NewAppointmentsPage() {
                     </div>
                   </div>
                 )}
-
-
-                {/* Date seçimi */}
                 {selectedDoctor && selectedDoctorDates.length > 0 && (
                   <div>
                     <Label className="block text-sm font-medium text-gray-700">Select a Date</Label>
@@ -438,28 +400,25 @@ export default function NewAppointmentsPage() {
                       >
                         <SelectTrigger
                           className={`w-full border rounded-md px-4 py-2 text-left ${selectedDoctorDates.length === 0 ? "cursor-not-allowed text-gray-500" : ""}`}
-                          value={selectedDate ? new Date(selectedDate).toISOString().split("T")[0] : "Select a Date"} // Kullanıcıya yyyy-mm-dd formatında göster
+                          value={selectedDate ? new Date(selectedDate).toISOString().split("T")[0] : "Select a Date"}
                           onClick={() => selectedDoctorDates.length > 0 && setIsDateDropdownOpen(!isDateDropdownOpen)}
                         >
                           <SelectValue
-                            value={selectedDate ? new Date(selectedDate).toISOString().split("T")[0] : "Select a Date"} // Kullanıcıya yyyy-mm-dd formatında göster
+                            value={selectedDate ? new Date(selectedDate).toISOString().split("T")[0] : "Select a Date"}
                           />
                         </SelectTrigger>
-
                         {isDateDropdownOpen && selectedDoctorDates.length > 0 && (
                           <SelectContent isOpen={isDateDropdownOpen} className="absolute z-10 w-full max-w-md bg-white border rounded-md shadow-lg">
                             <div className="max-h-60 overflow-y-auto">
                               {selectedDoctorDates.map((date, index) => (
                                 <SelectItem
                                   key={index}
-                                  value={new Date(date).toISOString().split("T")[0]} // Görünüm ve seçim için formatlanmış tarih
-                                  onSelect={() => handleDateSelect(date)} // İşlem için orijinal tarih kullanılıyor
+                                  value={new Date(date).toISOString().split("T")[0]}
+                                  onSelect={() => handleDateSelect(date)}
                                 >
-                                  {new Date(date).toISOString().split("T")[0]} {/* Kullanıcıya gösterilecek tarih */}
+                                  {new Date(date).toISOString().split("T")[0]}
                                 </SelectItem>
                               ))}
-
-
                             </div>
                           </SelectContent>
                         )}
@@ -467,8 +426,6 @@ export default function NewAppointmentsPage() {
                     </div>
                   </div>
                 )}
-
-                {/* Time slot seçimi */}
                 {selectedDate && selectedTimeSlots.length > 0 && (
                   <div>
                     <Label className="block text-sm font-medium text-gray-700">Select a Time Slot</Label>
@@ -492,7 +449,7 @@ export default function NewAppointmentsPage() {
                                   key={timeSlot._id}
                                   value={timeSlot.time}
                                   onSelect={() => handleTimeSlotSelect(timeSlot.time)}
-                                  disabled={!timeSlot.isFree} // Eğer isFree false ise disabled olur
+                                  disabled={!timeSlot.isFree}
                                 >
                                   <div
                                     className={`flex items-center ${timeSlot.isFree ? "" : "line-through text-red-400"}`}
@@ -508,24 +465,19 @@ export default function NewAppointmentsPage() {
                     </div>
                   </div>
                 )}
-
               </div>
-
             </CardContent>
             <div className="flex justify-between items-center mt-4">
-              {/* Reset Filters Butonu */}
               <Button
                 variant="outline"
-                onClick={() => resetSelections("all")} // Tüm seçimleri sıfırlamak için
-                className="ml-4" // Sol tarafa hizalar
+                onClick={() => resetSelections("all")}
+                className="ml-4"
               >
                 Reset Filters
               </Button>
-
-              {/* Create Appointment Butonu */}
               <Button
-                onClick={handleSubmit} // Randevu oluşturma işlemi
-                className="mr-4" // Sağ tarafa hizalar
+                onClick={handleSubmit}
+                className="mr-4"
               >
                 Create Appointment
               </Button>
@@ -535,5 +487,4 @@ export default function NewAppointmentsPage() {
       </main>
     </div>
   );
-
 }

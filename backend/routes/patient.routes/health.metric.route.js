@@ -13,5 +13,4 @@ router.put('/heart-rate', protect('patient'), updateHeartRate);
 router.put('/allergies', protect('patient'), updateAllergies);
 router.delete('/allergies/', protect('patient'), deleteAllergy);
 
-
 export default router;

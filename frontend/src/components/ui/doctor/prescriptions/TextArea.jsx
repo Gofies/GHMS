@@ -1,7 +1,6 @@
 import React from "react";
 import { useDarkMode } from "../../../../helpers/DarkModeContext";
 
-
 export function Textarea({ id, value, readOnly, onChange, placeholder }) {
   const { darkMode } = useDarkMode();
 

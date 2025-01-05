@@ -7,35 +7,27 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "../../components/ui/lab-staff/tests/Input.jsx"
 import { Label } from "../../components/ui/lab-staff/tests/Label.jsx"
 import { Textarea } from "../../components/ui/lab-staff/tests/TextArea.jsx"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/lab-staff/tests/Select.jsx"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/lab-staff/tests/Tabs.jsx"
-import { Home, LogOut, FlaskRoundIcon as Flask, Clipboard, Search, AlertTriangle } from 'lucide-react'
-import Link from "../../components/ui/lab-staff/tests/Link.jsx"
+import { FlaskRoundIcon as Flask, Clipboard, Search } from 'lucide-react'
 import { useDarkMode } from '../../helpers/DarkModeContext.js';
 import Sidebar from "../../components/ui/lab-staff/common/Sidebar.jsx"
 import Header from "../../components/ui/admin/Header.jsx";
-
 import { Endpoint, getRequest, putRequest, deleteRequest } from "../../helpers/Network.js";
-
 import { toast } from 'react-toastify';
 
-
 export default function LabStaffTests() {
+
   const { darkMode } = useDarkMode();
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTest, setSelectedTest] = useState(null)
   const [testResult, setTestResult] = useState({ result: '' })
-  const [additionalNotes, setAdditionalNotes] = useState(null);
   const [pendingTests, setPendingTests] = useState(null)
   const [completedTests, setCompletedTests] = useState(null)
-
-
   const [error, setError] = useState(null);
 
   const fetchAllLabTests = async () => {
     try {
       const response = await getRequest(Endpoint.GET_LAB_TECHNICIAN_TESTS);
-      console.log("response", response);
       setPendingTests(response.pendingTests);
       setCompletedTests(response.completedTests);
     } catch (err) {
@@ -48,7 +40,6 @@ export default function LabStaffTests() {
     fetchAllLabTests();
   }, []);
 
-
   const handleTestCompletion = async (e) => {
     e.preventDefault();
 
@@ -59,28 +50,17 @@ export default function LabStaffTests() {
 
     try {
       const requestedBody = {
-        testId: selectedTest._id, // Seçilen testin ID'si
-        result: testResult.result, // Test sonucu
+        testId: selectedTest._id,
+        result: testResult.result,
       };
 
-      console.log("Requested Body:", requestedBody);
-
       const response = await putRequest(Endpoint.PUT_COMPLETE_TEST, requestedBody);
-
-      console.log("Test completion response:", response);
-
       if (response) {
-        // Pending ve Completed listeleri yeniden çek
         const updatedLabTests = await getRequest(Endpoint.GET_LAB_TECHNICIAN_TESTS);
-
         setPendingTests(updatedLabTests.pendingTests);
         setCompletedTests(updatedLabTests.completedTests);
-
-        // Test seçimini ve formu sıfırla
         setSelectedTest(null);
         setTestResult({ result: "" });
-
-        console.log("Test completed and lists updated successfully.");
       } else {
         throw new Error("Failed to complete test");
       }
@@ -90,18 +70,12 @@ export default function LabStaffTests() {
     }
   };
 
-
   const handleDelete = async (labTestId) => {
-    console.log("ti", labTestId);
     try {
-      // Silme isteğini backend'e gönder
       const response = await deleteRequest(`/labtechnician/test/labTests/${labTestId}`);
-      console.log("reee", response);
       if (response) {
         toast.success('Lab test deleted successfully!');
         fetchAllLabTests();
-        // Listeyi güncellemek için mevcut lab testleri yeniden yükle
-        //setLabTests((prevTests) => prevTests.filter(test => test._id !== labTestId));
       } else {
         const errorData = await response.json();
         toast.error(`Failed to delete lab test: ${errorData.message}`);
@@ -123,36 +97,30 @@ export default function LabStaffTests() {
       .filter(test => {
         const searchTermLower = searchTerm.toLowerCase();
         return (
-          test.patient?.name.toLowerCase().includes(searchTermLower) || // Hasta adı
-          test.patient?.surname.toLowerCase().includes(searchTermLower) || // Hasta soyadı
-          test.testType?.toLowerCase().includes(searchTermLower) || // Test türü
-          test.urgency?.toLowerCase().includes(searchTermLower) // Aciliyet
+          test.patient?.name.toLowerCase().includes(searchTermLower) ||
+          test.patient?.surname.toLowerCase().includes(searchTermLower) ||
+          test.testType?.toLowerCase().includes(searchTermLower) ||
+          test.urgency?.toLowerCase().includes(searchTermLower)
         );
       })
       .sort((a, b) => {
         const dateA = new Date(a.createdAt).getTime();
         const dateB = new Date(b.createdAt).getTime();
-
-        // Önce urgency seviyesine göre sıralama
         if (urgencyOrder[a.urgency] !== urgencyOrder[b.urgency]) {
           return urgencyOrder[a.urgency] - urgencyOrder[b.urgency];
         }
-
-        // Aynı urgency seviyesine sahip olanları createdAt'e göre descending sırala
         return dateB - dateA;
       })
     : [];
-
-
 
   const filteredCompletedTests = Array.isArray(completedTests)
     ? completedTests.filter(test => {
       const searchTermLower = searchTerm.toLowerCase();
       return (
-        test.patient?.name.toLowerCase().includes(searchTermLower) || // Hasta adı
-        test.patient?.surname.toLowerCase().includes(searchTermLower) || // Hasta soyadı
-        test.testType?.toLowerCase().includes(searchTermLower) || // Test türü
-        test.urgency?.toLowerCase().includes(searchTermLower) || // Aciliyet
+        test.patient?.name.toLowerCase().includes(searchTermLower) ||
+        test.patient?.surname.toLowerCase().includes(searchTermLower) ||
+        test.testType?.toLowerCase().includes(searchTermLower) ||
+        test.urgency?.toLowerCase().includes(searchTermLower) ||
         test.result?.toLowerCase().includes(searchTermLower)
       );
     })
@@ -163,11 +131,9 @@ export default function LabStaffTests() {
   return (
     <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100"}text-gray-900`}>
       <Sidebar />
-
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         <Header title="Tests" />
-
         {/* Tests Content */}
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-6">
@@ -182,13 +148,11 @@ export default function LabStaffTests() {
               />
             </div>
           </div>
-
           <Tabs defaultValue="pending">
             <TabsList>
               <TabsTrigger value="pending">Pending Tests</TabsTrigger>
               <TabsTrigger value="completed">Completed Tests</TabsTrigger>
             </TabsList>
-
             <TabsContent value="pending">
               <Card>
                 <CardHeader>
@@ -201,8 +165,7 @@ export default function LabStaffTests() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Patient Name</TableHead>
-                        <TableHead>Patient Surname</TableHead>
+                        <TableHead>Patient</TableHead>
                         <TableHead>Test Type</TableHead>
                         <TableHead>Urgency</TableHead>
                         <TableHead>Requested By</TableHead>
@@ -213,67 +176,70 @@ export default function LabStaffTests() {
                     <TableBody>
                       {filteredPendingTests?.map((test) => (
                         <TableRow key={test._id}>
-                          <TableCell>{test.patient.name}</TableCell>
-                          <TableCell>{test.patient.surname}</TableCell>
+                          <TableCell>{test.patient.name} {test.patient.surname}</TableCell>
                           <TableCell>{test.testType}</TableCell>
                           <TableCell>
                             <Badge variant={test.urgency === 'High' ? 'destructive' : test.urgency === 'Medium' ? 'default' : 'secondary'}>
                               {test.urgency}
                             </Badge>
                           </TableCell>
-                          <TableCell>{test.doctor.name}</TableCell>
+                          <TableCell>{test.doctor.name} {test.doctor.surname}</TableCell>
                           <TableCell>
                             {new Date(test.createdAt).toISOString().replace('T', ' ').slice(0, 16)}
                           </TableCell>
                           <TableCell>
-                            <Dialog
-                              isOpen={isDialogOpen} // Dialog açık/kapalı durumunu kontrol eder
-                              onClose={() => setIsDialogOpen(false)} // Dialog arka plana tıklandığında kapanır
-                            >                              
-                            <DialogTrigger asChild>
-                                <Button
-                                  className="text-blue-500 underline"
-                                  onClick={() => {setIsDialogOpen(true); setSelectedTest(test);}}
-                                >
-                                  Complete Test
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>
-                                    Complete Test for {selectedTest?.patient?.name || "Unknown"}
-                                  </DialogTitle>
-                                </DialogHeader>
-                                <form onSubmit={handleTestCompletion}>
-                                  <div className="grid gap-4 py-4">
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                      <Label htmlFor="result" className="text-right">
-                                        Test Result
-                                      </Label>
-                                      <Textarea
-                                        id="result"
-                                        className="col-span-3"
-                                        value={testResult.result}
-                                        onChange={(e) =>
-                                          setTestResult((prev) => ({ ...prev, result: e.target.value }))
-                                        }
-                                      />
+                            <div className="flex space-x-2">
+                              <Dialog
+                                isOpen={isDialogOpen}
+                                onClose={() => setIsDialogOpen(false)}
+                              >
+                                <DialogTrigger asChild>
+                                  <Button
+                                    className="text-blue-500 underline"
+                                    onClick={() => { setIsDialogOpen(true); setSelectedTest(test); }}
+                                  >
+                                    Complete Test
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                  <DialogHeader>
+                                    <DialogTitle>
+                                      <DialogTitle>
+                                        Complete Test for {selectedTest?.patient?.name || "Unknown"} {selectedTest?.patient?.surname || ""}
+                                      </DialogTitle>
+                                    </DialogTitle>
+                                  </DialogHeader>
+                                  <form onSubmit={handleTestCompletion}>
+                                    <div className="grid gap-4 py-4">
+                                      <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="result" className="text-right">
+                                          Test Result
+                                        </Label>
+                                        <Textarea
+                                          id="result"
+                                          className="col-span-4"
+                                          value={testResult.result}
+                                          onChange={(e) =>
+                                            setTestResult((prev) => ({ ...prev, result: e.target.value }))
+                                          }
+                                        />
+                                      </div>
                                     </div>
-                                  </div>
-                                  <div className="flex justify-end">
-                                    <Button type="submit">Submit Results</Button>
-                                  </div>
-                                </form>
-                              </DialogContent>
-                            </Dialog>
-                            <Button
-                              variant="primary"
-                              onClick={() => handleDelete(test._id)}
-                            >
-                              Delete
-                            </Button>
-                          </TableCell>
+                                    <div className="flex justify-end">
+                                      <Button type="submit">Submit Results</Button>
+                                    </div>
+                                  </form>
+                                </DialogContent>
+                              </Dialog>
+                              <Button
+                                variant="danger"
+                                onClick={() => handleDelete(test._id)}
+                              >
+                                Delete
+                              </Button>
+                            </div>
 
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -293,8 +259,7 @@ export default function LabStaffTests() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Patient Name</TableHead>
-                        <TableHead>Patient Surname</TableHead>
+                        <TableHead>Patient</TableHead>
                         <TableHead>Test Type</TableHead>
                         <TableHead>Requested By</TableHead>
                         <TableHead>Result</TableHead>
@@ -305,14 +270,11 @@ export default function LabStaffTests() {
                     <TableBody>
                       {filteredCompletedTests?.map((test) => (
                         <TableRow key={test._id}>
-                          <TableCell>{test.patient.name}</TableCell>
-                          <TableCell>{test.patient.surname}</TableCell>
+                          <TableCell>{test.patient.name} {test.patient.surname}</TableCell>
                           <TableCell>{test.testType}</TableCell>
-                          <TableCell>{test.doctor.name}</TableCell>
+                          <TableCell>{test.doctor.name} {test.doctor.surname}</TableCell>
                           <TableCell>
-                            {/* <Badge variant={test.result === 'Normal' ? 'default' : 'destructive'}> */}
                             {test.result}
-                            {/* </Badge> */}
                           </TableCell>
                           <TableCell>
                             {test.resultDate && !isNaN(new Date(test.resultDate).getTime())
@@ -321,7 +283,7 @@ export default function LabStaffTests() {
                           </TableCell>
                           <TableCell>
                             <Button
-                              variant="primary"
+                              variant="danger"
                               onClick={() => handleDelete(test._id)}
                             >
                               Delete

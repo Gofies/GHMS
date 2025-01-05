@@ -3,7 +3,6 @@ import bcryptjs from 'bcryptjs';
 
 const getDoctors = async (req, res) => {
     try {
-        // `hospital` alanını `name` ile doldur
         const doctors = await Doctor.find({}, 'name surname title email specialization polyclinic hospital')
             .populate('hospital', 'name')
             .populate('polyclinic', 'name');
@@ -16,7 +15,6 @@ const getDoctors = async (req, res) => {
         return res.status(500).json({ message: "admin.getDoctors: " + error.message });
     }
 };
-
 
 const getDoctorsOfHospital = async (req, res) => {
     try {

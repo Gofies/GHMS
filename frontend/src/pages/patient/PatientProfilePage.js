@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Button } from "../../components/ui/patient/profile/Button.jsx"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/patient/profile/Card.jsx"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../components/ui/patient/profile/Card.jsx"
 import { Input } from "../../components/ui/patient/profile/Input.jsx"
 import { Label } from "../../components/ui/patient/profile/Label.jsx"
 import { Textarea } from "../../components/ui/patient/profile/TextArea.jsx"
-import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/patient/profile/Avatar.jsx"
+import { Avatar, AvatarImage } from "../../components/ui/patient/profile/Avatar.jsx"
 import { Endpoint, getRequest, putRequest } from "../../helpers/Network.js";
 import Sidebar from "../../components/ui/patient/common/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
@@ -12,7 +12,7 @@ import { useDarkMode } from '../../helpers/DarkModeContext.js';
 import { toast } from 'react-toastify'
 
 export default function PatientProfile() {
-  //const { darkMode } = useDarkMode(); // Dark mode durumu global olarak alınır
+
   const [isEditing, setIsEditing] = useState(false)
   const [patientInfo, setPatientInfo] = useState({
     name: "",
@@ -26,7 +26,8 @@ export default function PatientProfile() {
   });
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
-  const { darkMode, toggleDarkMode } = useDarkMode(); 
+  const { darkMode, toggleDarkMode } = useDarkMode();
+
   const formatBirthdate = (birthdate) => {
     const date = new Date(birthdate);
     const day = String(date.getDate()).padStart(2, '0');
@@ -45,14 +46,12 @@ export default function PatientProfile() {
     const fetchPatientProfile = async () => {
       try {
         const response = await getRequest(Endpoint.GET_PROFILE);
-        console.log("response", response)
         setPatientInfo(response.patient);
       } catch (err) {
         console.error('Error fetching patient profile:', err);
         setError('Failed to load patient profile.');
       }
     };
-
     fetchPatientProfile();
   }, []);
 
@@ -76,7 +75,6 @@ export default function PatientProfile() {
     }
   };
 
-  // Email validasyonu
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -91,8 +89,6 @@ export default function PatientProfile() {
 
   const validatePhoneNumber = (phone) => {
     const numericPhone = phone.replace(/[^\d]/g, "");
-
-    console.log(numericPhone.length)
     if (numericPhone.length === 12) {
       return null;
     }
@@ -111,28 +107,23 @@ export default function PatientProfile() {
   const saveChanges = async () => {
     try {
       const response = await putRequest(Endpoint.UPDATE_PROFILE, patientInfo);
-      if(response){
-        console.log("Profile updated successfully:", response.data);
-        toast("Profile updated successfully");
+      if (response) {
+        toast.success("Profile updated successfully");
         setIsEditing(false);
       }
-
     } catch (err) {
       console.error("Error updating profile:", err);
+      toast.error("Profile update failed");
       setError("Failed to update profile.");
     }
   };
-
-  // if (error) {
-  //   return <div>{error}</div>;
-  // }
 
   if (!patientInfo) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100" }text-gray-900`}>
+    <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100"}text-gray-900`}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <Header title="Profile" />
@@ -145,7 +136,6 @@ export default function PatientProfile() {
               </Avatar>
             </CardHeader>
             <CardContent className="grid gap-4">
-              {/* {error && <p className="text-red-500">{error}</p>} */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="name">Name</Label>
@@ -210,7 +200,12 @@ export default function PatientProfile() {
               </div>
               <div>
                 <Label htmlFor="address">Address</Label>
-                <Textarea id="address" value={patientInfo.address} readOnly={!isEditing} onChange={handleInputChange} />
+                <Textarea 
+                  id="address" 
+                  value={patientInfo.address} 
+                  readOnly={!isEditing} 
+                  onChange={handleInputChange} 
+                />
               </div>
             </CardContent>
             <CardFooter className="flex justify-end space-x-4">

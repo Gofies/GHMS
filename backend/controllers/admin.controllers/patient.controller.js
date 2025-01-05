@@ -3,7 +3,6 @@ import bcryptjs from 'bcryptjs';
 
 const getPatients = async (req, res) => {
     try {
-        // `hospital` alanını `name` ile doldur
         const patients = await Patient.find({}, 'name surname email');
         
         return res.status(200).json({

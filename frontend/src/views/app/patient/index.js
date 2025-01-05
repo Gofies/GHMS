@@ -18,8 +18,6 @@ const PatientView = () => {
       <Route path="/profile" element={<PatientProfilePage />} />
       <Route path="/medical-records" element={<PatientMedicalRecordsPage />} />
       <Route path="/settings" element={<PatientSettingsPage />} />
-      {/* Add additional routes here for PatientView */}
-      {/* Example: <Route path="/settings" element={<PatientSettings />} /> */}
    </Routes>
   );
 }

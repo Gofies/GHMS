@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { login, clearError } from '../../../redux/authSlice';
 
 export default function LoginPage() {
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -61,7 +62,7 @@ export default function LoginPage() {
       ></div>
       <Card className="w-[350px] z-10">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">Sign in</CardTitle>
+          <CardTitle className="text-2xl text-center">Sign In</CardTitle>
           <CardDescription className="text-center">
             Enter your credentials to access your account
           </CardDescription>
@@ -108,12 +109,9 @@ export default function LoginPage() {
                 </Button>
               </div>
             </div>
-            {/* Display loading state */}
             {loading && (
-              <div className="mt-2 text-sm text-blue-600">Logging in...</div>
+              <div className="mt-2 text-sm text-blue-600">Signing in...</div>
             )}
-
-            {/* Display error message */}
             {error && (
               <div className="mt-2 text-sm text-red-600">
                 {error.message || "Email or password is incorrect. Please try again."}
@@ -121,19 +119,20 @@ export default function LoginPage() {
             )}
             <div className="mt-4">
               <Button className="w-full" type="submit" disabled={loading}>
-                {loading ? "Signing in..." : "Sign in"}
+                {loading ? "Signing in..." : "Sign In"}
               </Button>
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col">
+        <CardFooter className="flex flex-col items-center">
           <NavLink
             to="/signup"
             className="text-sm text-blue-600 hover:underline"
           >
-            Signup
+            Create account as patient
           </NavLink>
         </CardFooter>
+
       </Card>
     </div>
   );

@@ -22,7 +22,7 @@ const hospitalSchema = new mongoose.Schema({
         required: true
     },
     polyclinics: [{
-        type: mongoose.Schema.Types.ObjectId,// global poliklinik arrayi oluştur
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Polyclinic',
         required: true
     }],

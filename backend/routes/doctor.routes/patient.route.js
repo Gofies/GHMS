@@ -1,7 +1,6 @@
 import express from 'express';
 
 import {
-    getPatientDetails,
     getPatients,
     createPrescription,
     updatePrescription,
@@ -23,10 +22,5 @@ router.delete('/:patientId/prescriptions/:prescriptionId', protect('doctor'), de
 
 router.post('/:patientId/labTests', protect('doctor'), newLabTestRequest);
 router.get('/:patientId/labTests', protect('doctor'), getLabTechniciansBySpecialization);
-
-
-
-
-
 
 export default router;

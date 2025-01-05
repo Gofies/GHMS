@@ -7,5 +7,4 @@ const router = express.Router();
 router.get('/', protect('labtechnician'), getHomePage);
 router.put('/', protect('labtechnician'), completeTest);
 
-
 export default router;

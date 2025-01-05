@@ -17,12 +17,10 @@ const getPatientHome = async (req, res) => {
             return res.status(404).json({ message: 'Patient not found' });
         }
 
-        // Gelecek randevuları tarihine göre azalan sırada sıralayın
         const upcomingAppointments = patient.appointments
             .filter(appointment => appointment.date > new Date())
             .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        // Geçmiş randevuları tarihine göre azalan sırada sıralayın
         const recentAppointments = patient.appointments
             .filter(appointment => appointment.date < new Date())
             .sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -33,6 +31,5 @@ const getPatientHome = async (req, res) => {
         res.status(500).send('Server Error');
     }
 };
-
 
 export { getPatientHome };

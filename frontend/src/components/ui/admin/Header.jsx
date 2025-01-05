@@ -8,7 +8,7 @@ import { useDarkMode } from "../../../helpers/DarkModeContext";
 export default function Header({ title }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { darkMode } = useDarkMode(); // Dark mode durumunu alın
+    const { darkMode } = useDarkMode();
 
     const handleLogout = () => {
         dispatch(logoutUser());
@@ -28,17 +28,14 @@ export default function Header({ title }) {
                 : "bg-white text-gray-900 border-b border-gray-200"
             } shadow-md transition-all duration-300`}>
             <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-                {/* Sol: Title */}
                 <div className="flex-1">
                     <h1 className={`text-3xl font-bold tracking-wide ${darkMode ? "text-white" : "text-gray-900"}`}>{title}</h1>
                 </div>
-                {/* Orta: Kullanıcı adı */}
                 <div className="flex-1 text-center">
                     {isAuthenticated && (
                         <div className="text-gray-500">{role} {name} {surname}</div>
                     )}
                 </div>
-                {/* Sağ: Logout butonu */}
                 <div className="flex-1 text-right">
                     <Button variant="outline" className={`flex items-center px-5 py-3 rounded-md transition-all duration-300 ${darkMode
                             ? "border-gray-500 text-white hover:bg-gray-800 hover:border-gray-400"

@@ -6,19 +6,14 @@ import { useDarkMode } from '../../helpers/DarkModeContext.js';
 import { Endpoint, getRequest } from "../../helpers/Network.js";
 
 export default function MedicalRecordsPage() {
+
   const { darkMode, toggleDarkMode } = useDarkMode();
-  const [activeTab, setActiveTab] = useState("test-results");
   const [testResults, setTestResults] = useState(null);
-  const [analyses, setAnalyses] = useState(null);
-  const [diagnoses, setDiagnoses] = useState(null);
-  const [selectedDiagnosis, setSelectedDiagnosis] = useState(null);
   const [error, setError] = useState(null);
 
   const fetchLabTests = async () => {
     try {
       const response = await getRequest(Endpoint.GET_LAB_TESTS);
-
-      // İşlem: Test sonuçlarını sıralama
       const pendingTests = response.labTests
         .filter(test => test.status === "pending")
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -27,16 +22,14 @@ export default function MedicalRecordsPage() {
         .filter(test => test.status === "completed")
         .sort((a, b) => new Date(b.resultdate).getTime() - new Date(a.resultdate).getTime());
 
-      setTestResults([...pendingTests, ...completedTests]); // Önce pending sonra completed
+      setTestResults([...pendingTests, ...completedTests]);
     } catch (err) {
       setError("Failed to fetch lab tests.");
     }
   };
 
   useEffect(() => {
-   // if (activeTab === "lab-tests") {
-      fetchLabTests();
-    //}
+    fetchLabTests();
   }, []);
 
   return (
@@ -61,24 +54,13 @@ export default function MedicalRecordsPage() {
                 {Array.isArray(testResults) && testResults.length > 0 ? (
                   testResults.map((result) => (
                     <TableRow key={result._id}>
-                      {/* Hospital Name */}
                       <TableCell>{result.hospital?.name || '-'}</TableCell>
-
-                      {/* Doctor Name and Surname */}
                       <TableCell>{`${result.doctor?.name || ''} ${result.doctor?.surname || ''}`}</TableCell>
-
-                      {/* Test Adı */}
                       <TableCell>{result.testType}</TableCell>
-
-                      {/* Status */}
                       <TableCell>{result.status}</TableCell>
-
-                      {/* Result */}
                       <TableCell>
                         {result.status === 'completed' ? result.result : 'Waiting...'}
                       </TableCell>
-
-                      {/* Date */}
                       <TableCell>
                         {result.status === 'completed' ?
                           (result.resultdate && !isNaN(new Date(result.resultdate).getTime())
@@ -92,7 +74,6 @@ export default function MedicalRecordsPage() {
                           )
                         }
                       </TableCell>
-
                     </TableRow>
                   ))
                 ) : (

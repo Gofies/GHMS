@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "../../components/ui/patient/signup/Input.jsx"
 import { Label } from "../../components/ui/patient/signup/Label.jsx"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/patient/signup/Select.jsx"
-import { Checkbox } from "../../components/ui/patient/signup/Checkbox.jsx"
 import { Eye, EyeOff } from 'lucide-react'
 import { Link, useNavigate } from "react-router-dom";
 import { Images } from "../../assets/images/Images";
@@ -12,6 +11,7 @@ import { Endpoint, postRequest } from "../../helpers/Network.js";
 import { toast } from "react-toastify";
 
 export default function PatientSignupPage() {
+
   const [showPassword, setShowPassword] = useState(false)
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
   const [name, setName] = useState('');
@@ -24,7 +24,6 @@ export default function PatientSignupPage() {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [address, setAddress] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
   const [selectedGender, setSelectedGender] = useState('');
   const [selectedNationality, setSelectedNationality] = useState('');
   const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false)
@@ -35,12 +34,12 @@ export default function PatientSignupPage() {
   const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState(false);
   const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
 
-  const days = Array.from({ length: 31 }, (_, i) => i + 1); // 1-31
+  const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
-  const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i); // Son 100 yıl
+  const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
 
   const genders = ["Male", "Female"]
 
@@ -50,8 +49,7 @@ export default function PatientSignupPage() {
 
   const getFormattedDate = () => {
     if (!selectedDay || !selectedMonth || !selectedYear) return null;
-
-    const monthIndex = months.indexOf(selectedMonth) + 1; // Ayın sırasını al
+    const monthIndex = months.indexOf(selectedMonth) + 1;
     return `${selectedYear}-${String(monthIndex).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
   };
 
@@ -120,7 +118,6 @@ export default function PatientSignupPage() {
       alert("Please select a valid date of birth.");
       return;
     }
-    console.log("Selected Birthdate:", birthdate);
 
     if (!selectedGender) {
       return toast.error("Please select a gender.");
@@ -156,20 +153,11 @@ export default function PatientSignupPage() {
         toast.success("Account created successfully!");
         navigate("/");
       } else {
-        const errorData = await responseData;
-        toast({
-          title: "Error",
-          description: errorData.message || "An error occurred during signup.",
-          variant: "destructive",
-        });
+        toast.error("An error occurred during signup.");
       }
     } catch (error) {
       console.error("Error:", error);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred.",
-        variant: "destructive",
-      });
+      toast.error("An unexpected error occurred.");
     }
   };
 
@@ -179,20 +167,15 @@ export default function PatientSignupPage() {
       style={{ backgroundImage: `url(${Images.LOGIN_PAGE_BACKGROUND_IMAGE})` }}
     >
       <Card className="w-full max-w-5xl p-6 bg-white">
-        {/* Üst Kısım: Başlık ve Açıklama */}
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Create a patient account</CardTitle>
           <CardDescription className="mt-2 text-gray-600">
             Enter your information to create your patient account
           </CardDescription>
         </CardHeader>
-
-        {/* Form Kısmı */}
         <CardContent>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Sol Sütun */}
             <div className="grid gap-4">
-              {/* Name */}
               <div className="grid gap-2">
                 <Label htmlFor="name">Name</Label>
                 <Input
@@ -203,8 +186,6 @@ export default function PatientSignupPage() {
                   required
                 />
               </div>
-
-              {/* Surname */}
               <div className="grid gap-2">
                 <Label htmlFor="surname">Surname</Label>
                 <Input
@@ -215,8 +196,6 @@ export default function PatientSignupPage() {
                   required
                 />
               </div>
-
-              {/* Email */}
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -228,8 +207,6 @@ export default function PatientSignupPage() {
                   required
                 />
               </div>
-
-              {/* Password */}
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -250,7 +227,6 @@ export default function PatientSignupPage() {
                   </button>
                 </div>
               </div>
-              {/* Confirm Password */}
               <div className="grid gap-2">
                 <Label htmlFor="passwordconfirm">Confirm Password</Label>
                 <div className="relative">
@@ -271,11 +247,9 @@ export default function PatientSignupPage() {
                   </button>
                 </div>
               </div>
-
               <div className="grid gap-2">
                 <Label>Date of Birth</Label>
                 <div className="flex w-full space-x-4">
-                  {/* Gün Dropdown */}
                   <div className="flex-1">
                     <Select>
                       <SelectTrigger
@@ -302,8 +276,6 @@ export default function PatientSignupPage() {
                       </SelectContent>
                     </Select>
                   </div>
-
-                  {/* Ay Dropdown */}
                   <div className="flex-1">
                     <Select>
                       <SelectTrigger
@@ -330,8 +302,6 @@ export default function PatientSignupPage() {
                       </SelectContent>
                     </Select>
                   </div>
-
-                  {/* Yıl Dropdown */}
                   <div className="flex-1">
                     <Select>
                       <SelectTrigger
@@ -361,21 +331,17 @@ export default function PatientSignupPage() {
                 </div>
               </div>
             </div>
-
-            {/* Sağ Sütun */}
             <div className="grid gap-4">
-              {/* Phone */}
               <div className="grid gap-2">
                 <Label htmlFor="phone">Phone</Label>
                 <div className="flex space-x-2">
-                  {/* Phone Code Dropdown */}
                   <div className="flex items-center space-x-2">
                     <Select>
                       <SelectTrigger
                         value={selectedPhoneCode}
                         onClick={() => setIsPhoneCodeDropdownOpen(!isPhoneCodeDropdownOpen)}
                       >
-                        <SelectValue value={selectedPhoneCode.split(" ")[1]} /> {/* Code */}
+                        <SelectValue value={selectedPhoneCode.split(" ")[1]} />
                       </SelectTrigger>
                       <SelectContent isOpen={isPhoneCodeDropdownOpen}>
                         <div className="max-h-60 overflow-y-auto">
@@ -398,8 +364,6 @@ export default function PatientSignupPage() {
                       </SelectContent>
                     </Select>
                   </div>
-
-                  {/* Phone Number Input */}
                   <Input
                     id="phone"
                     value={phone}
@@ -411,42 +375,38 @@ export default function PatientSignupPage() {
                   />
                 </div>
               </div>
-              {/* Emergency Contact */}
               <div className="grid gap-2">
                 <Label htmlFor="emergencyContact">Emergency Contact</Label>
                 <div className="flex space-x-2">
-                <div className="flex items-center space-x-2">
-                  {/* Emergency Contact Code */}
-                  <Select>
-                    <SelectTrigger
-                      value={selectedEmergencyContactCode}
-                      onClick={() => setIsEmergencyContactCodeDropdownOpen(!isEmergencyContactCodeDropdownOpen)}
-                    >
-                        <SelectValue value={selectedEmergencyContactCode.split(" ")[1]} /> {/* Code */}
-                        </SelectTrigger>
-                    <SelectContent isOpen={isEmergencyContactCodeDropdownOpen}>
-                      <div className="max-h-60 overflow-y-auto">
-                        {emergencyContactCodes.map(({ ecflag, eccode }) => (
-                          <SelectItem
-                            key={eccode}
-                            value={`${ecflag} ${eccode}`}
-                            onSelect={() => {
-                              setSelectedEmergencyContactCode(`${ecflag} ${eccode}`);
-                              setIsEmergencyContactCodeDropdownOpen(false);
-                            }}
-                          >
-                            <span className="flex items-center space-x-2">
-                              <span>{ecflag}</span>
-                              <span>{eccode}</span>
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </div>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center space-x-2">
+                    <Select>
+                      <SelectTrigger
+                        value={selectedEmergencyContactCode}
+                        onClick={() => setIsEmergencyContactCodeDropdownOpen(!isEmergencyContactCodeDropdownOpen)}
+                      >
+                        <SelectValue value={selectedEmergencyContactCode.split(" ")[1]} />
+                      </SelectTrigger>
+                      <SelectContent isOpen={isEmergencyContactCodeDropdownOpen}>
+                        <div className="max-h-60 overflow-y-auto">
+                          {emergencyContactCodes.map(({ ecflag, eccode }) => (
+                            <SelectItem
+                              key={eccode}
+                              value={`${ecflag} ${eccode}`}
+                              onSelect={() => {
+                                setSelectedEmergencyContactCode(`${ecflag} ${eccode}`);
+                                setIsEmergencyContactCodeDropdownOpen(false);
+                              }}
+                            >
+                              <span className="flex items-center space-x-2">
+                                <span>{ecflag}</span>
+                                <span>{eccode}</span>
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </div>
+                      </SelectContent>
+                    </Select>
                   </div>
-
-                  {/* Emergency Contact Input */}
                   <Input
                     id="emergencyContact"
                     value={emergencyContact}
@@ -458,7 +418,6 @@ export default function PatientSignupPage() {
                   />
                 </div>
               </div>
-              {/* Gender */}
               <div className="grid gap-2">
                 <Label htmlFor="gender">Gender</Label>
                 <Select>
@@ -477,7 +436,6 @@ export default function PatientSignupPage() {
                   </SelectContent>
                 </Select>
               </div>
-
               <div className="grid gap-2">
                 <Label htmlFor="nationality">Nationality</Label>
                 <Select>
@@ -498,8 +456,6 @@ export default function PatientSignupPage() {
                   </SelectContent>
                 </Select>
               </div>
-
-              {/* Address */}
               <div className="grid gap-2">
                 <Label htmlFor="address">Address</Label>
                 <textarea
@@ -511,31 +467,23 @@ export default function PatientSignupPage() {
                   className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full resize-none"
                 />
               </div>
-
-
-
             </div>
             <div className="col-span-1 md:col-span-2">
-      <Button className="w-full mt-6" type="submit">
-        Create account
-      </Button>
-    </div>
+              <Button className="w-full mt-6" type="submit">
+                Create account
+              </Button>
+            </div>
           </form>
         </CardContent>
-
-        {/* Alt Kısım: Button */}
         <CardFooter className="text-center">
-      
           <p className="text-sm text-center text-gray-600 mt-2">
             Already have a patient account?{' '}
             <Link to="/" className="text-blue-600 hover:underline">
-              Sign in
+              Sign In
             </Link>
           </p>
         </CardFooter>
       </Card>
     </div>
-
-
   );
 }

@@ -89,5 +89,4 @@ const deleteLabTechnician = async (req, res) => {
     }
 }
 
-
 export { newLabTechnician, getLabTechnician, getAllLabTechnicians, updateLabTechnician, deleteLabTechnician };

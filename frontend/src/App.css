@@ -35,3 +35,18 @@ li {
   font-style: italic;
   color: #888;
 }
+
+/* Randevu günleri için kırmızı stil */
+.react-calendar__tile--appointment {
+  background-color: red !important;
+  color: white !important;
+  border-radius: 50% !important;
+  font-weight: bold;
+}
+
+/* Seçim gününe özel mavi stil */
+.react-calendar__tile--active {
+  background-color: blue !important;
+  color: white !important;
+  border-radius: 50% !important;
+}

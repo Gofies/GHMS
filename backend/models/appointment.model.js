@@ -23,7 +23,7 @@ const appointment = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Treatment',
     }],
-    type: { // doktor-hasta, lab test
+    type: { 
         type: String,
         required: true
     },

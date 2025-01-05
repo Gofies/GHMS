@@ -2,20 +2,19 @@ import Patient from '../../models/patient.model.js';
 
 const getLabTests = async (req, res) => {
     try {
-        // Fetch the patient's lab tests
         const patient = await Patient.findById(req.user._id)
-            .select('labtests') // Sadece labtests alanını seçiyoruz
+            .select('labtests')
             .populate({
-                path: 'labtests', // labtests alanını dolduruyoruz
-                select: 'testType status doctor hospital result resultdate createdAt', // Gerekli alanları seçiyoruz
+                path: 'labtests', 
+                select: 'testType status doctor hospital result resultdate createdAt', 
                 populate: [
                     {
-                        path: 'doctor', // doctor bilgilerini doldur
-                        select: 'name surname' // Sadece name ve surname
+                        path: 'doctor',
+                        select: 'name surname'
                     },
                     {
-                        path: 'hospital', // hospital bilgilerini doldur
-                        select: 'name' // Sadece hospital name
+                        path: 'hospital', 
+                        select: 'name'
                     }
                 ]
             });
@@ -26,14 +25,12 @@ const getLabTests = async (req, res) => {
 
         return res.status(200).json({
             message: 'Lab tests retrieved successfully',
-            labTests: patient.labtests // Populate edilmiş ve filtrelenmiş labtests
+            labTests: patient.labtests 
         });
     } catch (error) {
         return res.status(500).json({ message: "patient.getLabTests: " + error.message });
     }
 };
-
-
 
 const getOtherTests = async (req, res) => {
     try {

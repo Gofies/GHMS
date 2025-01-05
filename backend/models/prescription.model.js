@@ -16,7 +16,7 @@ const prescription = new mongoose.Schema({
                 required: true,
             },
             form: {
-                type: String, // Optional if `form` is not always required
+                type: String,
             }
         }
     ],
@@ -29,9 +29,9 @@ const prescription = new mongoose.Schema({
         ref: 'Hospital',
         required: true
     },
-    doctor: { // Reçeteyi yazan doktor
+    doctor: { 
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Doctor', // Doctor modeline referans
+        ref: 'Doctor',
         required: true
     },
 }, { timestamps: true });

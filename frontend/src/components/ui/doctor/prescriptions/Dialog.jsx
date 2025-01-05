@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useDarkMode } from "../../../../helpers/DarkModeContext";
 
-
 export const Dialog = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
 

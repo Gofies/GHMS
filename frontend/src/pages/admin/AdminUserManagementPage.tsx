@@ -7,29 +7,25 @@ import { Label } from "../../components/ui/admin/Label.jsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/admin/Table.jsx";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/admin/Dialog.jsx";
 import { Badge } from "../../components/ui/admin/Badge.jsx";
-import { Search, Plus, Edit, Trash2, Eye, EyeOff, CloudCog } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/ui/admin/Sidebar.jsx";
 import Header from "../../components/ui/admin/Header.jsx";
 import { Endpoint, postRequest, getRequest, putRequest, deleteRequest } from "../../helpers/Network.js";
 import { toast } from 'react-toastify';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/admin/Select.jsx";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "../../components/ui/admin/Select.jsx";
 import { useDarkMode } from '../../helpers/DarkModeContext';
 
 export default function AdminUserManagementPage() {
+
   const [doctors, setDoctors] = useState([]);
-  const [patients, setPatients] = useState([]);
   const [labTechnicians, setLabTechnicians] = useState([]);
   const { darkMode } = useDarkMode();
-
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-
   const [showPassword, setShowPassword] = useState(false);
-
-  const [userType, setUserType] = useState('doctor'); // Varsayılan değer olarak 'doctor'
-  const [certificates, setCertificates] = useState(''); // Lab Technician için kullanılan alan
-
+  const [userType, setUserType] = useState('doctor'); 
+  const [certificates, setCertificates] = useState(''); 
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
   const [title, setTitle] = useState('');
@@ -45,13 +41,12 @@ export default function AdminUserManagementPage() {
   const [editingUser, setEditingUser] = useState(null);
   const [updatedPatientUser, setUpdatedPatientUser] = useState(null);
 
-  const days = Array.from({ length: 31 }, (_, i) => i + 1); // 1-31
+  const days = Array.from({ length: 31 }, (_, i) => i + 1); 
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
-  const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i); // Last 100 years
-
+  const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i); 
 
   const [selectedJobStartDay, setSelectedJobStartDay] = useState(1);
   const [selectedJobStartMonth, setSelectedJobStartMonth] = useState(months[0]);
@@ -61,7 +56,6 @@ export default function AdminUserManagementPage() {
   const [isJobStartMonthDropdownOpen, setIsJobStartMonthDropdownOpen] = useState(false);
   const [isJobStartYearDropdownOpen, setIsJobStartYearDropdownOpen] = useState(false);
 
-
   const fetchDoctors = async () => {
     try {
       const response = await getRequest(Endpoint.GET_ADMIN_DOCTOR);
@@ -70,7 +64,6 @@ export default function AdminUserManagementPage() {
           ...doctor,
           role: "Doctor",
         }));
-
         setDoctors(doctorsWithRole);
         setFilteredUsers(doctorsWithRole);
       } else {
@@ -82,26 +75,9 @@ export default function AdminUserManagementPage() {
     }
   };
 
-  // const fetchPatients = async () => {
-  //   try {
-  //     const response = await getRequest(Endpoint.GET_ADMIN_PATIENT);
-  //     if (response) {
-
-  //       setPatients(response.patients);
-  //       //setFilteredUsers(doctorsWithRole);
-  //     } else {
-  //       toast.error('Failed to fetch patients.');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching patients:', error);
-  //     toast.error('An error occurred while fetching patients data.');
-  //   }
-  // };
-
   const fetchLabTechnicians = async () => {
     try {
       const response = await getRequest(Endpoint.GET_ADMIN_LAB_TECHNICIAN);
-      console.log("a", response);
       if (response) {
         const labTechniciansWithRole = response.labTechnicians?.map((tech) => ({
           ...tech,
@@ -118,40 +94,26 @@ export default function AdminUserManagementPage() {
     }
   };
 
-  const navigate = useNavigate();
-
-
   const formatBirthdate = (day, month, year) => {
-    // Ayı sırasına göre indeks bul ve 1 artır
     const monthIndex = months.indexOf(month) + 1;
-
-    // Gün ve ay tek haneli ise başına '0' ekle
     const formattedDay = String(day).padStart(2, "0");
     const formattedMonth = String(monthIndex).padStart(2, "0");
-
-    // Format: DD.MM.YYYY
     return `${formattedDay}.${formattedMonth}.${year}`;
   };
 
-  // Kullanım
-
-
   const handleCreateUser = async (e) => {
     e.preventDefault();
-    // Validasyon: Zorunlu alanları kontrol et
     if (!name || !surname || !email || !password || !phone || !title || !specialization) {
       toast.error("Please fill in all required fields.");
       return;
     }
 
-    // Validasyon: E-posta formatını kontrol et
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       toast.error("Please enter a valid email address.");
       return;
     }
 
-    // Validasyon: Şifre uzunluğunu kontrol et
     if (password.length < 3) {
       toast.error("Password must be at least 3 characters long.");
       return;
@@ -159,7 +121,6 @@ export default function AdminUserManagementPage() {
 
     const birthdate = formatBirthdate(selectedDay, selectedMonth, selectedYear);
     const jobstartdate = formatBirthdate(selectedJobStartDay, selectedJobStartMonth, selectedJobStartYear);
-
 
     if (userType === 'doctor' && !degree) {
       toast.error("Please enter the degree for the doctor.");
@@ -186,22 +147,18 @@ export default function AdminUserManagementPage() {
 
     try {
       let responseData;
-      console.log("t", requestBody);
       if (userType === 'doctor') {
         responseData = await postRequest(Endpoint.GET_ADMIN_DOCTOR, requestBody);
       } else if (userType === 'labtechnician') {
         responseData = await postRequest(Endpoint.GET_ADMIN_LAB_TECHNICIAN, requestBody);
       }
-      console.log("q", responseData);
       if (responseData) {
         toast.success("User created successfully!");
         if (toast.success) {
           fetchDoctors();
           fetchLabTechnicians();
-          //fetchPatients();
         }
-
-        // Input alanlarını sıfırla
+        setIsDialogOpen(false);
         setName('');
         setSurname('');
         setTitle('');
@@ -235,14 +192,9 @@ export default function AdminUserManagementPage() {
           ? `${Endpoint.GET_ADMIN_DOCTOR}/${id}`
           : `${Endpoint.GET_ADMIN_LAB_TECHNICIAN}/${id}`;
 
-      // API isteğini gönder ve yanıtı al
       const responseData = await getRequest(endpoint);
-
       if (responseData) {
-        // Kullanıcı bilgilerini role'e göre düzenle
         const userData = role === "Doctor" ? responseData.doctor : responseData.labTechnician;
-
-        // Düzenlenecek kullanıcıyı state'e set et
         setEditingUser({ ...userData, role });
       } else {
         toast.error("An error occurred while fetching user data.");
@@ -253,24 +205,20 @@ export default function AdminUserManagementPage() {
     }
   };
 
-
   const handleSaveUpdatedUser = async (e, id) => {
     e.preventDefault();
 
-    // Validasyon: Zorunlu alanları kontrol et
     if (!editingUser?.name || !editingUser?.surname || !editingUser?.email || !editingUser?.phone) {
       toast.error("Please fill in all required fields.");
       return;
     }
 
-    // Validasyon: E-posta formatını kontrol et
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(editingUser.email)) {
       toast.error("Please enter a valid email address.");
       return;
     }
 
-    // Gönderilecek veriyi oluştur
     const requestBody = {
       name: editingUser.name,
       surname: editingUser.surname,
@@ -279,31 +227,24 @@ export default function AdminUserManagementPage() {
       phone: editingUser.phone,
       jobstartdate: editingUser.jobstartdate,
       specialization: editingUser.specialization,
-      ...(editingUser.role === "Doctor" && { degree: editingUser.degree }), // Doktor için degree ekle
-      ...(editingUser.role === "Lab Technician" && { certificates: editingUser.certificates }), // Teknisyen için certificates ekle
+      ...(editingUser.role === "Doctor" && { degree: editingUser.degree }),
+      ...(editingUser.role === "Lab Technician" && { certificates: editingUser.certificates }),
     };
 
-    console.log("Request Body:", requestBody);
-
     try {
-      // Role'e göre doğru endpoint'i belirle
       const endpoint =
         editingUser.role === "Doctor"
           ? `${Endpoint.GET_ADMIN_DOCTOR}/${id}`
           : `${Endpoint.GET_ADMIN_LAB_TECHNICIAN}/${id}`;
 
-      // API isteğini gönder
       const responseData = await putRequest(endpoint, requestBody);
 
       if (responseData) {
         toast.success("User updated successfully!");
-
-        // Kullanıcı listelerini güncelle
         fetchDoctors();
         fetchLabTechnicians();
-
-        // Düzenleme modundan çık
         setEditingUser(null);
+        setIsDialogOpen(false);
       } else {
         toast.error("An error occurred during user update.");
       }
@@ -313,68 +254,54 @@ export default function AdminUserManagementPage() {
     }
   };
 
-
   const [isDayDropdownOpen, setIsDayDropdownOpen] = useState(false);
   const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState(false);
   const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
 
-
   useEffect(() => {
     fetchDoctors();
     fetchLabTechnicians();
-    //fetchPatients();
   }, []);
 
   useEffect(() => {
-    // Tüm kullanıcıları birleştir
     const allUsers = [
       ...doctors.map((user) => ({ ...user, role: "Doctor" })),
-      // ...patients.map((user) => ({ ...user, role: "Patient" })),
       ...labTechnicians.map((user) => ({ ...user, role: "Lab Technician" })),
     ];
-  
-    // Kullanıcıları önce ada, sonra soyada göre sırala
+
     allUsers.sort((a, b) => {
       const nameComparison = a.name.localeCompare(b.name);
       if (nameComparison !== 0) {
-        return nameComparison; // İsimler farklıysa ada göre sırala
+        return nameComparison;
       }
-      return a.surname.localeCompare(b.surname); // İsimler aynıysa soyada göre sırala
+      return a.surname.localeCompare(b.surname);
     });
-  
-    // Arama terimine göre filtreleme yap
+
     const filtered = allUsers.filter((user) =>
       `${user.name} ${user.email} ${user.title} ${user.specialization} ${user.role}`
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
     );
-  
-    setFilteredUsers(filtered); // Filtrelenmiş ve sıralanmış kullanıcı listesini güncelle
-  }, [searchTerm, doctors, labTechnicians]); // patients
-  
+
+    setFilteredUsers(filtered);
+  }, [searchTerm, doctors, labTechnicians]);
 
   const deleteUser = async (id, role) => {
     try {
-      // Role'e göre endpoint belirle
       const endpoint =
         role === "Doctor"
           ? `${Endpoint.GET_ADMIN_DOCTOR}/${id}`
           : `${Endpoint.GET_ADMIN_LAB_TECHNICIAN}/${id}`;
 
-      // API isteğini gönder
       const response = await deleteRequest(endpoint);
 
       if (response) {
         toast.success('User deleted successfully!');
-
-        // Role'e göre doğru listeyi güncelle
         if (role === "Doctor") {
           setDoctors(doctors.filter(user => user._id !== id));
         } else if (role === "Lab Technician") {
           setLabTechnicians(labTechnicians.filter(user => user._id !== id));
         }
-
-        // Filtrelenmiş kullanıcı listesini güncelle
         setFilteredUsers(filteredUsers.filter(user => user._id !== id));
       } else {
         toast.error('Failed to delete user.');
@@ -385,16 +312,13 @@ export default function AdminUserManagementPage() {
     }
   };
 
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
-   <div className={`flex h-screen ${darkMode ? "bg-gray-900 " : "bg-gray-100" }text-gray-900`}>
+    <div className={`flex h-screen ${darkMode ? "bg-gray-900 " : "bg-gray-100"}text-gray-900`}>
       <Sidebar />
-
       <main className="flex-1 overflow-y-auto">
         <Header title="Staff Management" />
-
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center">
@@ -415,14 +339,13 @@ export default function AdminUserManagementPage() {
                 </Button>
               </DialogTrigger>
               {isDialogOpen && (
-
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Create New User</DialogTitle>
                   </DialogHeader>
                   <form
                     onSubmit={(e) => {
-                      e.preventDefault(); // Varsayılan form gönderimini engelle
+                      e.preventDefault();
                       handleCreateUser(e);
                     }}
                   >
@@ -434,11 +357,10 @@ export default function AdminUserManagementPage() {
                           value={userType}
                           onChange={(e) => setUserType(e.target.value)}
                           required
-                          className={`w-full px-3 py-2 rounded-md shadow-sm transition-all duration-300 ${
-                            darkMode
+                          className={`w-full px-3 py-2 rounded-md shadow-sm transition-all duration-300 ${darkMode
                               ? "bg-gray-800 text-white border border-gray-600 focus:ring-blue-500"
                               : "bg-white text-gray-900 border border-gray-300 focus:ring-blue-600"
-                          }`}
+                            }`}
                         >
                           <option value="doctor">Doctor</option>
                           <option value="labtechnician">Lab Technician</option>
@@ -545,7 +467,6 @@ export default function AdminUserManagementPage() {
                             />
                           </div>
                         )}
-
                         {userType === 'labtechnician' ? (
                           <div>
                             <Label htmlFor="specialization">Specialization</Label>
@@ -554,7 +475,10 @@ export default function AdminUserManagementPage() {
                               value={specialization}
                               onChange={(e) => setSpecialization(e.target.value)}
                               required
-                              className="w-full"
+                              className={`w-full px-3 py-2 rounded-md shadow-sm transition-all duration-300 ${darkMode
+                                ? "bg-gray-800 text-white border border-gray-600 focus:ring-blue-500"
+                                : "bg-white text-gray-900 border border-gray-300 focus:ring-blue-600"
+                              }`}
                             >
                               <option value="" disabled>Select a specialization</option>
                               <option value="Hematology">Hematology</option>
@@ -580,13 +504,12 @@ export default function AdminUserManagementPage() {
                         <div className="grid gap-2">
                           <Label>Date of Birth</Label>
                           <div className="flex w-full space-x-4">
-                            {/* Gün Dropdown */}
                             <div className="flex-1">
                               <Select>
                                 <SelectTrigger
                                   value={selectedDay}
                                   onClick={(e) => {
-                                    e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                    e.preventDefault();
                                     setIsDayDropdownOpen(!isDayDropdownOpen);
                                   }}
                                 />
@@ -606,14 +529,12 @@ export default function AdminUserManagementPage() {
                                 </SelectContent>
                               </Select>
                             </div>
-
-                            {/* Ay Dropdown */}
                             <div className="flex-1">
                               <Select>
                                 <SelectTrigger
                                   value={selectedMonth}
                                   onClick={(e) => {
-                                    e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                    e.preventDefault();
                                     setIsMonthDropdownOpen(!isMonthDropdownOpen);
                                   }}
                                 />
@@ -633,14 +554,12 @@ export default function AdminUserManagementPage() {
                                 </SelectContent>
                               </Select>
                             </div>
-
-                            {/* Yıl Dropdown */}
                             <div className="flex-1">
                               <Select>
                                 <SelectTrigger
                                   value={selectedYear}
                                   onClick={(e) => {
-                                    e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                    e.preventDefault();
                                     setIsYearDropdownOpen(!isYearDropdownOpen);
                                   }}
                                 />
@@ -662,17 +581,15 @@ export default function AdminUserManagementPage() {
                             </div>
                           </div>
                         </div>
-
                         <div className="grid gap-2">
                           <Label>Job Start Date</Label>
                           <div className="flex w-full space-x-4">
-                            {/* Gün Dropdown */}
                             <div className="flex-1">
                               <Select>
                                 <SelectTrigger
                                   value={selectedJobStartDay}
                                   onClick={(e) => {
-                                    e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                    e.preventDefault();
                                     setIsJobStartDayDropdownOpen(!isJobStartDayDropdownOpen);
                                   }}
                                 />
@@ -692,14 +609,12 @@ export default function AdminUserManagementPage() {
                                 </SelectContent>
                               </Select>
                             </div>
-
-                            {/* Ay Dropdown */}
                             <div className="flex-1">
                               <Select>
                                 <SelectTrigger
                                   value={selectedJobStartMonth}
                                   onClick={(e) => {
-                                    e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                    e.preventDefault();
                                     setIsJobStartMonthDropdownOpen(!isJobStartMonthDropdownOpen);
                                   }}
                                 />
@@ -719,14 +634,12 @@ export default function AdminUserManagementPage() {
                                 </SelectContent>
                               </Select>
                             </div>
-
-                            {/* Yıl Dropdown */}
                             <div className="flex-1">
                               <Select>
                                 <SelectTrigger
                                   value={selectedJobStartYear}
                                   onClick={(e) => {
-                                    e.preventDefault(); // Varsayılan form submit davranışını engelle
+                                    e.preventDefault();
                                     setIsJobStartYearDropdownOpen(!isJobStartYearDropdownOpen);
                                   }}
                                 />
@@ -753,13 +666,11 @@ export default function AdminUserManagementPage() {
                     <div className="flex justify-between">
                       <Button type="submit">Create User</Button>
                     </div>
-
                   </form>
                 </DialogContent>
               )}
             </Dialog>
           </div>
-
           <Card>
             <CardHeader>
               <CardTitle className="text-xl font-bold">Staff List</CardTitle>
@@ -791,10 +702,9 @@ export default function AdminUserManagementPage() {
                       <TableCell>{user.hospital?.name}</TableCell>
                       <TableCell>
                         <Badge
-                          variant={user?.hospital ? 'success' : 'destructive'} //  user hospital varsa success, yoksa destructive
+                          variant={user?.hospital ? 'success' : 'destructive'}
                         >
                           {user?.hospital ? 'Active' : 'Inactive'}
-                          {/* user hospital varsa active yoksa inactive */}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -896,7 +806,6 @@ export default function AdminUserManagementPage() {
                                       className="w-full"
                                     />
                                   </div>
-                                  {/* Doktorlar için Degree Alanı */}
                                   {editingUser?.role === 'Doctor' && (
                                     <div>
                                       <Label htmlFor="degree">Degree</Label>
@@ -915,18 +824,16 @@ export default function AdminUserManagementPage() {
                                       />
                                     </div>
                                   )}
-
-                                  {/* Laboratuvar Teknisyenleri için Certificates Alanı */}
                                   {editingUser?.role === 'Lab Technician' && (
                                     <div>
                                       <Label htmlFor="certificates">Certificates</Label>
                                       <Input
                                         id="certificates"
-                                        value={(editingUser?.certificates || []).join(', ')} // Array'den string'e çevir
+                                        value={(editingUser?.certificates || []).join(', ')}
                                         onChange={(e) =>
                                           setEditingUser((prev) => ({
                                             ...prev,
-                                            certificates: e.target.value.split(',').map((item) => item.trim()), // String'den array'e çevir
+                                            certificates: e.target.value.split(',').map((item) => item.trim()),
                                           }))
                                         }
                                         placeholder="Certification1, Certification2"
@@ -935,8 +842,6 @@ export default function AdminUserManagementPage() {
                                       />
                                     </div>
                                   )}
-
-
                                   <div>
                                     <Label htmlFor="specialization">Specialization</Label>
                                     {editingUser?.role === 'Lab Technician' ? (
@@ -950,7 +855,10 @@ export default function AdminUserManagementPage() {
                                           }))
                                         }
                                         required
-                                        className="w-full"
+                                        className={`w-full px-3 py-2 rounded-md shadow-sm transition-all duration-300 ${darkMode
+                                          ? "bg-gray-800 text-white border border-gray-600 focus:ring-blue-500"
+                                          : "bg-white text-gray-900 border border-gray-300 focus:ring-blue-600"
+                                        }`}
                                       >
                                         <option value="" disabled>Select a specialization</option>
                                         <option value="Hematology">Hematology</option>
@@ -975,8 +883,6 @@ export default function AdminUserManagementPage() {
                                       />
                                     )}
                                   </div>
-
-
                                 </div>
                                 <div className="flex justify-end">
                                   <Button type="submit">Save Changes</Button>

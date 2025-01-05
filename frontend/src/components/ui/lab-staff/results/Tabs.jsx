@@ -9,7 +9,6 @@ export function TabsList({ children }) {
 }
 
 export function TabsContent({ value, selectedValue, children }) {
-    // Ensure that we only render the content if the tab is selected
     return value === selectedValue ? <div>{children}</div> : null;
   }
   
