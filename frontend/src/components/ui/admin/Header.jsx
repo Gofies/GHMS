@@ -15,10 +15,9 @@ export default function Header({ title }) {
         navigate("/");
     };
 
-    const { name, surname, role, isAuthenticated } = useSelector((state) => ({
+    const { name, surname, isAuthenticated } = useSelector((state) => ({
         name: state.auth.name,
         surname: state.auth.surname,
-        role: state.auth.role,
         isAuthenticated: state.auth.isAuthenticated,
     }));
 
@@ -33,7 +32,7 @@ export default function Header({ title }) {
                 </div>
                 <div className="flex-1 text-center">
                     {isAuthenticated && (
-                        <div className="text-gray-500">{role} {name} {surname}</div>
+                        <div className="text-gray-500">{name} {surname}</div>
                     )}
                 </div>
                 <div className="flex-1 text-right">
