@@ -7,13 +7,18 @@ export const Select = ({ children }) => {
 export const SelectTrigger = ({ value, onClick }) => {
   return (
     <button
-      onClick={onClick}
+      type="button" 
+      onClick={(e) => {
+        e.stopPropagation(); 
+        onClick();
+      }}
       className="border border-gray-300 rounded px-4 py-2 w-full text-left bg-white"
     >
       <SelectValue value={value} />
     </button>
   );
 };
+
 
 export const SelectValue = ({ value }) => {
   return <span>{value || 'Select an option'}</span>;
@@ -29,13 +34,19 @@ export const SelectContent = ({ children, isOpen }) => {
   );
 };
 
-export const SelectItem = ({ value, onSelect }) => {
+export const SelectItem = ({ value, onSelect, disabled }) => {
   return (
     <div
-      onClick={() => onSelect(value)}
-      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+      onClick={(e) => {
+        e.stopPropagation();
+        !disabled && onSelect(value);
+      }}
+      className={`px-4 py-2 cursor-pointer transition-all duration-300 ${
+        disabled ? 'text-gray-400 cursor-not-allowed' : 'hover:bg-gray-100'
+      }`}
     >
       {value}
     </div>
   );
 };
+

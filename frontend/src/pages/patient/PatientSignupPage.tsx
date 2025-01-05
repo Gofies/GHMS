@@ -174,7 +174,10 @@ export default function PatientSignupPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={(e) => {
+            e.preventDefault(); 
+            handleSubmit(e); 
+          }} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">Name</Label>
