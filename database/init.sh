@@ -68,7 +68,7 @@ for cmd in "${commands[@]}"; do
     execute_with_retry "$cmd"
 done
 
-collections=("admins" "appointments" "doctors" "hospitals" "labtechnicians" "labtests" "patients" "polyclinics" "prescriptions")
+collections=("admins" "appointments" "doctors" "hospitals" "labtechnicians" "labtests" "patients" "polyclinics")
 for collection in "${collections[@]}"; do
     log "Sharding the collection: $collection..."
     execute_with_retry "docker exec router-01 mongosh --port 27117 -u \"${MONGO_USERNAME}\" -p \"${MONGO_PASSWORD}\" --authenticationDatabase admin --eval 'db.adminCommand({ shardCollection: \"HospitalDatabase.${collection}\", key: { _id: \"hashed\" } })'" # random
