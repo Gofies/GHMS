@@ -67,8 +67,8 @@ const updateAllergies = async (req, res) => {
     try {
         const patient = await Patient.findByIdAndUpdate(
             req.user._id,
-            { $push: { allergies: req.body.allergies } }, // Push to the allergies array
-            { new: true } // Return the updated document
+            { $push: { allergies: req.body.allergies } }, 
+            { new: true } 
         );
 
         return res.status(200).json({ message: 'Allergies updated successfully', patient });
@@ -84,8 +84,8 @@ const deleteAllergy = async (req, res) => {
 
         const patient = await Patient.findByIdAndUpdate(
             req.user._id,
-            { $pull: { allergies: allergyName } }, // allergies dizisinden eşleşen öğeyi kaldır
-            { new: true } // Return the updated document
+            { $pull: { allergies: allergyName } }, 
+            { new: true } 
         );
 
         return res.status(200).json({ message: 'Allergy deleted successfully' });

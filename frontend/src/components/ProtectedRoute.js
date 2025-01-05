@@ -14,7 +14,6 @@ const ProtectedRoute = ({ requiredRole }) => {
     return <Navigate to="/" replace />;
   }
 
-  // Role göre ID doğrulaması
   if (role === "patient" && patientId && userId !== patientId) {
     return <Navigate to="/" replace />;
   }

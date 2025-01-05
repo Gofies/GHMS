@@ -143,11 +143,8 @@ doctorSchema.methods.updateSchedule = async function () {
 
         // Save the updated schedule to the database
         await this.save();
-
-
     }
 };
-
 
 const Doctor = mongoose.model('Doctor', doctorSchema);
 

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, User, CalendarDays, FileText, PieChart, Settings, Clipboard } from "lucide-react"; // Icon importlarını unutmayın
+import { Home, User, CalendarDays, FileText, PieChart, Settings, Clipboard } from "lucide-react"; 
 import { useSelector } from "react-redux";
 import { useDarkMode } from "../../../../helpers/DarkModeContext";
 
@@ -11,9 +11,8 @@ export default function Sidebar() {
     const isActive = (path) => location.pathname === path;
     const { userId } = useSelector((state) => state.auth);
 
-    const [currentPath, setCurrentPath] = useState(location.pathname); // Sayfa değişim kontrolü
+    const [currentPath, setCurrentPath] = useState(location.pathname); 
 
-  
     const links = [
         {
           to: `/doctor/${userId}/`,
@@ -32,12 +31,11 @@ export default function Sidebar() {
         },
       ];
 
-         // Eğer pathname değişirse "soft refresh" yap
-    useEffect(() => {
-      if (location.pathname !== currentPath) {
-          setCurrentPath(location.pathname); // Path güncelleniyor
-          window.location.reload(); // Sayfa yenileniyor
-      }
+  useEffect(() => {
+    if (location.pathname !== currentPath) {
+        setCurrentPath(location.pathname);
+        window.location.reload(); 
+    }
   }, [location.pathname]);
 
     return (

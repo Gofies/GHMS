@@ -16,6 +16,7 @@ import patientMedicalRecordRoutes from "./routes/patient.routes/medical.record.r
 import patientProfileRoutes from "./routes/patient.routes/profile.route.js";
 import patientHomeRoutes from "./routes/patient.routes/home.route.js";
 
+import adminAuthRoutes from "./routes/admin.routes/auth.route.js";
 import adminDoctorRoutes from "./routes/admin.routes/doctor.routes.js";
 import adminPatientRoutes from "./routes/admin.routes/patient.routes.js";
 import adminHospitalRoutes from "./routes/admin.routes/hospital.routes.js";
@@ -54,6 +55,7 @@ app.use("/api/v1/patient/metrics", patientMetricsRoutes);
 app.use("/api/v1/patient/medical-record", patientMedicalRecordRoutes);
 app.use("/api/v1/patient/profile", patientProfileRoutes);
 
+app.use("/api/v1/admin/auth", adminAuthRoutes);
 app.use("/api/v1/admin/doctor", adminDoctorRoutes);
 app.use("/api/v1/admin/patient", adminPatientRoutes);
 app.use("/api/v1/admin/hospital", adminHospitalRoutes);
@@ -68,8 +70,6 @@ app.use("/api/v1/labtechnician", labTechnicianHomeRoutes);
 app.use("/api/v1/labtechnician/auth", labTechnicianAuthRoutes);
 app.use("/api/v1/labtechnician/test", labTechnicianTestRoutes);
 
-
-//ASAGDAKI SILMEEEEEEEEEEEEEEEEEE
 app.get("/api/health", (req, res) => {
     res.status(200).send('OK');
 });

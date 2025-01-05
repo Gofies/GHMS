@@ -9,7 +9,6 @@ const LabStaffView = () => {
       <Route path="/" element={<LabStaffTestsPage />} />
       <Route path="/tests" element={<LabStaffTestsPage />} />
       <Route path="/settings" element={<LabStaffSettingsPage />} />
-      {/* Add additional routes here for LabStaffView */}
    </Routes>
   );
 }

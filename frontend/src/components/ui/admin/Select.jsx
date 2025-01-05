@@ -7,7 +7,7 @@ export function Select({ children, disabled }) {
     <div
       className={`relative transition-all duration-300 ${
         disabled ? "opacity-50 pointer-events-none" : ""
-      } ${darkMode ? "bg-gray-800 text-white border border-gray-600" : "bg-white text-black border border-gray-300"}`}
+      } ${darkMode ? "bg-gray-800 text-white border border-gray-600" : "text-black border border-gray-300"}`}
     >
       {children}
     </div>
@@ -21,8 +21,8 @@ export function SelectTrigger({ children, value, onClick }) {
       onClick={onClick}
       className={`w-full px-4 py-2 border rounded-md flex justify-between items-center transition-all duration-300 ${
         darkMode
-          ? "bg-gray-800 border-gray-600 text-white hover:bg-gray-700 focus:ring-blue-500"
-          : "bg-white border-gray-300 text-black hover:bg-gray-100 focus:ring-blue-300"
+          ? "bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+          : "bg-white border-gray-300 text-black hover:bg-gray-100"
       }`}
     >
       {value || children}
@@ -56,20 +56,22 @@ export function SelectContent({ children, isOpen }) {
   );
 }
 
-export function SelectItem({ value, children, onSelect }) {
+export const SelectItem = ({ value, onSelect, disabled }) => {
   const { darkMode } = useDarkMode();
   return (
     <div
-      className={`p-2 cursor-pointer transition-all duration-300 ${
-        darkMode
-          ? "hover:bg-gray-900 text-white"
-          : "hover:bg-gray-100 text-black"
+      onClick={() => !disabled && onSelect(value)}
+      className={`px-4 py-2 cursor-pointer transition-all duration-300 ${
+        disabled
+          ? darkMode
+            ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+            : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+          : darkMode
+            ? 'hover:bg-gray-700 text-white'
+            : 'hover:bg-gray-100 text-black'
       }`}
-      onClick={() => {
-        if (onSelect) onSelect(value);
-      }}
     >
-      {children}
+      {value}
     </div>
   );
-}
+};

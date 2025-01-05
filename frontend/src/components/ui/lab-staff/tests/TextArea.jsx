@@ -22,5 +22,5 @@ export function Textarea({ id, value, readOnly, onChange, placeholder }) {
       }`}
       rows={4}
     />
-  );
+  ); 
 }

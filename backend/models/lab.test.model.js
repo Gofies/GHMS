@@ -25,7 +25,7 @@ const labTestSchema = new mongoose.Schema({
         ref: 'LabTechnician',
         required: true
     },
-    testType: { // doctor, lab, radiology
+    testType: {
         type: String,
     },
     resultdate: {
@@ -40,7 +40,7 @@ const labTestSchema = new mongoose.Schema({
         default: 'pending'
     },
     urgency: {
-        type: String, // low medium high
+        type: String,
     },
 }, { timestamps: true });
 

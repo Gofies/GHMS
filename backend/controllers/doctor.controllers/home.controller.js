@@ -4,46 +4,50 @@ const getDoctorHome = async (req, res) => {
     try {
         console.log(req.user.id);
 
-        // Fetch the doctor's appointments and lab tests
         const doctor = await Doctor.findById(req.user.id)
-            .select('appointments labtests') // Select appointments and labtests fields
+            .select('appointments labtests') 
             .populate({
-                path: 'appointments', // Populate appointments
+                path: 'appointments', 
                 populate: [
                     {
-                        path: 'tests', // Populate tests within appointments
+                        path: 'tests',
                         model: 'LabTest'
                     },
                     {
-                        path: 'hospital', // Populate hospital field
-                        select: 'name' // Select only name field from hospital
+                        path: 'hospital', 
+                        select: 'name'
                     },
                     {
-                        path: 'patient', // Populate patient field
-                        select: 'name surname' // Select name and surname fields
+                        path: 'patient',
+                        select: 'name surname'
                     }
                 ]
             })
             .populate({
-                path: 'labtests', // Populate labtests
+                path: 'labtests', 
                 model: 'LabTest',
-                populate: {
-                    path: 'patient', // Populate patient field in labtests
-                    select: 'name surname' // Select name and surname fields
-                }
+                populate: [
+                    {
+                        path: 'patient', 
+                        select: 'name surname'
+                    },
+                    {
+                        path: 'labTechnician', 
+                        select: 'name surname'
+                    }
+                ]
             });
 
         if (!doctor) {
             return res.status(404).json({ message: "Doctor not found" });
         }
 
-        // All appointments for the doctor
         const allAppointments = doctor.appointments;
 
         return res.status(200).json({
             message: 'Doctor home data retrieved successfully',
             allAppointments,
-            labtests: doctor.labtests // All lab tests
+            labtests: doctor.labtests
         });
     } catch (error) {
         console.error(error, 'Error in getDoctorHome controller');

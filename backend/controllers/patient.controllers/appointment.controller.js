@@ -6,10 +6,8 @@ import jwt from 'jsonwebtoken';
 import Hospital from '../../models/hospital.model.js';
 import LabTest from '../../models/lab.test.model.js';
 
-
 const getHospitalByPolyclinic = async (req, res, next) => {
     try {
-        // Validate required query parameters
         if (!req.query.city) {
             return res.status(400).json({ message: 'City is required' });
         }
@@ -17,28 +15,23 @@ const getHospitalByPolyclinic = async (req, res, next) => {
             return res.status(400).json({ message: 'Polyclinic name is required' });
         }
 
-        // Fetch polyclinics and populate the fields
         let polyclinics = await Polyclinic.find({ name: req.query.polyclinicName })
             .populate('hospital', 'name address')
             .populate('doctors', 'name surname schedule');
 
-        // Filter polyclinics by city
         polyclinics = polyclinics.filter(polyclinic => polyclinic.hospital.address.includes(req.query.city));
 
-        // Prepare the results
         const queryResults = [];
         for (const polyclinic of polyclinics) {
             const { hospital, doctors } = polyclinic;
 
-            // Update schedule for each doctor
             for (const doctor of doctors) {
-                await doctor.updateSchedule(); // Await the updateSchedule method
+                await doctor.updateSchedule();
             }
 
             queryResults.push({ hospital, doctors });
         }
 
-        // Respond with the results
         return res.status(200).json({ queryResults });
 
     } catch (error) {
@@ -46,7 +39,6 @@ const getHospitalByPolyclinic = async (req, res, next) => {
         return res.status(500).json({ message: `Error in patient.middleware.getHospitalByPolyclinic: ${error.message}` });
     }
 };
-
 
 const newAppointment = async (req, res) => {
     try {
@@ -100,16 +92,12 @@ const newAppointment = async (req, res) => {
                         appointments: appointment._id
                     }
                 },
-                { new: true } // Returns the updated document
+                { new: true } 
             );
-
         }
 
         await Patient.findByIdAndUpdate(patientId, { $push: { appointments: appointment._id } });
         await Doctor.findByIdAndUpdate(doctorId, { $push: { appointments: appointment._id }, });
-
-
-
 
         if (!scheduleDay) {
             return res.status(400).json({ message: 'Invalid date; no schedule exists for the doctor on the specified date.' });
@@ -164,18 +152,15 @@ const getAppointments = async (req, res) => {
 
         const appointments = patient.appointments;
 
-        // KONTROL ET BURAYI
         if (appointments) {
-            // Randevuların durumunu kontrol et ve güncelle
             const currentDate = new Date();
             for (const appointment of appointments) {
                 if (new Date(appointment.date) < currentDate && appointment.status === 'Scheduled') {
                     appointment.status = 'Completed';
-                    await appointment.save(); // Durumu kaydet
+                    await appointment.save(); 
                 }
             }
 
-            // Tarihe göre sıralama (yeniden eskiye)
             appointments.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             return res.status(200).json({
@@ -188,54 +173,24 @@ const getAppointments = async (req, res) => {
     }
 }
 
-
-// const cancelAppointment = async (req, res) => {
-//     try {
-//         const { id } = req.params;
-
-//         if (id === undefined) {
-//             return res.status(400).json({ message: 'Appointment ID is required' });
-//         }
-
-//         const appointment = await Appointment.findById(id);
-
-//         if (!appointment) {
-//             return res.status(404).json({ message: 'Appointment not found' });
-//         }
-
-//         await Appointment.findByIdAndDelete(id);
-
-//         return res.status(200).json({ message: 'Appointment cancelled successfully' });
-//     }
-//     catch (error) {
-//         return res.status(500).json({ message: "patient.cancelAppointment: " + error.message });
-//     }
-// }
-
 const cancelAppointment = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Check if appointment ID is provided
         if (!id) {
             return res.status(400).json({ message: 'Appointment ID is required' });
         }
 
-        // Find the appointment and populate related data
         const appointment = await Appointment.findById(id).populate('patient').populate('doctor');
 
-        // Check if appointment exists
         if (!appointment) {
             return res.status(404).json({ message: 'Appointment not found' });
         }
 
-        // Check if the appointment belongs to the current patient
         if (!appointment.patient.equals(req.user._id)) {
             return res.status(403).json({ message: 'You are not authorized to cancel this appointment' });
         }
         
-
-        // Update the time slot to make it free
         const doctor = await Doctor.findById(appointment.doctor);
         const scheduleDay = doctor.schedule.find(day =>
             new Date(day.date).toISOString().slice(0, 10) === new Date(appointment.date).toISOString().slice(0, 10)
@@ -244,22 +199,19 @@ const cancelAppointment = async (req, res) => {
         if (scheduleDay) {
             const timeSlot = scheduleDay.timeSlots.find(slot => slot.time === appointment.time);
             if (timeSlot) {
-                timeSlot.isFree = true; // Mark the time slot as free
+                timeSlot.isFree = true; 
             }
-            await doctor.save(); // Save the updated schedule
+            await doctor.save();
         }
 
-        // Remove the appointment from the patient's record
         await Patient.findByIdAndUpdate(req.user._id, {
             $pull: { appointments: id },
         });
 
-        // Optionally, remove the appointment from the doctor's record
         await Doctor.findByIdAndUpdate(appointment.doctor, {
             $pull: { appointments: id },
         });
 
-        // Delete the appointment
         await Appointment.findByIdAndDelete(id);
 
         return res.status(200).json({ message: 'Appointment cancelled successfully' });
@@ -268,6 +220,5 @@ const cancelAppointment = async (req, res) => {
         return res.status(500).json({ message: "patient.cancelAppointment: " + error.message });
     }
 };
-
 
 export { getHospitalByPolyclinic, newAppointment, getAppointments, cancelAppointment };

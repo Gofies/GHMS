@@ -6,11 +6,10 @@ export const Endpoint = {
   LOGIN: '/auth/login',
   LOGOUT: '/auth/logout',
   SIGNUP: '/patient/auth/signup',
-
+  ADMIN_CHANGE_PASSWORD: '/admin/auth/change-password',
   PATIENT_CHANGE_PASSWORD: '/patient/auth/change-password',
   DOCTOR_CHANGE_PASSWORD: '/doctor/auth/change-password',
   LAB_TECHNICIAN_CHANGE_PASSWORD: '/labtechnician/auth/',
-
   GET_PATIENT_APPOINTMENTS: '/patient/appointments',
   GET_PROFILE: '/patient/profile',
   UPDATE_PROFILE: '/patient/profile',
@@ -27,16 +26,11 @@ export const Endpoint = {
   GET_ADMIN_POLYCLINIC: '/admin/polyclinic',
   GET_ADMIN_HOSPITAL: '/admin/hospital',
   GET_DOCTOR_PATIENTS: '/doctor/patient',
-
   GET_LAB_TECHNICIAN_HOME: '/labtechnician/',
   PUT_COMPLETE_TEST: '/labtechnician/',
-
   GET_LAB_TECHNICIAN_TESTS: '/labtechnician/test',
   GET_LAB_TECHNICIAN_TESTS_RESULTS: '/labtechnician/test/results',
-
   CANCEL_APPOINTMENT: '/patient/appointments'
-
-
 };
 
 let isRefreshing = false;

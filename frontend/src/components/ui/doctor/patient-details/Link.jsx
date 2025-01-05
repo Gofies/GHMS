@@ -2,7 +2,6 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 
 /**
- * A reusable Link component that uses `react-router-dom` for navigation.
  * 
  * @param {Object} props - Props for the Link component.
  * @param {string} props.href - The destination URL.

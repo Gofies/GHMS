@@ -3,22 +3,16 @@ import { Button } from "../../components/ui/doctor/patient-details/Button.jsx"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/doctor/patient-details/Card.jsx"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/doctor/patient-details/Tabs.jsx"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/doctor/patient-details/Table.jsx"
-import { Textarea } from "../../components/ui/doctor/patient-details/TextArea.jsx"
-import { Home, Users, Clipboard, LogOut, FileText, History, Users as FamilyIcon, Pill, Calendar } from 'lucide-react'
-import Link from "../../components/ui/doctor/management/Link.jsx"
+import { FileText, Users as FamilyIcon, Pill, Calendar } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/admin/Dialog.jsx";
-import { Search, Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { Input } from "../../components/ui/doctor/patient-details/Input.jsx";
 import { Label } from "../../components/ui/doctor/patient-details/Label.jsx";
 import { useDarkMode } from '../../helpers/DarkModeContext';
 import Sidebar from "../../components/ui/doctor/common/Sidebar.jsx"
 import Header from "../../components/ui/admin/Header.jsx";
-
 import { Endpoint, getRequest, postRequest, putRequest, deleteRequest } from "../../helpers/Network.js";
-
 import { useParams } from "react-router-dom";
 import { toast } from 'react-toastify'
-//import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@radix-ui/react-accordion";
 
 const testSpecializations = {
   "Blood Test": ["Hematology", "Clinical Pathology"],
@@ -28,30 +22,10 @@ const testSpecializations = {
 };
 
 export default function PatientDetails() {
+
   const [editingPrescription, setEditingPrescription] = useState(null);
   const { darkMode, toggleDarkMode } = useDarkMode();
-  function calculateAge(birthdate) {
-    // Doğum tarihini Date nesnesine çevir
-    const birthDate = new Date(birthdate);
-
-    // Bugünün tarihini al
-    const today = new Date();
-
-    // Yaşı hesapla
-    let age = today.getFullYear() - birthDate.getFullYear();
-
-    // Ay ve gün kontrolü yap (tam yaş için)
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-      age--; // Doğum günü henüz geçmemişse yaşı bir azalt
-    }
-
-    return age;
-  }
-
-  const { doctorId, patientId } = useParams();
-
-  const [newPrescription, setNewPrescription] = useState('')
+  const { patientId } = useParams();
 
   const [basicInfo, setBasicInfo] = useState({
     name: null,
@@ -63,20 +37,25 @@ export default function PatientDetails() {
     weight: null,
   });
 
+  function calculateAge(birthdate) {
+    const birthDate = new Date(birthdate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  }
 
   const [activeTab, setActiveTab] = useState("results");
   const [labTests, setLabTests] = useState([]);
-  //const [familyHistory, setFamilyHistory] = useState([]);
   const [appointmentHistory, setAppointmentHistory] = useState([]);
   const [patientHistory, setPatientHistory] = useState([]);
   const [prescriptionHistory, setPrescriptionHistory] = useState([]);
 
   const [loading, setLoading] = useState(false);
-
-  const [updateTrigger, setUpdateTrigger] = useState(false); // Yeni bir trigger
-
-  //const [diagnosisHistory, setDiagnosisHistory] = useState([]);
-  const [patientDetails, setPatientDetails] = useState({}); // Diğer temel hasta bilgileri için
+  const [updateTrigger, setUpdateTrigger] = useState(false);
 
   useEffect(() => {
     const fetchAllPatientDetails = async () => {
@@ -97,7 +76,6 @@ export default function PatientDetails() {
 
       } catch (err) {
         console.error('Error fetching patient details:', err);
-        //setError('Failed to fetch patient details.');
         setLoading(false);
       }
     };
@@ -107,37 +85,34 @@ export default function PatientDetails() {
 
   const [tempEditingPrescription, setTempEditingPrescription] = useState(null);
 
-  const handleEditPrescription = (prescription) => { // yeni
-    setEditingPrescription(JSON.parse(JSON.stringify(prescription))); // Derin kopya
-    setTempEditingPrescription(JSON.parse(JSON.stringify(prescription))); // Geçici düzenleme için kopya
+  const handleEditPrescription = (prescription) => {
+    setEditingPrescription(JSON.parse(JSON.stringify(prescription)));
+    setTempEditingPrescription(JSON.parse(JSON.stringify(prescription)));
   };
 
-  const handleInputChangeInDialog = (index, field, value) => { // yeni
+  const handleInputChangeInDialog = (index, field, value) => {
     setTempEditingPrescription((prev) => {
       const updatedMedicine = [...prev.medicine];
-      updatedMedicine[index][field] = value; // İlgili alanı güncelle
+      updatedMedicine[index][field] = value;
       return { ...prev, medicine: updatedMedicine };
     });
   };
 
-  const handleUpdatePrescription = async (e, id) => { // yeni
+  const handleUpdatePrescription = async (e, id) => {
     e.preventDefault();
 
     try {
       const updatedData = {
-        ...tempEditingPrescription, // Geçici düzenleme verilerini gönder
+        ...tempEditingPrescription,
       };
 
-      const response = await putRequest(
-        `/doctor/patient/${patientId}/prescriptions/${id}`,
-        updatedData
-      );
+      const response = await putRequest(`/doctor/patient/${patientId}/prescriptions/${id}`, updatedData);
 
       if (response) {
         toast.success("Prescription updated successfully!");
-        setUpdateTrigger((prev) => !prev); // Listeleri güncellemek için tetikleyici
-        setEditingPrescription(null); // Dialog'u kapat
-        setTempEditingPrescription(null); // Geçici düzenlemeleri temizle
+        setUpdateTrigger((prev) => !prev);
+        setEditingPrescription(null);
+        setTempEditingPrescription(null);
       } else {
         toast.error("Failed to update prescription.");
       }
@@ -146,7 +121,6 @@ export default function PatientDetails() {
       toast.error("An error occurred while updating the prescription.");
     }
   };
-
 
   const [medicine, setMedicine] = useState([]);
   const [newMedicine, setNewMedicine] = useState({
@@ -157,7 +131,6 @@ export default function PatientDetails() {
   });
   const [status, setStatus] = useState("ongoing");
 
-  // İlacı listeye eklemek için
   const handleMedicineChange = (e) => {
     e.preventDefault();
     const { name, value } = e.target;
@@ -167,7 +140,6 @@ export default function PatientDetails() {
   const handleAddMedicine = (e) => {
     e.preventDefault();
 
-    // Validasyon: Gerekli alanların dolu olması kontrol edilir
     if (
       !newMedicine.name ||
       !newMedicine.quantity ||
@@ -177,17 +149,13 @@ export default function PatientDetails() {
       toast.error("Please fill out all fields before adding a medicine.");
       return;
     }
-
-    // Eğer validasyon geçtiyse ilacı ekle
     setMedicine((prev) => [...prev, newMedicine]);
     setNewMedicine({ name: "", quantity: "", time: "", form: "" });
   };
 
-
   const handlePrescriptionSubmit = async (e) => {
     e.preventDefault();
 
-    // Validasyon: Boş ilaç veya status kontrolü
     if (medicine.length === 0) {
       toast.error("Please add at least one medicine.");
       return;
@@ -202,9 +170,9 @@ export default function PatientDetails() {
       const response = await postRequest(`/doctor/patient/${patientId}/prescriptions`, prescriptionData);
       if (response) {
         toast.success("Prescription submitted successfully!");
-        setMedicine([]); // Formu temizle
+        setMedicine([]);
         setStatus("ongoing");
-        setUpdateTrigger((prev) => !prev); // Trigger'ı değiştirerek useEffect'i tetikle
+        setUpdateTrigger((prev) => !prev);
       } else {
         toast.error("Failed to submit prescription");
       }
@@ -214,14 +182,12 @@ export default function PatientDetails() {
     }
   };
 
-
   const handleDeletePrescription = async (prescriptionId) => {
     try {
-      // Delete request gönder
       const response = await deleteRequest(`/doctor/patient/${patientId}/prescriptions/${prescriptionId}`);
       if (response) {
         toast("Prescription deleted successfully!");
-        setUpdateTrigger((prev) => !prev); // Trigger'ı değiştirerek useEffect'i tetikle
+        setUpdateTrigger((prev) => !prev);
       } else {
         toast("Failed to delete prescription");
       }
@@ -231,33 +197,28 @@ export default function PatientDetails() {
     }
   };
 
-
   const [testType, setTestType] = useState('');
   const [urgency, setUrgency] = useState('');
   const [specialization, setSpecialization] = useState('');
   const [tests, setTests] = useState([]);
-
   const [availableSpecializations, setAvailableSpecializations] = useState([]);
 
   const handleTestTypeChange = (e) => {
     const selectedTestType = e.target.value;
     setTestType(selectedTestType);
 
-    // Specialization seçeneklerini güncelle
     if (testSpecializations[selectedTestType]) {
       setAvailableSpecializations(testSpecializations[selectedTestType]);
-      setSpecialization(''); // Specialization'ı sıfırla
-      setLabTechnicians([]); // Lab technicians listesini sıfırla
-      setIsLabTechnicianVisible(false); // Lab technician alanını gizle
+      setSpecialization('');
+      setLabTechnicians([]);
+      setIsLabTechnicianVisible(false);
     } else {
       setAvailableSpecializations([]);
     }
   };
 
-  // Urgency değişiminde çalışacak metod
   const handleUrgencyChange = (e) => {
     setUrgency(e.target.value);
-    console.log('Urgency Changed:', e.target.value);
   };
 
   const handleSpecializationChange = async (e) => {
@@ -268,10 +229,10 @@ export default function PatientDetails() {
       const response = await getRequest(`/doctor/patient/${patientId}/labTests?specialization=${selectedSpecialization}`);
       if (response && response.labTechnicians) {
         setLabTechnicians(response.labTechnicians);
-        setIsLabTechnicianVisible(true); // Eğer teknisyen varsa göster
+        setIsLabTechnicianVisible(true);
       } else {
         setLabTechnicians([]);
-        setIsLabTechnicianVisible(false); // Yoksa gizle
+        setIsLabTechnicianVisible(false);
       }
     } catch (error) {
       console.error('Error fetching lab technicians:', error);
@@ -280,22 +241,17 @@ export default function PatientDetails() {
 
   const [labTechnicians, setLabTechnicians] = useState([]);
   const [labTechnician, setLabTechnician] = useState(null);
-  const [isLabTechnicianVisible, setIsLabTechnicianVisible] = useState(false); // Lab technicians sekmesinin görünürlüğü
+  const [isLabTechnicianVisible, setIsLabTechnicianVisible] = useState(false);
 
-  // Specialization değiştiğinde tetiklenen API çağrısı
   const fetchLabTechnicians = async () => {
     try {
-      console.log("spec", specialization);
       const response = await getRequest(`/doctor/patient/${patientId}/labTests?specialization=${specialization}`);
-      console.log("r", response);
       if (response) {
         setLabTechnicians(response.labTechnicians);
-        setIsLabTechnicianVisible(true); // Eğer teknisyenler varsa sekmeyi görünür yap
-
+        setIsLabTechnicianVisible(true);
       } else {
         console.error('No lab technicians found for this specialization.');
-        setIsLabTechnicianVisible(false); // Teknisyen bulunamadıysa gizle
-
+        setIsLabTechnicianVisible(false);
       }
     } catch (error) {
       console.error('Error fetching lab technicians:', error);
@@ -319,23 +275,20 @@ export default function PatientDetails() {
       testType,
       urgency,
       specialization,
-      labTechnicianId: labTechnician, // Seçilen teknisyen ID'si
+      labTechnicianId: labTechnician,
     };
 
     try {
-      console.log("Request Body:", requestBody);
       const response = await postRequest(`/doctor/patient/${patientId}/labTests`, requestBody);
       if (response) {
-        console.log("Response:", response);
         toast.success("Lab test submitted successfully!");
-        setTests([]); // Gönderim sonrası test listesini sıfırla
-        setTestType(''); // Formu temizle
+        setTests([]);
+        setTestType('');
         setUrgency('');
         setSpecialization('');
         setLabTechnician(null);
         setIsLabTechnicianVisible(false);
-        setUpdateTrigger((prev) => !prev); // Results listesini güncelle
-
+        setUpdateTrigger((prev) => !prev);
       } else {
         toast.error("Failed to submit lab tests.");
       }
@@ -346,19 +299,17 @@ export default function PatientDetails() {
   };
 
   const handleRemoveMedicine = (index) => {
-    // UI üzerinde ilaç listesini güncelle
     setTempEditingPrescription((prev) => ({
       ...prev,
       medicine: prev.medicine.filter((_, i) => i !== index),
     }));
   };
 
-
   return (
     <div className={`flex h-screen ${darkMode ? "bg-gray-800 " : "bg-gray-100"}text-gray-900`}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
-        <Header title="Patient Detail"/>
+        <Header title="Patient Detail" />
         {/* Patient Details Content */}
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <Card className="mb-6">
@@ -388,7 +339,7 @@ export default function PatientDetails() {
                 setActiveTab(value);
               }}
             >
-              <TabsList className="grid w-full grid-cols-6">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="results">Lab Tests</TabsTrigger>
                 <TabsTrigger value="appointments">Appointments</TabsTrigger>
                 <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
@@ -449,7 +400,6 @@ export default function PatientDetails() {
                       </Table>
                     )}
                   </CardContent>
-
                 </Card>
               </TabsContent>
               <TabsContent value="appointments">
@@ -462,7 +412,7 @@ export default function PatientDetails() {
                   </CardHeader>
                   <CardContent>
                     {loading ? (
-                      <p>Loading...</p> // Yüklenme durumunda mesaj göster
+                      <p>Loading...</p> 
                     ) : (
                       <Table>
                         <TableHeader>
@@ -475,7 +425,7 @@ export default function PatientDetails() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {appointmentHistory && appointmentHistory.length > 0 ? ( // Eğer liste doluysa
+                          {appointmentHistory && appointmentHistory.length > 0 ? (
                             appointmentHistory.map((appointment) => {
                               const appointmentDate = new Date(appointment.date);
                               const today = new Date();
@@ -517,7 +467,6 @@ export default function PatientDetails() {
                         <div className="grid gap-4">
                           {prescriptionHistory && prescriptionHistory.length > 0 ? (
                             prescriptionHistory.map((prescription) => {
-                              console.log("p", prescription);
                               const formattedDate = new Date(prescription.createdAt)
                                 .toISOString()
                                 .split("T")[0];
@@ -528,6 +477,9 @@ export default function PatientDetails() {
                                 >
                                   <div className="flex justify-between items-center">
                                     <h3 className="text-lg font-bold">Prescription</h3>
+                                    <span className="text-sm text-gray-500">
+                                      Doctor: {prescription.doctor?.name} {prescription.doctor?.surname}
+                                    </span>
                                     <span className="text-sm text-gray-500">
                                       Status: {prescription.status}
                                     </span>
@@ -702,12 +654,10 @@ export default function PatientDetails() {
                           <option value="ongoing">Ongoing</option>
                           <option value="completed">Completed</option>
                         </select>
-
                       </div>
-
                       {/* Medicine Fields */}
                       <div className="grid grid-cols-4 gap-4 mb-6 items-center">
-                        {/* Medicine Name */}
+                        {/* Medication Name */}
                         <div>
                           <Label className="block text-sm font-medium mb-1">
                             Medication Name
@@ -721,7 +671,7 @@ export default function PatientDetails() {
                           />
                         </div>
 
-                        {/* Quantity */}
+                        {/* Dosage */}
                         <div>
                           <Label className="block text-sm font-medium mb-1">
                             Dosage
@@ -735,7 +685,7 @@ export default function PatientDetails() {
                           />
                         </div>
 
-                        {/* Time */}
+                        {/* Duration */}
                         <div>
                           <Label className="block text-sm font-medium mb-1">
                             Duration (Days)
@@ -763,7 +713,6 @@ export default function PatientDetails() {
                           />
                         </div>
                       </div>
-
                       <div className="flex justify-end">
                         <Button
                           type="button"
@@ -773,7 +722,6 @@ export default function PatientDetails() {
                           Add Medicine
                         </Button>
                       </div>
-
                       <div className="grid grid-cols-4 gap-4 text-sm font-semibold">
                         <div>Medication Name</div>
                         <div>Dosage (ml)</div>
@@ -822,7 +770,7 @@ export default function PatientDetails() {
                     <form onSubmit={handleSubmitLabTests}>
                       {/* Test Type Field */}
                       <div className="mb-6">
-                        <Label className="block text-sm font-medium text-gray-700 mb-1">
+                        <Label className="block text-sm font-medium mb-1">
                           Test Type
                         </Label>
                         <select
@@ -840,10 +788,9 @@ export default function PatientDetails() {
                           <option value="MRI">MRI</option>
                         </select>
                       </div>
-
                       {/* Urgency Field */}
                       <div className="mb-6">
-                        <Label className="block text-sm font-medium text-gray-700 mb-1">
+                        <Label className="block text-sm font-medium mb-1">
                           Urgency
                         </Label>
                         <select
@@ -861,10 +808,9 @@ export default function PatientDetails() {
                           <option value="High">High</option>
                         </select>
                       </div>
-
                       {/* Specialization Field */}
                       <div className="mb-6">
-                        <Label className="block text-sm font-medium text-gray-700 mb-1">
+                        <Label className="block text-sm font-medium mb-1">
                           Specialization
                         </Label>
                         <select
